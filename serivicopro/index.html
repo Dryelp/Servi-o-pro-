@@ -890,6 +890,7 @@ window.onload = () => {
   document.getElementById('o-valid').value = v.toISOString().split('T')[0];
   relMesAtual();
   render();
+  renderRel();
   iniciarNotificacoes();
   atualizarBadge();
   uiPerfil();
@@ -1083,7 +1084,7 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderRel(); renderNotifs(); rDespesas(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderNotifs(); rDespesas(); }
 
 function rDash(){
   const mes = hj().slice(0,7);
