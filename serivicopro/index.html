@@ -204,6 +204,9 @@ input:checked+.slider:before{transform:translateX(19px)}
 .cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px}
 .cfg-t{font-family:'Fraunces',serif;font-size:.97rem;font-weight:600;color:var(--brn);margin-bottom:13px;display:flex;align-items:center;gap:6px}
 
+/* RELATÓRIO DETALHADO */
+.rel-oculto{display:none!important}
+
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:30px 14px;color:var(--mut);font-size:.84rem}
 .empty-ico{font-size:1.8rem;margin-bottom:7px}
@@ -460,10 +463,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel('detalhado')">📋 Detalhado</button>
     </div>
     <div id="rel-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>
-    <div class="tw" id="rel-tw-rec" style="display:none"><div class="th"><div class="pt">💵 Recebimentos do período</div></div><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Forma</th><th>Valor</th><th>Status</th></tr></thead><tbody id="tb-rel-rec"></tbody></table></div>
-    <div class="tw" id="rel-tw-mat" style="display:none"><div class="th"><div class="pt">💸 Custos de materiais</div></div><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Material</th><th>Custo</th></tr></thead><tbody id="tb-rel-mat"></tbody></table></div>
-    <div class="tw" id="rel-tw-desp" style="display:none"><div class="th"><div class="pt">💸 Despesas operacionais</div></div><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma</th><th>Parcela</th><th>Valor</th></tr></thead><tbody id="tb-rel-desp"></tbody></table></div>
-    <div class="tw" id="rel-tw-srv" style="display:none"><div class="th"><div class="pt">📅 Todos os serviços do período</div></div><table><thead><tr><th>Data</th><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Custo</th><th>Lucro</th><th>Status</th></tr></thead><tbody id="tb-rel-srv"></tbody></table></div>
+    <div id="rel-detalhado-body" class="rel-oculto"></div>
   </div>
 
   <!-- NOTIFICAÇÕES -->
@@ -2139,20 +2139,22 @@ function relMesAnterior(){
   renderRel();
 }
 
-window._relDetalhado = false;
-
 function setModoRel(modo){
-  window._relDetalhado = modo === 'detalhado';
-  const btnR = document.getElementById('btn-rel-resumido');
-  const btnD = document.getElementById('btn-rel-detalhado');
-  if(btnR) btnR.className = window._relDetalhado ? 'btn btn-gho btn-sm' : 'btn btn-brn btn-sm';
-  if(btnD) btnD.className = window._relDetalhado ? 'btn btn-brn btn-sm' : 'btn btn-gho btn-sm';
-  renderRel();
+  const detalhado = modo === 'detalhado';
+  document.getElementById('btn-rel-resumido').className = detalhado ? 'btn btn-gho btn-sm' : 'btn btn-brn btn-sm';
+  document.getElementById('btn-rel-detalhado').className = detalhado ? 'btn btn-brn btn-sm' : 'btn btn-gho btn-sm';
+  const body = document.getElementById('rel-detalhado-body');
+  if(!body) return;
+  if(detalhado){
+    body.classList.remove('rel-oculto');
+    preencherTabelasRel();
+  } else {
+    body.classList.add('rel-oculto');
+  }
 }
 
 function renderRel(){
   const mes = document.getElementById('rel-mes')?.value; if(!mes) return;
-  const detalhado = window._relDetalhado === true;
   const srvMes  = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
   const reais   = srvMes.filter(s=>s.sts_srv==='Realizado');
   const pagos   = reais.filter(s=>s.sts_pag==='Pago');
@@ -2165,7 +2167,6 @@ function renderRel(){
   const lucro   = tRec - tCusto - tDesp;
   const ticket  = pagos.length>0 ? tRec/pagos.length : 0;
 
-  // Cards — sempre visíveis
   document.getElementById('rel-cards').innerHTML = `
     <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido</div><div class="sc-val">${R$(tRec)}</div><div class="sc-hint">${pagos.length} pagos</div></div>
     <div class="sc" style="--sc-c:var(--red)"><div class="sc-lbl">Custos materiais</div><div class="sc-val" style="color:var(--red)">${R$(tCusto)}</div><div class="sc-hint">dos serviços</div></div>
@@ -2174,61 +2175,93 @@ function renderRel(){
     <div class="sc" style="--sc-c:var(--blu)"><div class="sc-lbl">Serviços</div><div class="sc-val">${srvMes.length}</div><div class="sc-hint">${reais.length} realizados</div></div>
     <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Ticket médio</div><div class="sc-val">${R$(ticket)}</div><div class="sc-hint">por serviço pago</div></div>
   `;
+}
 
-  // Tabelas — só no modo detalhado
-  ['rel-tw-rec','rel-tw-mat','rel-tw-desp','rel-tw-srv'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.style.display = detalhado ? '' : 'none';
-  });
+function preencherTabelasRel(){
+  const mes     = document.getElementById('rel-mes')?.value; if(!mes) return;
+  const body    = document.getElementById('rel-detalhado-body'); if(!body) return;
+  const srvMes  = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais   = srvMes.filter(s=>s.sts_srv==='Realizado').sort((a,b)=>(a.dt||'').localeCompare(b.dt||''));
+  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes)).sort((a,b)=>a.dt.localeCompare(b.dt));
+  const tDesp   = despMes.reduce((a,b)=>a+(+b.val),0);
+  const tMat    = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
+  const tRec    = reais.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
+  const lucroReal = tRec - tMat - tDesp;
 
-  if(!detalhado) return;
+  // Bloco por serviço
+  const blocoServicos = reais.length ? reais.map(s=>{
+    const mats  = s.materiais||[];
+    const tMat  = mats.reduce((a,b)=>a+(+b.val),0);
+    const lucro = (+s.val) - tMat;
+    return `
+      <div style="background:var(--sur);border:1.5px solid var(--bor);border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${mats.length?'10px':'0'}">
+          <div>
+            <div style="font-size:.72rem;color:var(--mut);font-weight:600">${fd(s.dt)} · ${s.tipo||'—'}</div>
+            <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700">${s.cli||'—'}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--grn)">${R$(s.val)}</div>
+            <div style="font-size:.72rem;color:var(--mut)">${s.pag||'—'} · ${s.sts_pag||'—'}</div>
+          </div>
+        </div>
+        ${mats.length ? `
+          <div style="border-top:1px dashed var(--bor);padding-top:8px">
+            ${mats.map(m=>`
+              <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;color:var(--mut)">
+                <span>📦 ${m.desc}</span>
+                <span style="color:var(--red);font-weight:600">−${R$(m.val)}</span>
+              </div>`).join('')}
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;padding-top:6px;border-top:1px solid var(--bor);margin-top:4px">
+              <span style="color:var(--mut)">Lucro do serviço</span>
+              <span style="color:${lucro>=0?'var(--grn)':'var(--red)'}">${R$(lucro)}</span>
+            </div>
+          </div>` : ''}
+      </div>`;
+  }).join('') : '<div class="empty">Nenhum serviço realizado no período</div>';
 
-  document.getElementById('tb-rel-rec').innerHTML = reais.length
-    ? reais.map(s=>`<tr><td>${fd(s.dt)}</td><td><strong>${s.cli}</strong></td><td>${s.tipo}</td><td>${s.pag||'—'}</td><td><strong>${R$(s.val)}</strong></td><td>${bdg(s.sts_pag)}</td></tr>`).join('')
-    : '<tr><td colspan="6" class="empty">Nenhum serviço realizado</td></tr>';
+  // Bloco despesas
+  const blocoDesp = despMes.length ? `
+    <div class="tw" style="margin-bottom:12px">
+      <div class="th"><div class="pt">💸 Despesas operacionais</div></div>
+      <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead>
+      <tbody>
+        ${despMes.map(d=>`<tr>
+          <td>${fd(d.dt)}</td>
+          <td><strong>${d.nm}</strong>${d.parcela?` <span style="font-size:.7rem;color:var(--mut)">${d.parcela}/${d.totalParcelas}</span>`:''}</td>
+          <td><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></td>
+          <td style="color:var(--red);font-weight:700">${R$(d.val)}</td>
+        </tr>`).join('')}
+        <tr style="background:var(--sur2)">
+          <td colspan="3" style="text-align:right;font-size:.8rem;color:var(--mut);font-weight:700">Total despesas</td>
+          <td style="color:var(--red);font-weight:700">${R$(tDesp)}</td>
+        </tr>
+      </tbody></table>
+    </div>` : '<div class="empty" style="margin-bottom:12px">Nenhuma despesa no período</div>';
 
-  const mats = reais.flatMap(s=>(s.materiais||[]).map(m=>({...m,cli:s.cli,tipo:s.tipo,dt:s.dt})));
-  document.getElementById('tb-rel-mat').innerHTML = mats.length
-    ? mats.map(m=>`<tr><td>${fd(m.dt)}</td><td><strong>${m.cli}</strong></td><td>${m.tipo}</td><td>${m.desc}</td><td style="color:var(--red)"><strong>${R$(m.val)}</strong></td></tr>`).join('')
-    : '<tr><td colspan="5" class="empty">Nenhum material registrado</td></tr>';
+  // Lucro real final
+  const blocoLucro = `
+    <div style="background:${lucroReal>=0?'linear-gradient(135deg,var(--grn-bg),#c8eed9)':'linear-gradient(135deg,var(--red-bg),#fdd)'};border:1.5px solid ${lucroReal>=0?'rgba(26,107,60,.2)':'rgba(184,50,50,.2)'};border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'};text-transform:uppercase;letter-spacing:.5px">📈 Lucro real do mês</div>
+        <div style="font-size:.8rem;color:var(--mut);margin-top:2px">Recebido − Materiais − Despesas</div>
+      </div>
+      <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'}">${R$(lucroReal)}</div>
+    </div>`;
 
-  const despRel = despMes.sort((a,b)=>a.dt.localeCompare(b.dt));
-  // Agrupar por categoria
-  const cats = {};
-  despRel.forEach(d=>{ if(!cats[d.cat]) cats[d.cat]=0; cats[d.cat]+=(+d.val); });
-  document.getElementById('tb-rel-desp').innerHTML = despRel.length
-    ? despRel.map(d=>`<tr>
-        <td>${fd(d.dt)}</td>
-        <td><strong>${d.nm}</strong></td>
-        <td><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></td>
-        <td>${d.pag||'—'}</td>
-        <td style="font-size:.76rem;color:var(--mut)">${d.parcela?`${d.parcela}/${d.totalParcelas}`:'—'}</td>
-        <td style="color:var(--red);font-weight:700">${R$(d.val)}</td>
-      </tr>`).join('')
-      + `<tr style="background:var(--sur2);font-weight:700">
-          <td colspan="5" style="text-align:right;padding-right:8px;font-size:.8rem;color:var(--mut)">Total despesas</td>
-          <td style="color:var(--red)">${R$(tDesp)}</td>
-         </tr>`
-    : '<tr><td colspan="6" class="empty">Nenhuma despesa no período</td></tr>';
-
-  document.getElementById('tb-rel-srv').innerHTML = srvMes.length
-    ? [...srvMes].sort((a,b)=>(a.dt||'').localeCompare(b.dt||'')).map(s=>{
-        const custo = (s.materiais||[]).reduce((a,b)=>a+(+b.val),0);
-        const ls    = (+s.val) - custo;
-        return `<tr>
-          <td>${fd(s.dt)}</td><td><strong>${s.cli}</strong></td><td>${s.tipo}</td>
-          <td>${R$(s.val)}</td>
-          <td style="color:var(--red)">${custo>0?R$(custo):'—'}</td>
-          <td style="color:${ls>=0?'var(--grn)':'var(--red)'}">${s.sts_srv==='Realizado'?R$(ls):'—'}</td>
-          <td>${bdg(s.sts_srv)}</td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="7" class="empty">Nenhum serviço no período</td></tr>';
+  body.innerHTML = `
+    <div class="tw" style="margin-bottom:12px">
+      <div class="th"><div class="pt">🔧 Serviços realizados</div></div>
+      <div style="padding:12px">${blocoServicos}</div>
+    </div>
+    ${blocoDesp}
+    ${blocoLucro}
+  `;
 }
 
 function gerarPDFRel(){
   const mes = document.getElementById('rel-mes').value;
-  const detalhado = window._relDetalhado === true;
+  const detalhado = !document.getElementById('rel-tw-rec')?.classList.contains('rel-oculto');
   if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
   const {jsPDF} = window.jspdf;
   const doc  = new jsPDF({unit:'mm',format:'a4'});
