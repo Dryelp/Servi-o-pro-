@@ -2306,47 +2306,79 @@ function gerarPDFRel(){
   });
   y+=22;
 
+  // SERVIÇOS — cada um com seus materiais discriminados
   if(reais.length){
     doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
-    doc.text('Serviços Realizados',14,y); y+=5;
-    doc.setFillColor(30,15,0); doc.rect(14,y,pw-28,7,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(7.5);
-    const hs=['Data','Cliente','Serviço','Valor','Custo','Lucro','Pagto'];
-    const ws=[22,38,44,24,22,22,24];
-    let x=14; hs.forEach((h,k)=>{ doc.text(h,x+2,y+4.8); x+=ws[k]; });
-    y+=7;
-    reais.forEach((s,ri)=>{
-      if(y>270){ doc.addPage(); y=20; }
-      const custo=(s.materiais||[]).reduce((a,b)=>a+(+b.val),0);
-      const lq=(+s.val)-custo;
-      if(ri%2===0){ doc.setFillColor(250,247,243); doc.rect(14,y,pw-28,7,'F'); }
-      doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8);
-      const row=[fd(s.dt),s.cli,s.tipo,R$(s.val),custo>0?R$(custo):'—',R$(lq),s.sts_pag||'—'];
-      let rx=14; row.forEach((v,k)=>{ doc.text(String(v||'—').slice(0,Math.floor(ws[k]/2.5)),rx+2,y+4.8); rx+=ws[k]; });
-      y+=7;
+    doc.text('Servicos Realizados',14,y); y+=6;
+
+    reais.sort((a,b)=>(a.dt||'').localeCompare(b.dt||'')).forEach(s=>{
+      if(y>255){ doc.addPage(); y=20; }
+      const mats  = s.materiais||[];
+      const custo = mats.reduce((a,b)=>a+(+b.val),0);
+      const lucroS = (+s.val) - custo;
+      const altBloco = 16 + (mats.length * 6) + (mats.length ? 8 : 0);
+
+      // Caixa do serviço
+      doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,altBloco,3,3,'F');
+
+      // Cabeçalho serviço
+      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+      doc.text(`${fd(s.dt)} · ${s.tipo||'—'}`,18,y+6);
+      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text((s.cli||'—').slice(0,30),18,y+13);
+      doc.setFontSize(11);doc.setFont('helvetica','bold');
+      doc.setTextColor(...(s.sts_pag==='Pago'?[26,107,60]:[224,123,42]));
+      doc.text(R$(s.val),pw-18,y+13,{align:'right'});
+      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+      doc.text(`${s.pag||'—'} · ${s.sts_pag||'—'}`,pw-18,y+19,{align:'right'});
+      y+=16;
+
+      // Materiais do serviço
+      if(mats.length){
+        doc.setDrawColor(220,210,200); doc.line(18,y,pw-18,y); y+=2;
+        mats.forEach(m=>{
+          doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
+          doc.text(`+ ${m.desc}`,20,y+4);
+          doc.setTextColor(184,50,50);
+          doc.text(`-${R$(m.val)}`,pw-18,y+4,{align:'right'});
+          y+=6;
+        });
+        // Lucro do serviço
+        doc.setDrawColor(200,190,180); doc.line(18,y,pw-18,y); y+=2;
+        doc.setFontSize(8);doc.setFont('helvetica','bold');
+        doc.setTextColor(80,60,40); doc.text('Lucro do servico',18,y+5);
+        doc.setTextColor(lucroS>=0?26:184, lucroS>=0?107:50, lucroS>=0?60:50);
+        doc.text(R$(lucroS),pw-18,y+5,{align:'right'});
+        y+=8;
+      } else {
+        y+=2;
+      }
+      y+=4;
     });
   }
 
-  // Despesas detalhadas — só no modo detalhado
-  if(detalhado && despMes.length){
-    if(y>230){ doc.addPage(); y=20; }
-    y+=6;
+  // DESPESAS OPERACIONAIS
+  if(despMes.length){
+    if(y>240){ doc.addPage(); y=20; }
+    y+=4;
     doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
-    doc.text('Despesas Operacionais',14,y); y+=5;
+    doc.text('Despesas Operacionais',14,y); y+=6;
     doc.setFillColor(224,123,42); doc.rect(14,y,pw-28,7,'F');
     doc.setTextColor(255,255,255);doc.setFontSize(7.5);
-    ['Data','Descrição','Categoria','Forma','Parcela','Valor'].forEach((h,k)=>{
-      const xs=[14,36,100,136,158,172];
-      doc.text(h,xs[k]+2,y+4.8);
-    });
+    doc.text('Data',16,y+4.8);
+    doc.text('Descricao',36,y+4.8);
+    doc.text('Categoria',110,y+4.8);
+    doc.text('Valor',pw-18,y+4.8,{align:'right'});
     y+=7;
     despMes.sort((a,b)=>a.dt.localeCompare(b.dt)).forEach((d,di)=>{
       if(y>270){ doc.addPage(); y=20; }
       if(di%2===0){ doc.setFillColor(255,244,235); doc.rect(14,y,pw-28,7,'F'); }
       doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8);
-      const xs=[14,36,100,136,158,172];
-      const row=[fd(d.dt),d.nm.slice(0,28),d.cat,d.pag||'—',d.parcela?`${d.parcela}/${d.totalParcelas}`:'—',R$(d.val)];
-      row.forEach((v,k)=>{ doc.text(String(v||'—'),xs[k]+2,y+4.8); });
+      doc.text(fd(d.dt),16,y+4.8);
+      doc.text(d.nm.slice(0,30),36,y+4.8);
+      doc.text(d.cat,110,y+4.8);
+      doc.setTextColor(184,50,50);doc.setFont('helvetica','bold');
+      doc.text(R$(d.val),pw-18,y+4.8,{align:'right'});
       y+=7;
     });
     // Total despesas
@@ -2355,14 +2387,17 @@ function gerarPDFRel(){
     doc.text('TOTAL DESPESAS',16,y+5.5);
     doc.text(R$(tDesp),pw-16,y+5.5,{align:'right'});
     y+=14;
-    // Lucro real
-    doc.setFillColor(lucroReal>=0?26:184, lucroReal>=0?107:50, lucroReal>=0?60:50);
-    doc.rect(14,y,pw-28,10,'F');
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('LUCRO REAL DO MÊS',16,y+7);
-    doc.text(R$(lucroReal),pw-16,y+7,{align:'right'});
-    y+=16;
   }
+
+  // LUCRO REAL FINAL
+  if(y>270){ doc.addPage(); y=20; }
+  doc.setFillColor(lucroReal>=0?26:184, lucroReal>=0?107:50, lucroReal>=0?60:50);
+  doc.rect(14,y,pw-28,12,'F');
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('LUCRO REAL DO MES',16,y+8);
+  doc.setFontSize(13);
+  doc.text(R$(lucroReal),pw-16,y+8,{align:'right'});
+  y+=18;
 
   for(let k=1;k<=doc.internal.getNumberOfPages();k++){
     doc.setPage(k);
