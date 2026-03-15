@@ -2344,11 +2344,13 @@ function gerarPDFRel(){
           y+=6;
         });
         // Lucro do serviço
-        doc.setDrawColor(200,190,180); doc.line(18,y,pw-18,y); y+=2;
+        doc.setDrawColor(200,190,180); doc.line(18,y,pw-18,y);
+        doc.setFillColor(235,245,238); doc.rect(14,y,pw-28,8,'F');
         doc.setFontSize(8);doc.setFont('helvetica','bold');
-        doc.setTextColor(80,60,40); doc.text('Lucro do servico',18,y+5);
+        doc.setTextColor(80,60,40); doc.text('Lucro do servico',18,y+5.5);
         doc.setTextColor(lucroS>=0?26:184, lucroS>=0?107:50, lucroS>=0?60:50);
-        doc.text(R$(lucroS),pw-18,y+5,{align:'right'});
+        doc.setFontSize(9);
+        doc.text(R$(lucroS),pw-18,y+5.5,{align:'right'});
         y+=8;
       } else {
         y+=2;
