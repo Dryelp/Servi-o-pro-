@@ -1,7 +1,7 @@
 {
-  "name": "ServiçoPro",
-  "short_name": "ServiçoPro",
-  "description": "Agenda e financeiro para prestadores de serviço em construção",
+  "name": "AutônomoPro",
+  "short_name": "AutônomoPro",
+  "description": "Gestão completa para autônomos de qualquer segmento",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1e0f00",
