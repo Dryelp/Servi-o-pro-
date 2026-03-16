@@ -838,106 +838,6 @@ let orcItens = [];
 // ══════════════════════════════════════════
 
 // ══════════════════════════════════════════
-// SEGMENTOS INTELIGENTES
-// ══════════════════════════════════════════
-const SEGMENTOS = {
-  construcao: {
-    keywords: ['construção','construcao','reforma','elétrica','eletrica',
-               'hidráulica','hidraulica','pintura','manutenção','manutencao',
-               'pedreiro','encanador','eletricista','carpinteiro','gesseiro'],
-    icone: '⚒️',
-    paleta: { org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3' },
-    labels: { servico:'Serviço',servicos:'Serviços',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Orçamento',orcamentos:'Orçamentos',materiais:'Materiais',
-              status:['Agendado','Em andamento','Realizado','Cancelado'] }
-  },
-  frete: {
-    keywords: ['frete','transporte','caminhão','caminhao','entrega',
-               'motorista','mudança','mudanca','logística','logistica'],
-    icone: '🚛',
-    paleta: { org:'#1d6fa4',org2:'#2d8fc4',orgBg:'#e8f4fd',brn:'#0a1f30',bg:'#f5faff' },
-    labels: { servico:'Frete',servicos:'Fretes',cliente:'Contratante',clientes:'Contratantes',
-              orcamento:'Proposta',orcamentos:'Propostas',materiais:'Custos da viagem',
-              status:['Agendado','Em rota','Entregue','Cancelado'] }
-  },
-  confeitaria: {
-    keywords: ['doces','confeitaria','bolo','brigadeiro','festa','candy',
-               'doceira','chocolate','torta','cupcake','bem casado'],
-    icone: '🍰',
-    paleta: { org:'#e879a0',org2:'#f59bc0',orgBg:'#fff0f5',brn:'#2d0a1a',bg:'#fff8fb' },
-    labels: { servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Proposta',orcamentos:'Propostas',materiais:'Ingredientes',
-              status:['Recebido','Em produção','Pronto','Entregue'] }
-  },
-  cerimonial: {
-    keywords: ['cerimonial','cerimônia','cerimonia','eventos','casamento',
-               'formatura','buffet','decoração','decoracao','festa infantil',
-               'aniversário','aniversario'],
-    icone: '🎊',
-    paleta: { org:'#c9a84c',org2:'#e0c068',orgBg:'#fdf8ec',brn:'#1a1200',bg:'#fdfaf0' },
-    labels: { servico:'Evento',servicos:'Eventos',cliente:'Contratante',clientes:'Contratantes',
-              orcamento:'Proposta',orcamentos:'Propostas',materiais:'Fornecedores',
-              status:['Proposta enviada','Contrato assinado','Em preparação','Realizado'] }
-  },
-  artesanato: {
-    keywords: ['papelaria','artesanato','bíblia','biblia','portaretrato',
-               'porta retrato','scrapbook','personalizado','personalizada',
-               'feltro','crochê','croche','bordado','costura'],
-    icone: '✂️',
-    paleta: { org:'#4a9b6f',org2:'#6ab88a',orgBg:'#f0faf4',brn:'#0a1f12',bg:'#f5faf7' },
-    labels: { servico:'Encomenda',servicos:'Encomendas',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Orçamento',orcamentos:'Orçamentos',materiais:'Materiais',
-              status:['Recebido','Em produção','Pronto','Entregue'] }
-  },
-  embalagens: {
-    keywords: ['embalagens','caixas','balões','baloes','lembrança','lembranca',
-               'kit','presente','mimo','laço','laco','ribbon'],
-    icone: '🎁',
-    paleta: { org:'#9b6fd4',org2:'#b48ee0',orgBg:'#f5f0fd',brn:'#1a0a2d',bg:'#faf7ff' },
-    labels: { servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Orçamento',orcamentos:'Orçamentos',materiais:'Materiais',
-              status:['Recebido','Em produção','Pronto','Entregue'] }
-  },
-  beleza: {
-    keywords: ['cabelo','unha','estética','estetica','manicure','cabeleireiro',
-               'makeup','maquiagem','sobrancelha','lash','depilação','depilacao',
-               'massagem','nail'],
-    icone: '💅',
-    paleta: { org:'#b06fd4',org2:'#c98ee0',orgBg:'#faf0fd',brn:'#200a2d',bg:'#fdf7ff' },
-    labels: { servico:'Atendimento',servicos:'Atendimentos',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Orçamento',orcamentos:'Orçamentos',materiais:'Produtos',
-              status:['Agendado','Em atendimento','Concluído','Cancelado'] }
-  },
-  fotografia: {
-    keywords: ['foto','fotografia','ensaio','fotografo','fotógrafo',
-               'vídeo','video','filmagem','drone','retratos'],
-    icone: '📷',
-    paleta: { org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',bg:'#f9fafb' },
-    labels: { servico:'Sessão',servicos:'Sessões',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Proposta',orcamentos:'Propostas',materiais:'Equipamentos',
-              status:['Agendado','Em andamento','Editando','Entregue'] }
-  },
-  geral: {
-    keywords: [],
-    icone: '🛠️',
-    paleta: { org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3' },
-    labels: { servico:'Serviço',servicos:'Serviços',cliente:'Cliente',clientes:'Clientes',
-              orcamento:'Orçamento',orcamentos:'Orçamentos',materiais:'Materiais',
-              status:['Agendado','Em andamento','Realizado','Cancelado'] }
-  }
-};
-
-function detectarSegmento(tipoServico){
-  if(!tipoServico) return 'geral';
-  const texto = tipoServico.toLowerCase();
-  for(const [key, seg] of Object.entries(SEGMENTOS)){
-    if(key === 'geral') continue;
-    const encontrou = seg.keywords.some(p => texto.includes(p.toLowerCase()));
-    if(encontrou) return key;
-  }
-  return 'geral';
-}
-
 // ══════════════════════════════════════════
 // SERVICE WORKER + DETECÇÃO DE ATUALIZAÇÃO
 // ══════════════════════════════════════════
@@ -1060,9 +960,7 @@ function salvarPerfil(){
   localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
   document.getElementById('welcome').classList.remove('open');
   uiPerfil(); render();
-  const segAtual = D.perfil.segmento || 'geral';
-  const icoAtual = (typeof SEGMENTOS !== 'undefined') ? SEGMENTOS[segAtual]?.icone || '🛠️' : '🛠️';
-  toast(`✅ Bem-vindo, ${nm}! ${icoAtual}`);
+  toast(`✅ Bem-vindo, ${nm}! ⚒️`);
 }
 
 function atualizarPerfil(){
@@ -1071,64 +969,15 @@ function atualizarPerfil(){
   D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
   localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
   uiPerfil();
-  const segUp = D.perfil.segmento || 'geral';
-  const icoUp = (typeof SEGMENTOS !== 'undefined') ? SEGMENTOS[segUp]?.icone || '🛠️' : '🛠️';
-  toast(`✅ Perfil atualizado! ${icoUp}`);
+  toast('✅ Perfil atualizado!');
 }
 
 function uiPerfil(){
-  const nm  = D.perfil.nome || '';
-  const tp  = D.perfil.tipo || '';
-  const seg = (typeof detectarSegmento === 'function') ? detectarSegmento(tp) : 'geral';
-  const SEG = (typeof SEGMENTOS !== 'undefined') ? SEGMENTOS[seg] : null;
-  const ico = SEG ? SEG.icone : '🛠️';
-
-  // Salva segmento no perfil
-  D.perfil.segmento = seg;
-
-  // Dashboard
-  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ${ico}` : `Olá! ${ico}`;
-  document.getElementById('sb-tipo').textContent  = tp || 'Gestão de Serviços';
+  const nm = D.perfil.nome || '';
+  const tp = D.perfil.tipo || 'Gestão de Serviços';
+  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ⚒️` : 'Olá! ⚒️';
+  document.getElementById('sb-tipo').textContent  = tp;
   document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
-
-  // Logo ícone na sidebar e welcome
-  const logoIco = document.querySelector('.logo-ico');
-  if(logoIco) logoIco.textContent = ico;
-  const welcomeIco = document.getElementById('welcome-ico');
-  if(welcomeIco) welcomeIco.textContent = ico;
-
-  // Aplica paleta de cores
-  if(SEG && SEG.paleta){
-    const r = document.documentElement.style;
-    r.setProperty('--org',    SEG.paleta.org);
-    r.setProperty('--org2',   SEG.paleta.org2);
-    r.setProperty('--org-bg', SEG.paleta.orgBg);
-    r.setProperty('--brn',    SEG.paleta.brn);
-    r.setProperty('--bg',     SEG.paleta.bg);
-    r.setProperty('--txt',    SEG.paleta.brn);
-    // Atualiza theme-color do PWA
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute('content', SEG.paleta.org);
-  }
-
-  // Labels dinâmicos — navegação
-  if(SEG && SEG.labels){
-    const L = SEG.labels;
-    // Sidebar
-    const nbs = document.querySelectorAll('.nb .ni');
-    // Botões de novo serviço
-    document.querySelectorAll('[onclick="abre('m-srv')"]').forEach(b=>{
-      if(b.textContent.includes('Novo')) b.textContent = `+ Novo ${L.servico}`;
-    });
-    // Título da aba serviços
-    const pgSrv = document.querySelector('#pg-servicos .pg-title');
-    if(pgSrv) pgSrv.textContent = L.servicos;
-    // Sub da aba serviços
-    const pgSrvSub = document.querySelector('#pg-servicos .pg-sub');
-    if(pgSrvSub) pgSrvSub.textContent = `Gerencie seus ${L.servicos.toLowerCase()} do início ao fim`;
-  }
-
-  // Toast de boas vindas com ícone
   const en = document.getElementById('edit-nome'); if(en) en.value = D.perfil.nome;
   const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
   const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
