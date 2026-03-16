@@ -929,13 +929,10 @@ const SEGMENTOS = {
 
 function detectarSegmento(tipoServico){
   if(!tipoServico) return 'geral';
-  const texto = tipoServico.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const texto = tipoServico.toLowerCase();
   for(const [key, seg] of Object.entries(SEGMENTOS)){
     if(key === 'geral') continue;
-    const encontrou = seg.keywords.some(p =>
-      texto.includes(p.normalize('NFD').replace(/[\u0300-\u036f]/g,''))
-    );
+    const encontrou = seg.keywords.some(p => texto.includes(p.toLowerCase()));
     if(encontrou) return key;
   }
   return 'geral';
