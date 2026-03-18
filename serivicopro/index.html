@@ -132,6 +132,8 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .srv-cli{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--brn)}
 .srv-tipo{font-size:.8rem;color:var(--mut);margin-top:2px}
 .srv-end{font-size:.76rem;color:var(--mut);margin-top:2px}
+.srv-prazo{font-size:.74rem;color:var(--org);font-weight:600;margin-top:3px}
+.srv-etapas{font-size:.74rem;color:var(--blu);font-weight:600;margin-top:3px}
 .srv-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding-top:11px;border-top:1px solid var(--bor)}
 
 /* MATERIAIS */
@@ -281,7 +283,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="nav-sec">Financeiro</div>
     <button class="nb" onclick="ir('recebimentos',this)"><span class="ni">💵</span>Recebimentos</button>
     <button class="nb" onclick="ir('despesas',this)"><span class="ni">💸</span>Despesas</button>
-    <button class="nb" onclick="ir('clientes',this)"><span class="ni">👷</span>Clientes</button>
+    <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
     <div class="nav-sec">Vendas</div>
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
     <div class="nav-sec">Análise</div>
@@ -307,7 +309,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="tb-right">
         <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
         <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
-        <button class="btn btn-org" onclick="abre('m-srv')">+ Novo Serviço</button>
+        <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
       </div>
     </div>
 
@@ -369,7 +371,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="topbar">
       <div><div class="pg-title">Serviços</div><div class="pg-sub">Gerencie seus serviços do início ao fim</div></div>
       <div class="tb-right">
-        <button class="btn btn-org" onclick="abre('m-srv')">+ Novo serviço</button>
+        <button class="btn btn-org" onclick="abreSrv()">+ Novo serviço</button>
       </div>
     </div>
     <div class="search-bar">
@@ -498,6 +500,15 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
     </div>
     <div class="cfg-sec">
+      <div class="cfg-t">🛠️ Meus serviços</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:12px;line-height:1.6">Cadastre os tipos de serviço que você presta. Vão aparecer como sugestão ao criar um novo serviço.</p>
+      <div id="meus-srvs-lista" style="margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="novo-srv-tipo" placeholder="Ex: Instalação elétrica, pintura..." style="flex:1">
+        <button class="btn btn-org" onclick="adicionarMeuSrv()">+ Add</button>
+      </div>
+    </div>
+    <div class="cfg-sec">
       <div class="cfg-t">🎯 Meta mensal</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Defina quanto quer faturar por mês. Vamos te mostrar o progresso em tempo real no dashboard.</p>
       <div class="fg"><label class="fl">Meta de faturamento (R$)</label>
@@ -541,7 +552,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <button class="mb" id="mb-mais" onclick="toggleMais()"><span class="mi">☰</span>Mais<span class="mn-dot" id="mob-dot"></span></button>
 </div>
 <div class="mob-more-menu" id="mob-more">
-  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi">👷</span>Clientes</button>
+  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
   <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
   <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
@@ -648,10 +659,32 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="s-dt"></div>
       <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="s-hr"></div>
     </div>
-    <div class="fg"><label class="fl">Cliente</label><input class="fi" id="s-cli" placeholder="Nome do cliente" list="dl-s"><datalist id="dl-s"></datalist></div>
-    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="s-tipo" placeholder="Ex: Pintura de parede, instalação elétrica..."></div>
+    <div class="fg"><label class="fl">Cliente</label><input class="fi" id="s-cli" placeholder="Nome do cliente" list="dl-s" oninput="autoPreencherCliente()"><datalist id="dl-s"></datalist></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="s-tipo" placeholder="Ex: Tipo de serviço..." id-placeholder="s-tipo" list="dl-tipo"><datalist id="dl-tipo"></datalist></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="s-end" placeholder="Rua, número, bairro..."></div>
     <div class="fg"><label class="fl">Valor combinado (R$) <span style="color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0">— opcional, pode preencher depois</span></label><input class="fi" type="number" id="s-val" placeholder="Deixe em branco se não souber ainda" min="0" step="0.01"></div>
+
+    <!-- Campo prazo de entrega — aparece pra encomendas -->
+    <div class="fg" id="s-prazo-box" style="display:none">
+      <label class="fl">📅 Prazo de entrega</label>
+      <input class="fi" type="date" id="s-prazo">
+    </div>
+
+    <!-- Campo quantidade — aparece pra encomendas -->
+    <div class="fg" id="s-qtd-box" style="display:none">
+      <label class="fl">📦 Quantidade de itens</label>
+      <input class="fi" type="number" id="s-qtd" placeholder="Ex: 50 brigadeiros, 10 caixas..." min="1">
+    </div>
+
+    <!-- Pagamento em etapas — aparece pra cerimonial e construção -->
+    <div id="s-etapas-box" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">💰 Pagamento em etapas</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Entrada (R$)</label><input class="fi" type="number" id="s-entrada" placeholder="0,00" min="0" step="0.01" oninput="calcSaldo()"></div>
+        <div class="fg"><label class="fl">Saldo restante</label><input class="fi" id="s-saldo" readonly style="color:var(--org);font-weight:700"></div>
+      </div>
+    </div>
+
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()">✅ Agendar serviço</button>
       <button class="btn btn-gho" onclick="fecha('m-srv')">Cancelar</button>
@@ -752,7 +785,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Cliente -->
 <div class="overlay" id="m-cli">
   <div class="modal">
-    <div class="mt">👷 Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
+    <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="c-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="c-wpp" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Pintura, hidráulica..."></div>
@@ -838,6 +871,169 @@ let orcItens = [];
 // ══════════════════════════════════════════
 
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// SEGMENTOS INTELIGENTES
+// ══════════════════════════════════════════
+const SEGMENTOS = {
+  construcao: {
+    keywords: ['construcao','construção','reforma','eletrica','elétrica',
+               'hidraulica','hidráulica','pintura','manutencao','manutenção',
+               'pedreiro','encanador','eletricista','carpinteiro','gesseiro',
+               'soldador','serralheiro','marcador'],
+    icone: '⚒️',
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3'},
+    labels: {servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Agendado','Em andamento','Realizado','Cancelado']}
+  },
+  frete: {
+    keywords: ['frete','transporte','caminhao','caminhão','entrega',
+               'motorista','mudanca','mudança','logistica','logística','mototaxista'],
+    icone: '🚛',
+    paleta: {org:'#1d6fa4',org2:'#2d8fc4',orgBg:'#e8f4fd',brn:'#0a1f30',bg:'#f5faff'},
+    labels: {servico:'Frete',servicos:'Fretes',cliente:'Contratante',
+             clientes:'Contratantes',materiais:'Custos da viagem',
+             status:['Agendado','Em rota','Entregue','Cancelado']}
+  },
+  confeitaria: {
+    keywords: ['doces','confeitaria','bolo','brigadeiro','candy',
+               'doceira','chocolate','torta','cupcake','bem casado','salgado'],
+    icone: '🍰',
+    paleta: {org:'#e879a0',org2:'#f59bc0',orgBg:'#fff0f5',brn:'#2d0a1a',bg:'#fff8fb'},
+    labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Ingredientes',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  cerimonial: {
+    keywords: ['cerimonial','cerimonia','eventos','casamento','formatura',
+               'buffet','decoracao','decoração','aniversario','aniversário','debutante'],
+    icone: '🎊',
+    paleta: {org:'#c9a84c',org2:'#e0c068',orgBg:'#fdf8ec',brn:'#1a1200',bg:'#fdfaf0'},
+    labels: {servico:'Evento',servicos:'Eventos',cliente:'Contratante',
+             clientes:'Contratantes',materiais:'Fornecedores',
+             status:['Proposta enviada','Contrato assinado','Em preparacao','Realizado']}
+  },
+  artesanato: {
+    keywords: ['papelaria','artesanato','biblia','biblia','portaretrato',
+               'scrapbook','personalizado','personalizada','feltro','croche','bordado','costura'],
+    icone: '✂️',
+    paleta: {org:'#4a9b6f',org2:'#6ab88a',orgBg:'#f0faf4',brn:'#0a1f12',bg:'#f5faf7'},
+    labels: {servico:'Encomenda',servicos:'Encomendas',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  embalagens: {
+    keywords: ['embalagens','caixas','baloes','balões','lembranca','lembrança',
+               'kit','presente','mimo','laco','laço','ribbon'],
+    icone: '🎁',
+    paleta: {org:'#9b6fd4',org2:'#b48ee0',orgBg:'#f5f0fd',brn:'#1a0a2d',bg:'#faf7ff'},
+    labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  beleza: {
+    keywords: ['cabelo','unha','estetica','estética','manicure','cabeleireiro',
+               'makeup','maquiagem','sobrancelha','lash','depilacao','depilação','massagem','nail'],
+    icone: '💅',
+    paleta: {org:'#b06fd4',org2:'#c98ee0',orgBg:'#faf0fd',brn:'#200a2d',bg:'#fdf7ff'},
+    labels: {servico:'Atendimento',servicos:'Atendimentos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Produtos',
+             status:['Agendado','Em atendimento','Concluido','Cancelado']}
+  },
+  fotografia: {
+    keywords: ['foto','fotografia','ensaio','fotografo','fotógrafo',
+               'video','vídeo','filmagem','drone','retratos'],
+    icone: '📷',
+    paleta: {org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',bg:'#f9fafb'},
+    labels: {servico:'Sessao',servicos:'Sessoes',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Equipamentos',
+             status:['Agendado','Em andamento','Editando','Entregue']}
+  },
+  geral: {
+    keywords: [],
+    icone: '🛠️',
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3'},
+    labels: {servico:'Servico',servicos:'Servicos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Agendado','Em andamento','Realizado','Cancelado']}
+  }
+};
+
+function detectarSegmento(tipo){
+  if(!tipo) return 'geral';
+  const t = tipo.toLowerCase();
+  for(const [key,seg] of Object.entries(SEGMENTOS)){
+    if(key==='geral') continue;
+    if(seg.keywords.some(k=>t.includes(k))) return key;
+  }
+  return 'geral';
+}
+
+const PLACEHOLDERS_SEG = {
+  construcao: 'Ex: Pintura, instalacao eletrica, reforma...',
+  frete:      'Ex: Frete urbano, mudanca, entrega...',
+  confeitaria:'Ex: Bolo personalizado, brigadeiros...',
+  cerimonial: 'Ex: Casamento, aniversario, formatura...',
+  artesanato: 'Ex: Papelaria, portaretrato, bordado...',
+  embalagens: 'Ex: Caixas personalizadas, baloes...',
+  beleza:     'Ex: Corte de cabelo, manicure, maquiagem...',
+  fotografia: 'Ex: Ensaio fotografico, casamento...',
+  geral:      'Ex: Tipo de servico prestado...'
+};
+
+const ICONES_CLI_SEG = {
+  construcao: '👷', frete:'🚛', confeitaria:'🍰',
+  cerimonial: '💍', artesanato:'✂️', embalagens:'🎁',
+  beleza:     '💅', fotografia:'📷', geral:'👤'
+};
+
+function aplicarSegmento(seg){
+  if(!seg) seg = SEGMENTOS.geral;
+  const key = Object.keys(SEGMENTOS).find(k=>SEGMENTOS[k]===seg) || 'geral';
+  const r = document.documentElement.style;
+  r.setProperty('--org',   seg.paleta.org);
+  r.setProperty('--org2',  seg.paleta.org2);
+  r.setProperty('--org-bg',seg.paleta.orgBg);
+  r.setProperty('--brn',   seg.paleta.brn);
+  r.setProperty('--bg',    seg.paleta.bg);
+  r.setProperty('--txt',   seg.paleta.brn);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', seg.paleta.org);
+
+  // Ícone principal
+  const logoIco = document.querySelector('.logo-ico');
+  if(logoIco) logoIco.textContent = seg.icone;
+  const welcomeIco = document.getElementById('welcome-ico');
+  if(welcomeIco) welcomeIco.textContent = seg.icone;
+
+  // Ícone de cliente
+  const icoC = ICONES_CLI_SEG[key] || '👤';
+  ['nav-cli-ico','mob-cli-ico','empty-cli-ico','modal-cli-ico'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = icoC;
+  });
+
+  // Ícone tela vazia de serviços
+  const emptySrv = document.getElementById('empty-srv-ico');
+  if(emptySrv) emptySrv.textContent = seg.icone;
+
+  // Placeholder tipo de serviço
+  const tipoInp = document.getElementById('s-tipo');
+  if(tipoInp) tipoInp.placeholder = PLACEHOLDERS_SEG[key] || 'Ex: Tipo de servico...';
+
+  // Label "Clientes" no nav vira nome do segmento
+  const L = seg.labels;
+  if(L){
+    // Botões de novo serviço
+    document.querySelectorAll('[onclick="abreSrv()"]').forEach(b=>{
+      if(b.textContent.includes('Novo')||b.textContent.includes('Cadastrar'))
+        b.textContent = b.textContent.includes('primeiro')
+          ? '+ Cadastrar primeiro ' + L.servico.toLowerCase()
+          : '+ Novo ' + L.servico;
+    });
+  }
+}
+
 // ══════════════════════════════════════════
 // SERVICE WORKER + DETECÇÃO DE ATUALIZAÇÃO
 // ══════════════════════════════════════════
@@ -960,7 +1156,8 @@ function salvarPerfil(){
   localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
   document.getElementById('welcome').classList.remove('open');
   uiPerfil(); render();
-  toast(`✅ Bem-vindo, ${nm}! ⚒️`);
+  const segKey = detectarSegmento(D.perfil.tipo);
+  toast('Bem-vindo, ' + nm + '! ' + SEGMENTOS[segKey].icone);
 }
 
 function atualizarPerfil(){
@@ -973,16 +1170,23 @@ function atualizarPerfil(){
 }
 
 function uiPerfil(){
-  const nm = D.perfil.nome || '';
-  const tp = D.perfil.tipo || 'Gestão de Serviços';
-  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ⚒️` : 'Olá! ⚒️';
-  document.getElementById('sb-tipo').textContent  = tp;
+  const nm  = D.perfil.nome || '';
+  const tp  = D.perfil.tipo || '';
+  const key = detectarSegmento(tp);
+  const SEG = SEGMENTOS[key];
+  const ico = SEG.icone;
+  D.perfil.segmento = key;
+  document.getElementById('dash-ola').textContent = nm ? `Ola, ${nm.split(' ')[0]}! ${ico}` : `Ola! ${ico}`;
+  document.getElementById('sb-tipo').textContent  = tp || 'Gestao de Servicos';
   document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
+  aplicarSegmento(SEG);
   const en = document.getElementById('edit-nome'); if(en) en.value = D.perfil.nome;
   const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
   const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
   atualizarPreviewMeta();
+  renderMeusSrvs();
+  atualizarDatalistTipo();
 }
 
 function atualizarPreviewMeta(){
@@ -1168,7 +1372,7 @@ function rDash(){
         <div class="empty-ico" id="empty-srv-ico" style="font-size:2.4rem;margin-bottom:10px">🚀</div>
         <div style="font-weight:700;margin-bottom:6px">Tudo começa com o primeiro serviço!</div>
         <div style="margin-bottom:16px">Cadastre um serviço e veja seu negócio crescer aqui.</div>
-        <button class="btn btn-org" onclick="abre('m-srv')">+ Cadastrar primeiro serviço</button>
+        <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
       </div></td></tr>`
 
   rChart();
@@ -1208,10 +1412,10 @@ function rServicos(){
   if(!lista.length){
     if(!D.servicos.length){
     el.innerHTML=`<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" style="font-size:2.8rem;margin-bottom:12px">🔨</div>
+      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">🛠️</div>
       <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum serviço ainda</div>
       <div style="margin-bottom:18px">Cadastre seu primeiro serviço e comece a faturar!</div>
-      <button class="btn btn-org" onclick="abre('m-srv')">+ Cadastrar primeiro serviço</button>
+      <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
     </div>`;
   } else {
     el.innerHTML='<div class="empty"><div class="empty-ico">🔧</div>Nenhum serviço encontrado</div>';
@@ -1232,8 +1436,10 @@ function rServicos(){
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
         <div>
           <div class="srv-cli">${srv.cli||'—'}</div>
-          <div class="srv-tipo">${srv.tipo||'—'}</div>
+          <div class="srv-tipo">${srv.tipo||'—'}${srv.qtd?' · '+srv.qtd+' unid.':''}</div>
           ${srv.end?`<div class="srv-end">📍 ${srv.end}</div>`:''}
+          ${srv.prazo?`<div class="srv-prazo">📅 Entrega: ${fd(srv.prazo)}</div>`:''}
+          ${srv.entrada?`<div class="srv-etapas">💰 Entrada: ${R$(srv.entrada)} · Saldo: ${R$(srv.saldo||0)}</div>`:''}
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--grn)">${R$(srv.val)}</div>
@@ -1305,10 +1511,10 @@ function rRecebimentos(){
 function rClientes(){
   if(!D.clientes.length){
     document.getElementById('tb-cli').innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:40px 20px">
-      <div class="empty-ico" style="font-size:2.4rem;margin-bottom:10px">👷</div>
+      <div class="empty-ico" id="empty-cli-ico" style="font-size:2.4rem;margin-bottom:10px">👤</div>
       <div style="font-weight:700;margin-bottom:6px">Nenhum cliente ainda</div>
       <div style="margin-bottom:16px">Os clientes aparecem aqui automaticamente quando você agenda um serviço!</div>
-      <button class="btn btn-org" onclick="abre('m-srv')">+ Novo serviço</button>
+      <button class="btn btn-org" onclick="abreSrv()">+ Novo serviço</button>
     </div></td></tr>`;
     return;
   }
@@ -1413,7 +1619,100 @@ function rOrcamentos(){
 // ══════════════════════════════════════════
 // SERVIÇO ACTIONS
 // ══════════════════════════════════════════
+// Sugestões de tipo de serviço por segmento
+const SUGESTOES_SEG = {
+  construcao: ['Pintura','Instalacao eletrica','Hidraulica','Reforma','Gesso','Massa corrida','Piso','Telhado','Alvenaria','Outro'],
+  frete:      ['Frete urbano','Frete interestadual','Mudanca','Entrega expressa','Coleta','Outro'],
+  confeitaria:['Bolo personalizado','Brigadeiros','Salgados','Mesa de doces','Bem casado','Cupcake','Torta','Outro'],
+  cerimonial: ['Casamento','Aniversario','Formatura','Festa infantil','Corporativo','Debutante','Outro'],
+  artesanato: ['Papelaria personalizada','Reforma de biblia','Porta retrato','Scrapbook','Bordado','Croche','Outro'],
+  embalagens: ['Caixas personalizadas','Baloes decorados','Kit presente','Lembrancinha','Mimo','Outro'],
+  beleza:     ['Corte de cabelo','Coloracao','Escova','Manicure','Pedicure','Maquiagem','Depilacao','Sobrancelha','Outro'],
+  fotografia: ['Ensaio fotografico','Casamento','Aniversario','Formatura','Newborn','Produto','Video','Outro'],
+  geral:      ['Servico geral','Manutencao','Reparo','Consultoria','Outro']
+};
+
+function atualizarDatalistTipo(){
+  const seg   = D.perfil.segmento || 'geral';
+  const sugs  = SUGESTOES_SEG[seg] || SUGESTOES_SEG.geral;
+  const meus  = D.perfil.meusSrvs || [];
+  const todos = [...new Set([...meus, ...sugs])];
+  const dl    = document.getElementById('dl-tipo');
+  if(dl) dl.innerHTML = todos.map(s=>`<option value="${s}">`).join('');
+}
+
+function adicionarMeuSrv(){
+  const inp = document.getElementById('novo-srv-tipo');
+  const val = inp?.value.trim();
+  if(!val) return toast('Digite o tipo de servico');
+  if(!D.perfil.meusSrvs) D.perfil.meusSrvs = [];
+  if(D.perfil.meusSrvs.includes(val)) return toast('Ja cadastrado!');
+  D.perfil.meusSrvs.push(val);
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  inp.value = '';
+  renderMeusSrvs();
+  atualizarDatalistTipo();
+  toast('Servico adicionado!');
+}
+
+function removerMeuSrv(i){
+  D.perfil.meusSrvs.splice(i,1);
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  renderMeusSrvs();
+  atualizarDatalistTipo();
+}
+
+function renderMeusSrvs(){
+  const el   = document.getElementById('meus-srvs-lista');
+  const lista = D.perfil.meusSrvs || [];
+  if(!el) return;
+  if(!lista.length){
+    el.innerHTML = '<div style="font-size:.8rem;color:var(--mut);margin-bottom:8px">Nenhum servico cadastrado ainda.</div>';
+    return;
+  }
+  el.innerHTML = lista.map((s,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--bor);margin-bottom:6px;font-size:.85rem">
+      <span>${s}</span>
+      <button class="btn btn-del btn-sm" onclick="removerMeuSrv(${i})" style="padding:3px 8px">✕</button>
+    </div>`).join('');
+}
+
+function autoPreencherCliente(){
+  const nome = document.getElementById('s-cli')?.value.trim();
+  if(!nome) return;
+  const cli = D.clientes.find(c=>c.nm.toLowerCase()===nome.toLowerCase());
+  if(!cli) return;
+  const end = document.getElementById('s-end');
+  if(end && !end.value && cli.end) end.value = cli.end;
+}
+
+function abreSrv(){
+  // Mostrar campos conforme segmento atual
+  const seg = D.perfil.segmento || 'geral';
+  const segsP = ['confeitaria','artesanato','embalagens','fotografia'];
+  const segsQ = ['confeitaria','artesanato','embalagens'];
+  const segsE = ['cerimonial','construcao','frete'];
+  const prazoBox  = document.getElementById('s-prazo-box');
+  const qtdBox    = document.getElementById('s-qtd-box');
+  const etapasBox = document.getElementById('s-etapas-box');
+  if(prazoBox)  prazoBox.style.display  = segsP.includes(seg) ? '' : 'none';
+  if(qtdBox)    qtdBox.style.display    = segsQ.includes(seg) ? '' : 'none';
+  if(etapasBox) etapasBox.style.display = segsE.includes(seg) ? '' : 'none';
+  atualizarDatalistTipo();
+  abre('m-srv');
+}
+
+function calcSaldo(){
+  const val     = parseFloat(document.getElementById('s-val')?.value) || 0;
+  const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
+  const saldo   = Math.max(0, val - entrada);
+  const el      = document.getElementById('s-saldo');
+  if(el) el.value = saldo > 0 ? 'R$ ' + saldo.toFixed(2).replace('.',',') : 'R$ 0,00';
+}
+
 function salvarSrv(){
+  const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
+  const val     = parseFloat(document.getElementById('s-val').value) || 0;
   const o = {
     id: gerarId(),
     dt: document.getElementById('s-dt').value,
@@ -1421,7 +1720,11 @@ function salvarSrv(){
     cli: document.getElementById('s-cli').value.trim(),
     tipo: document.getElementById('s-tipo').value.trim(),
     end: document.getElementById('s-end').value.trim(),
-    val: document.getElementById('s-val').value || '0',
+    val: val || 0,
+    prazo: document.getElementById('s-prazo')?.value || null,
+    qtd: document.getElementById('s-qtd')?.value || null,
+    entrada: entrada || null,
+    saldo: entrada > 0 ? val - entrada : null,
     sts_srv: 'Agendado', sts_pag: null, pag: null,
     materiais: [], desc_feito: '', inicio: null, fim: null
   };
@@ -1438,7 +1741,8 @@ function salvarSrv(){
   }
 
   save(); fecha('m-srv'); render();
-  clr('s-cli','s-hr','s-tipo','s-end','s-val');
+  clr('s-cli','s-hr','s-tipo','s-end','s-val','s-prazo','s-qtd','s-entrada');
+  const el = document.getElementById('s-saldo'); if(el) el.value = '';
 }
 
 function iniciarSrv(i){
@@ -1722,7 +2026,8 @@ function wppRelSrv(){
   const s = D.servicos[i];
   const nome = D.perfil.nome || 'Prestador';
   let msg = `📋 *Relatório de Serviço*\n\n`;
-  msg += `👷 *${nome}*\n`;
+  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  msg += `${_ico} *${nome}*\n`;
   msg += `👤 Cliente: ${s.cli||'—'}\n`;
   msg += `📅 Data: ${fd(s.dt)}\n`;
   if(s.end) msg += `📍 Local: ${s.end}\n`;
@@ -2111,7 +2416,8 @@ function wppOrc(i){
   const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
   const nome  = D.perfil.nome || 'Prestador';
   let msg = `📋 *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
-  msg += `👷 *${nome}*\n`;
+  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  msg += `${_ico} *${nome}*\n`;
   msg += `👤 Cliente: ${o.cli||'—'}\n`;
   msg += `📅 Data: ${fd(o.dt)}\n`;
   if(o.desc) msg += `📋 ${o.desc}\n`;
