@@ -32,7 +32,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* SIDEBAR */
 .sidebar{width:252px;background:var(--brn);position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;overflow:hidden}
 .logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(224,123,42,.4)}
+.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .logo-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:#fff}
 .logo-sub{font-size:.65rem;color:rgba(255,255,255,.28);margin-top:1px}
 .nav{flex:1;padding:10px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
@@ -56,7 +56,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
 .btn-brn{background:var(--brn);color:#fff}.btn-brn:hover{background:var(--brn2)}
-.btn-org{background:var(--org);color:#fff}.btn-org:hover{background:#cc6e22;transform:translateY(-1px);box-shadow:0 4px 14px rgba(224,123,42,.35)}
+.btn-org{background:var(--org);color:#fff}.btn-org:hover{background:var(--org2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .btn-gho{background:var(--sur);color:var(--brn2);border:1.5px solid var(--bor)}.btn-gho:hover{border-color:var(--org);color:var(--org)}
 .btn-grn{background:var(--grn);color:#fff}.btn-grn:hover{background:#155c32}
 .btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#9b2a2a}
@@ -118,14 +118,14 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .fg{margin-bottom:11px}
 .fl{display:block;font-size:.73rem;font-weight:700;color:var(--brn2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
 .fi,.fs{width:100%;background:var(--bg);border:1.5px solid var(--bor);border-radius:8px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
-.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(224,123,42,.1)}
+.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
 .fi::placeholder{color:var(--mut)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mf{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 
 /* SERVIÇO CARD */
 .srv-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s,box-shadow .2s}
-.srv-card:hover{border-color:rgba(224,123,42,.4);box-shadow:var(--shd2)}
+.srv-card:hover{border-color:var(--org);opacity:.9;box-shadow:var(--shd2)}
 .srv-card.sts-andamento{border-left:4px solid var(--pur)}
 .srv-card.sts-realizado{border-left:4px solid var(--grn)}
 .srv-card.sts-cancelado{border-left:4px solid var(--red);opacity:.6}
@@ -151,7 +151,7 @@ tbody td{padding:9px 14px;vertical-align:middle}
 
 /* ORC CARD */
 .orc-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s}
-.orc-card:hover{border-color:rgba(224,123,42,.4)}
+.orc-card:hover{border-color:var(--org)}
 .orc-item-row{display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0;border-bottom:1px dashed var(--bor)}
 .orc-item-row:last-child{border-bottom:none}
 
@@ -263,7 +263,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="welcome-title" id="welcome-title">Bem-vindo ao AutônomoPro!</div>
     <div class="welcome-sub">Gestão completa para autônomos de qualquer segmento.<br>Antes de começar, nos diga quem é você!</div>
     <div class="fg" style="text-align:left"><label class="fl">Seu nome</label><input class="fi" id="p-nome" placeholder="Ex: João Silva"></div>
-    <div class="fg" style="text-align:left"><label class="fl">Tipo de serviço que você faz</label><input class="fi" id="p-tipo" placeholder="Ex: Pintura, elétrica, hidráulica..."></div>
+    <div class="fg" style="text-align:left"><label class="fl">Tipo de serviço que você faz</label><input class="fi" id="p-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
     <button class="btn btn-org" style="width:100%;justify-content:center;margin-top:6px;padding:12px" onclick="salvarPerfil()">Começar agora 🚀</button>
   </div>
 </div>
@@ -495,7 +495,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="cfg-sec">
       <div class="cfg-t">👤 Informações pessoais</div>
       <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
-      <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Pintura, elétrica..."></div>
+      <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
       <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
     </div>
@@ -504,7 +504,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:12px;line-height:1.6">Cadastre os tipos de serviço que você presta. Vão aparecer como sugestão ao criar um novo serviço.</p>
       <div id="meus-srvs-lista" style="margin-bottom:10px"></div>
       <div style="display:flex;gap:8px">
-        <input class="fi" id="novo-srv-tipo" placeholder="Ex: Instalação elétrica, pintura..." style="flex:1">
+        <input class="fi" id="novo-srv-tipo" placeholder="Ex: Tipo de serviço que você presta..." style="flex:1">
         <button class="btn btn-org" onclick="adicionarMeuSrv()">+ Add</button>
       </div>
     </div>
@@ -589,7 +589,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <div class="fg">
       <label class="fl">Nome da despesa</label>
-      <input class="fi" id="desp-nm" placeholder="Ex: Combustível, João (ajudante), Furadeira...">
+      <input class="fi" id="desp-nm" placeholder="Nome da despesa...">
     </div>
 
     <div class="fg">
@@ -712,12 +712,12 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="fg">
-      <label class="fl">Materiais e despesas do serviço</label>
+      <label class="fl" id="fin-mat-label">Custos do serviço</label>
       <div class="mat-lista" id="fin-mat-lista">
         <div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum material adicionado</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 110px auto;gap:7px;margin-top:7px;align-items:end">
-        <div><label class="fl">Material / despesa</label><input class="fi" id="fin-mat-desc" placeholder="Ex: Tinta 18L, fita crepe..."></div>
+        <div><label class="fl">Material / despesa</label><input class="fi" id="fin-mat-desc" placeholder="Descreva o item ou custo..."></div>
         <div><label class="fl">Valor R$</label><input class="fi" type="number" id="fin-mat-val" placeholder="0,00" min="0" step="0.01"></div>
         <button class="btn btn-org" onclick="addMat()" style="margin-top:auto">+ Add</button>
       </div>
@@ -769,7 +769,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <div class="modal modal-lg">
     <div class="mt">📄 Relatório do Serviço <button class="xbtn" onclick="fecha('m-rel-srv')">✕</button></div>
     <input type="hidden" id="rel-srv-idx">
-    <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;background:var(--org-bg);border:1.5px solid rgba(224,123,42,.2);border-radius:9px;padding:10px 14px;font-size:.86rem;font-weight:600;color:var(--brn2)">
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;background:var(--org-bg);border:1.5px solid var(--org-bg);border-radius:9px;padding:10px 14px;font-size:.86rem;font-weight:600;color:var(--brn2)">
       <input type="checkbox" id="rel-srv-desp" onchange="abrirRelSrv(document.getElementById('rel-srv-idx').value)" style="accent-color:var(--org);width:16px;height:16px">
       💸 Incluir despesas e custos no relatório
     </label>
@@ -788,7 +788,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="c-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="c-wpp" placeholder="(11) 99999-9999"></div>
-    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Pintura, hidráulica..."></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Tipo de serviço..."></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="c-end" placeholder="Endereço principal"></div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarCli()">✅ Salvar</button>
@@ -804,7 +804,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <input type="hidden" id="edit-cli-idx">
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="edit-cli-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-cli-wpp" placeholder="(11) 99999-9999"></div>
-    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-cli-srv" placeholder="Ex: Pintura, hidráulica..."></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-cli-srv" placeholder="Ex: Tipo de serviço..."></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="edit-cli-end" placeholder="Endereço principal"></div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarEditCli()">✅ Salvar alterações</button>
@@ -821,7 +821,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Cliente</label><input class="fi" id="o-cli" placeholder="Nome do cliente" list="dl-o"><datalist id="dl-o"></datalist></div>
       <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="o-dt"></div>
     </div>
-    <div class="fg"><label class="fl">Descrição do serviço</label><input class="fi" id="o-desc" placeholder="Ex: Reforma completa do banheiro..."></div>
+    <div class="fg"><label class="fl">Descrição do serviço</label><input class="fi" id="o-desc" placeholder="Descreva o serviço a ser orçado..."></div>
     <div class="fg"><label class="fl">Válido até</label><input class="fi" type="date" id="o-valid"></div>
     <div class="fg">
       <label class="fl">Itens do orçamento</label>
@@ -829,7 +829,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum item adicionado</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 110px auto;gap:7px;margin-top:7px;align-items:end">
-        <div><label class="fl">Item / serviço</label><input class="fi" id="oi-desc" placeholder="Ex: Mão de obra pintura"></div>
+        <div><label class="fl">Item / serviço</label><input class="fi" id="oi-desc" placeholder="Descreva o item do orçamento..."></div>
         <div><label class="fl">Valor R$</label><input class="fi" type="number" id="oi-val" placeholder="0,00" min="0" step="0.01"></div>
         <button class="btn btn-org" onclick="addOrcItem()" style="margin-top:auto">+ Add</button>
       </div>
@@ -881,7 +881,7 @@ const SEGMENTOS = {
                'pedreiro','encanador','eletricista','carpinteiro','gesseiro',
                'soldador','serralheiro','marcador'],
     icone: '⚒️',
-    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3'},
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',brn2:'#3d2008',bg:'#faf7f3',sur2:'#f5f0e8',bor:'#e8dfd2',mut:'#8a7060'},
     labels: {servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Agendado','Em andamento','Realizado','Cancelado']}
@@ -890,7 +890,7 @@ const SEGMENTOS = {
     keywords: ['frete','transporte','caminhao','caminhão','entrega',
                'motorista','mudanca','mudança','logistica','logística','mototaxista'],
     icone: '🚛',
-    paleta: {org:'#1d6fa4',org2:'#2d8fc4',orgBg:'#e8f4fd',brn:'#0a1f30',bg:'#f5faff'},
+    paleta: {org:'#1d6fa4',org2:'#2d8fc4',orgBg:'#e8f4fd',brn:'#0a1f30',brn2:'#0d2d42',bg:'#f5faff',sur2:'#e8f4fd',bor:'#c5dff0',mut:'#5a7a8a'},
     labels: {servico:'Frete',servicos:'Fretes',cliente:'Contratante',
              clientes:'Contratantes',materiais:'Custos da viagem',
              status:['Agendado','Em rota','Entregue','Cancelado']}
@@ -899,7 +899,7 @@ const SEGMENTOS = {
     keywords: ['doces','confeitaria','bolo','brigadeiro','candy',
                'doceira','chocolate','torta','cupcake','bem casado','salgado'],
     icone: '🍰',
-    paleta: {org:'#e879a0',org2:'#f59bc0',orgBg:'#fff0f5',brn:'#2d0a1a',bg:'#fff8fb'},
+    paleta: {org:'#e879a0',org2:'#f59bc0',orgBg:'#fff0f5',brn:'#2d0a1a',brn2:'#4a1428',bg:'#fff8fb',sur2:'#fff0f5',bor:'#f5c0d5',mut:'#8a5a6a'},
     labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Ingredientes',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -908,7 +908,7 @@ const SEGMENTOS = {
     keywords: ['cerimonial','cerimonia','eventos','casamento','formatura',
                'buffet','decoracao','decoração','aniversario','aniversário','debutante'],
     icone: '🎊',
-    paleta: {org:'#c9a84c',org2:'#e0c068',orgBg:'#fdf8ec',brn:'#1a1200',bg:'#fdfaf0'},
+    paleta: {org:'#c9a84c',org2:'#e0c068',orgBg:'#fdf8ec',brn:'#1a1200',brn2:'#2d2000',bg:'#fdfaf0',sur2:'#f8f2dc',bor:'#e8d898',mut:'#7a6a30'},
     labels: {servico:'Evento',servicos:'Eventos',cliente:'Contratante',
              clientes:'Contratantes',materiais:'Fornecedores',
              status:['Proposta enviada','Contrato assinado','Em preparacao','Realizado']}
@@ -917,7 +917,7 @@ const SEGMENTOS = {
     keywords: ['papelaria','artesanato','biblia','biblia','portaretrato',
                'scrapbook','personalizado','personalizada','feltro','croche','bordado','costura'],
     icone: '✂️',
-    paleta: {org:'#4a9b6f',org2:'#6ab88a',orgBg:'#f0faf4',brn:'#0a1f12',bg:'#f5faf7'},
+    paleta: {org:'#4a9b6f',org2:'#6ab88a',orgBg:'#f0faf4',brn:'#0a1f12',brn2:'#153d22',bg:'#f5faf7',sur2:'#e0f0e8',bor:'#b8dcc8',mut:'#4a7060'},
     labels: {servico:'Encomenda',servicos:'Encomendas',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -926,7 +926,7 @@ const SEGMENTOS = {
     keywords: ['embalagens','caixas','baloes','balões','lembranca','lembrança',
                'kit','presente','mimo','laco','laço','ribbon'],
     icone: '🎁',
-    paleta: {org:'#9b6fd4',org2:'#b48ee0',orgBg:'#f5f0fd',brn:'#1a0a2d',bg:'#faf7ff'},
+    paleta: {org:'#9b6fd4',org2:'#b48ee0',orgBg:'#f5f0fd',brn:'#1a0a2d',brn2:'#2d1550',bg:'#faf7ff',sur2:'#ede8f8',bor:'#c8b8e8',mut:'#6a5080'},
     labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -935,7 +935,7 @@ const SEGMENTOS = {
     keywords: ['cabelo','unha','estetica','estética','manicure','cabeleireiro',
                'makeup','maquiagem','sobrancelha','lash','depilacao','depilação','massagem','nail'],
     icone: '💅',
-    paleta: {org:'#b06fd4',org2:'#c98ee0',orgBg:'#faf0fd',brn:'#200a2d',bg:'#fdf7ff'},
+    paleta: {org:'#b06fd4',org2:'#c98ee0',orgBg:'#faf0fd',brn:'#200a2d',brn2:'#380f4a',bg:'#fdf7ff',sur2:'#f0e8f8',bor:'#d0b8e8',mut:'#7a5888'},
     labels: {servico:'Atendimento',servicos:'Atendimentos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Produtos',
              status:['Agendado','Em atendimento','Concluido','Cancelado']}
@@ -944,7 +944,7 @@ const SEGMENTOS = {
     keywords: ['foto','fotografia','ensaio','fotografo','fotógrafo',
                'video','vídeo','filmagem','drone','retratos'],
     icone: '📷',
-    paleta: {org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',bg:'#f9fafb'},
+    paleta: {org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',brn2:'#1a1c22',bg:'#f9fafb',sur2:'#e8eaef',bor:'#c8ccd8',mut:'#6a7080'},
     labels: {servico:'Sessao',servicos:'Sessoes',cliente:'Cliente',
              clientes:'Clientes',materiais:'Equipamentos',
              status:['Agendado','Em andamento','Editando','Entregue']}
@@ -952,7 +952,7 @@ const SEGMENTOS = {
   geral: {
     keywords: [],
     icone: '🛠️',
-    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',bg:'#faf7f3'},
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',brn2:'#3d2008',bg:'#faf7f3',sur2:'#f5f0e8',bor:'#e8dfd2',mut:'#8a7060'},
     labels: {servico:'Servico',servicos:'Servicos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Agendado','Em andamento','Realizado','Cancelado']}
@@ -990,15 +990,34 @@ const ICONES_CLI_SEG = {
 function aplicarSegmento(seg){
   if(!seg) seg = SEGMENTOS.geral;
   const key = Object.keys(SEGMENTOS).find(k=>SEGMENTOS[k]===seg) || 'geral';
+  const p = seg.paleta;
   const r = document.documentElement.style;
-  r.setProperty('--org',   seg.paleta.org);
-  r.setProperty('--org2',  seg.paleta.org2);
-  r.setProperty('--org-bg',seg.paleta.orgBg);
-  r.setProperty('--brn',   seg.paleta.brn);
-  r.setProperty('--bg',    seg.paleta.bg);
-  r.setProperty('--txt',   seg.paleta.brn);
+
+  // Cores primárias
+  r.setProperty('--org',    p.org);
+  r.setProperty('--org2',   p.org2);
+  r.setProperty('--org-bg', p.orgBg);
+  r.setProperty('--brn',    p.brn);
+  r.setProperty('--brn2',   p.brn2  || p.brn);
+  r.setProperty('--bg',     p.bg);
+  r.setProperty('--txt',    p.brn);
+  r.setProperty('--sur2',   p.sur2  || p.bg);
+  r.setProperty('--bor',    p.bor   || p.bg);
+  r.setProperty('--mut',    p.mut   || '#8a7060');
+
+  // Sidebar usa --brn como fundo — atualiza
+  const sidebar = document.querySelector('.sidebar');
+  if(sidebar) sidebar.style.background = p.brn;
+
+  // Mobile bar
+  const mobBar = document.querySelector('.mob-bar');
+  if(mobBar) mobBar.style.background = p.brn;
+  const mobMore = document.querySelector('.mob-more-menu');
+  if(mobMore) mobMore.style.background = p.brn;
+
+  // Theme color PWA
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', seg.paleta.org);
+  if(meta) meta.setAttribute('content', p.org);
 
   // Ícone principal
   const logoIco = document.querySelector('.logo-ico');
@@ -1093,6 +1112,11 @@ window.onload = () => {
   atualizarBadge();
   uiPerfil();
   if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
+  // Aplicar segmento salvo ao carregar
+  if(typeof SEGMENTOS !== 'undefined'){
+    const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
+    aplicarSegmento(SEGMENTOS[segSalvo] || SEGMENTOS.geral);
+  }
 };
 
 // Gerador de ID sequencial seguro (evita colisão do Date.now)
@@ -1234,7 +1258,10 @@ function ir(pg, el){
   }
   fecharMais();
   render();
-  // Ao entrar em relatórios, garante que as tabelas estão no estado correto
+  // Reaplicar segmento sempre que navegar — mantém paleta e ícones
+  if(typeof SEGMENTOS !== 'undefined' && D.perfil.segmento){
+    aplicarSegmento(SEGMENTOS[D.perfil.segmento] || SEGMENTOS.geral);
+  }
   if(pg === 'relatorio') setTimeout(renderRel, 30);
 }
 
@@ -1761,6 +1788,11 @@ function cancelarSrv(i){
 }
 
 function abrirFinalizar(i){
+  // Atualizar label de materiais conforme segmento
+  const seg = D.perfil.segmento || 'geral';
+  const SEG = SEGMENTOS[seg];
+  const lbl = document.getElementById('fin-mat-label');
+  if(lbl) lbl.textContent = SEG ? SEG.labels.materiais : 'Custos do servico';
   document.getElementById('fin-idx').value = i;
   finMats = [];
   clr('fin-desc','fin-mat-desc','fin-mat-val');
