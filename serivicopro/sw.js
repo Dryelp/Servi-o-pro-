@@ -1,4 +1,4 @@
-const CACHE = 'servicopro-v5';
+const CACHE = 'autonomopro-v6';
 // Atualizar este número a cada novo deploy para forçar atualização nos dispositivos
 const FILES = ['./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
 
@@ -29,13 +29,13 @@ self.addEventListener('fetch', e => {
 
 // Push notification handler
 self.addEventListener('push', e => {
-  const data = e.data ? e.data.json() : { title: 'ServiçoPro', body: 'Nova notificação' };
+  const data = e.data ? e.data.json() : { title: 'AutônomoPro', body: 'Nova notificação' };
   e.waitUntil(self.registration.showNotification(data.title, {
     body: data.body,
     icon: './icon-192.png',
     badge: './icon-192.png',
     vibrate: [200, 100, 200],
-    tag: data.tag || 'servicopro',
+    tag: data.tag || 'autonomopro',
     requireInteraction: data.requireInteraction || false
   }));
 });
@@ -58,7 +58,7 @@ self.addEventListener('message', e => {
       icon: './icon-192.png',
       badge: './icon-192.png',
       vibrate: [200, 100, 200],
-      tag: e.data.tag || 'sp-' + Date.now()
+      tag: e.data.tag || 'ap-' + Date.now()
     });
   }
 });
