@@ -288,4 +288,2618 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
     <div class="nav-sec">Análise</div>
     <button class="nb" onclick="ir('relatorio',this)"><span class="ni">📊</span>Relatórios</button>
-    <button class="nb" onclick="ir('notificacoes',this)"
+    <button class="nb" onclick="ir('notificacoes',this)"><span class="ni">🔔</span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
+    <div class="nav-sec">Conta</div>
+    <button class="nb" onclick="ir('perfil',this)"><span class="ni">👤</span>Meu Perfil</button>
+    <button class="nb" onclick="ir('config',this)"><span class="ni">⚙️</span>Configurações</button>
+  </nav>
+  <div class="sfoot">AutônomoPro v5.0<br><span id="sb-nome" style="color:rgba(255,255,255,.35)">Dados locais</span></div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="pg-dashboard">
+    <div class="topbar">
+      <div>
+        <div class="pg-title" id="dash-ola">Olá! 🛠️</div>
+        <div class="pg-sub" id="data-hoje"></div>
+      </div>
+      <div class="tb-right">
+        <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
+        <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
+        <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="sc" style="--sc-c:var(--grn)">
+        <div class="sc-ico">💰</div><div class="sc-lbl">Recebido (mês)</div>
+        <div class="sc-val" id="v-rec">R$ 0,00</div>
+        <div class="sc-hint" id="v-rec-h">0 serviços pagos</div>
+      </div>
+      <div class="sc" style="--sc-c:var(--org)">
+        <div class="sc-ico">⏳</div><div class="sc-lbl">A receber</div>
+        <div class="sc-val" id="v-pend">R$ 0,00</div>
+        <div class="sc-hint" id="v-pend-h">0 pendentes</div>
+      </div>
+      <div class="sc" style="--sc-c:var(--red)">
+        <div class="sc-ico">💸</div><div class="sc-lbl">Custos (mês)</div>
+        <div class="sc-val" id="v-custo">R$ 0,00</div>
+        <div class="sc-hint" id="v-custo-h">materiais + despesas</div>
+      </div>
+      <div class="sc" style="--sc-c:var(--pur)">
+        <div class="sc-ico">📈</div><div class="sc-lbl">Lucro real</div>
+        <div class="sc-val" id="v-lucro">R$ 0,00</div>
+        <div class="sc-hint">receitas − tudo</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-bottom:18px" class="dash-grid">
+      <div class="panel">
+        <div class="ph"><div class="pt">🗓 Serviços de Hoje</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
+        <div class="pb" id="dash-hoje"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="pt">📊 Receita semanal</div></div>
+        <div class="pb">
+          <div class="chart-bars" id="chart"></div>
+          <div style="display:flex;gap:4px;margin-top:6px" id="chart-lbl"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRASE META -->
+    <div id="dash-meta-box" style="display:none;background:linear-gradient(135deg,var(--grn-bg),#c8eed9);border:1px solid rgba(26,107,60,.15);border-radius:12px;padding:13px 18px;margin-bottom:18px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">📈 Progresso do mês</div>
+        <div id="dash-meta-txt" style="font-size:.9rem;font-weight:600;color:var(--brn)"></div>
+      </div>
+      <div id="dash-meta-pct" style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--grn)"></div>
+    </div>
+
+    <div class="tw">
+      <div class="th"><div class="pt">🔧 Últimos serviços</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
+      <table><thead><tr><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Data</th><th>Valor</th><th>Status</th><th class="hide-mob">Pagamento</th></tr></thead>
+      <tbody id="tb-dash"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <div class="page" id="pg-servicos">
+    <div class="topbar">
+      <div><div class="pg-title">Serviços</div><div class="pg-sub">Gerencie seus serviços do início ao fim</div></div>
+      <div class="tb-right">
+        <button class="btn btn-org" onclick="abreSrv()">+ Novo serviço</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <input class="search-inp" id="srv-search" placeholder="🔍 Buscar por cliente ou serviço..." oninput="rServicos()">
+      <select class="fi" id="srv-filtro" style="width:145px;flex:none" onchange="rServicos()">
+        <option value="">Todos</option>
+        <option value="Agendado">Agendados</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Realizado">Realizados</option>
+        <option value="Cancelado">Cancelados</option>
+      </select>
+    </div>
+    <div id="srv-lista"></div>
+  </div>
+
+  <!-- RECEBIMENTOS -->
+  <div class="page" id="pg-recebimentos">
+    <div class="topbar">
+      <div><div class="pg-title">Recebimentos</div><div class="pg-sub">Gerado automaticamente ao finalizar serviços</div></div>
+    </div>
+    <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido (mês)</div><div class="sc-val" id="r-rec">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Pendente</div><div class="sc-val" id="r-pend">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total geral</div><div class="sc-val" id="r-tot">R$ 0,00</div></div>
+    </div>
+    <div class="tw">
+      <table><thead><tr><th class="hide-mob">Data</th><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Forma</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody id="tb-rec"></tbody></table>
+    </div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div class="page" id="pg-clientes">
+    <div class="topbar">
+      <div><div class="pg-title">Clientes</div><div class="pg-sub">Base de clientes cadastrados</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-cli')">+ Novo cliente</button></div>
+    </div>
+    <div class="tw">
+      <table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Serviço</th><th>Total gasto</th><th>Último atend.</th><th></th></tr></thead>
+      <tbody id="tb-cli"></tbody></table>
+    </div>
+  </div>
+
+  <!-- DESPESAS -->
+  <div class="page" id="pg-despesas">
+    <div class="topbar">
+      <div><div class="pg-title">Despesas</div><div class="pg-sub">Controle seus gastos operacionais</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-desp')">+ Nova despesa</button></div>
+    </div>
+    <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+      <div class="sc" style="--sc-c:var(--red)"><div class="sc-lbl">Total do mês</div><div class="sc-val" id="desp-tot">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Mão de obra</div><div class="sc-val" id="desp-mdo">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--pur)"><div class="sc-lbl">Outras despesas</div><div class="sc-val" id="desp-out">R$ 0,00</div></div>
+    </div>
+    <div class="search-bar">
+      <input class="search-inp" id="desp-search" placeholder="🔍 Buscar despesa..." oninput="rDespesas()">
+      <select class="fi" id="desp-mes" style="width:160px;flex:none" onchange="rDespesas()"></select>
+    </div>
+    <div id="desp-lista"></div>
+  </div>
+
+  <!-- ORÇAMENTOS -->
+  <div class="page" id="pg-orcamentos">
+    <div class="topbar">
+      <div><div class="pg-title">Orçamentos</div><div class="pg-sub">Orçamentos para visitas prévias — independente dos serviços</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-orc')">+ Novo orçamento</button></div>
+    </div>
+    <div class="search-bar">
+      <input class="search-inp" id="orc-search" placeholder="🔍 Buscar por cliente, descrição..." oninput="rOrcamentos()">
+      <select class="fi" id="orc-filtro-sts" style="width:145px;flex:none" onchange="rOrcamentos()">
+        <option value="">Todos status</option>
+        <option>Pendente</option><option>Enviado</option><option>Aprovado</option><option>Recusado</option>
+      </select>
+    </div>
+    <div id="orc-lista"></div>
+  </div>
+
+  <!-- RELATÓRIOS -->
+  <div class="page" id="pg-relatorio">
+    <div class="topbar">
+      <div><div class="pg-title">Relatórios</div><div class="pg-sub">Análise financeira completa do período</div></div>
+      <div class="tb-right"><button class="btn btn-pdf" onclick="gerarPDFRel()">📄 Baixar PDF</button></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+      <input class="fi" type="month" id="rel-mes" style="width:155px;flex:none" onchange="renderRel()">
+      <button class="btn btn-gho btn-sm" onclick="relMesAnterior()">← Anterior</button>
+      <button class="btn btn-gho btn-sm" onclick="relMesAtual()">Mês atual</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:18px">
+      <button id="btn-rel-resumido" class="btn btn-brn btn-sm" onclick="setModoRel('resumido')">📄 Resumido</button>
+      <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel('detalhado')">📋 Detalhado</button>
+    </div>
+    <div id="rel-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>
+    <div id="rel-detalhado-body" class="rel-oculto"></div>
+  </div>
+
+  <!-- NOTIFICAÇÕES -->
+  <div class="page" id="pg-notificacoes">
+    <div class="topbar">
+      <div><div class="pg-title">Notificações</div></div>
+      <div class="tb-right">
+        <button class="btn btn-gho btn-sm" onclick="limparNotifs()">Limpar tudo</button>
+        <button class="btn btn-org" id="btn-ativar" onclick="ativarNotifs()">🔔 Ativar notificações</button>
+      </div>
+    </div>
+    <div class="cfg-sec" style="margin-bottom:18px">
+      <div class="cfg-t">⚙️ Configurar alertas</div>
+      <div class="toggle-row"><div><div class="tl">Lembrete de agendamento</div><div class="ts">1 hora antes do serviço</div></div><label class="switch"><input type="checkbox" id="tog-ag" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div class="toggle-row"><div><div class="tl">Resumo diário</div><div class="ts">Todo dia às 8h</div></div><label class="switch"><input type="checkbox" id="tog-res" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div class="toggle-row"><div><div class="tl">Cobrança pendente</div><div class="ts">Avisar sobre pagamentos em aberto às 9h</div></div><label class="switch"><input type="checkbox" id="tog-cob" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bor)">
+        <button class="btn btn-gho btn-sm" onclick="testarNotif()">🧪 Testar notificação</button>
+      </div>
+    </div>
+    <div class="panel" id="notif-list"><div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div></div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="page" id="pg-perfil">
+    <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Suas informações pessoais</div></div></div>
+    <div class="cfg-sec">
+      <div class="cfg-t">👤 Informações pessoais</div>
+      <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
+      <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
+      <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
+      <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-t">🛠️ Meus serviços</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:12px;line-height:1.6">Cadastre os tipos de serviço que você presta. Vão aparecer como sugestão ao criar um novo serviço.</p>
+      <div id="meus-srvs-lista" style="margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" id="novo-srv-tipo" placeholder="Ex: Tipo de serviço que você presta..." style="flex:1">
+        <button class="btn btn-org" onclick="adicionarMeuSrv()">+ Add</button>
+      </div>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-t">🎯 Meta mensal</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Defina quanto quer faturar por mês. Vamos te mostrar o progresso em tempo real no dashboard.</p>
+      <div class="fg"><label class="fl">Meta de faturamento (R$)</label>
+        <input class="fi" type="number" id="edit-meta" placeholder="Ex: 3000" min="0" step="100" oninput="atualizarPreviewMeta()">
+      </div>
+      <div id="meta-preview" style="display:none;background:linear-gradient(135deg,var(--grn-bg),#c8eed9);border:1px solid rgba(26,107,60,.15);border-radius:10px;padding:13px 16px;margin-bottom:12px">
+        <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Sua meta</div>
+        <div id="meta-preview-txt" style="font-size:.92rem;font-weight:600;color:var(--brn)"></div>
+      </div>
+      <button class="btn btn-org" onclick="salvarMeta()">🎯 Definir meta</button>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="page" id="pg-config">
+    <div class="topbar"><div><div class="pg-title">Configurações</div></div></div>
+    <div class="cfg-sec">
+      <div class="cfg-t" style="color:var(--red)">⚠️ Zona de perigo</div>
+      <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Apaga todos os dados do app localmente. Esta ação <strong>não pode ser desfeita</strong>.</p>
+      <button class="btn btn-del" onclick="limparTudo()">🗑️ Limpar todos os dados</button>
+    </div>
+    <div class="cfg-sec">
+      <div class="cfg-t">ℹ️ Sobre o AutônomoPro</div>
+      <p style="font-size:.83rem;color:var(--mut);line-height:1.8">
+        Versão: 5.0<br>
+        Gestão completa para autônomos de qualquer segmento<br>
+        Dados salvos localmente no seu dispositivo
+      </p>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- MOBILE BAR -->
+<div class="mob-bar">
+  <button class="mb on" onclick="ir('dashboard',this)"><span class="mi">🏠</span>Início</button>
+  <button class="mb" onclick="ir('servicos',this)"><span class="mi">🔧</span>Serviços</button>
+  <button class="mb" onclick="ir('orcamentos',this)"><span class="mi">📋</span>Orçam.</button>
+  <button class="mb" onclick="ir('recebimentos',this)"><span class="mi">💵</span>Receb.</button>
+  <button class="mb" id="mb-mais" onclick="toggleMais()"><span class="mi">☰</span>Mais<span class="mn-dot" id="mob-dot"></span></button>
+</div>
+<div class="mob-more-menu" id="mob-more">
+  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
+  <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
+  <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
+  <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
+  <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi">👤</span>Perfil</button>
+  <button class="mob-more-btn" onclick="ir('config');fecharMais()"><span class="mi">⚙️</span>Config</button>
+</div>
+
+<!-- ═══ MODAIS ═══ -->
+
+<!-- Converter Orçamento em Serviço -->
+<div class="overlay" id="m-conv-orc">
+  <div class="modal">
+    <div class="mt">✅ Converter em Serviço <button class="xbtn" onclick="fecha('m-conv-orc')">✕</button></div>
+    <input type="hidden" id="conv-orc-idx">
+    <div style="background:var(--grn-bg);border:1px solid rgba(26,107,60,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.84rem">
+      <div id="conv-orc-preview" style="color:var(--brn)"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Data do serviço</label><input class="fi" type="date" id="conv-dt"></div>
+      <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="conv-hr"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="converterOrcSrv()">✅ Criar serviço agendado</button>
+      <button class="btn btn-gho" onclick="fecha('m-conv-orc')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nova Despesa -->
+<div class="overlay" id="m-desp">
+  <div class="modal">
+    <div class="mt">💸 Nova Despesa <button class="xbtn" onclick="fecha('m-desp')">✕</button></div>
+    <input type="hidden" id="desp-edit-idx" value="-1">
+
+    <div class="fg">
+      <label class="fl">Nome da despesa</label>
+      <input class="fi" id="desp-nm" placeholder="Nome da despesa...">
+    </div>
+
+    <div class="fg">
+      <label class="fl">Categoria</label>
+      <select class="fs" id="desp-cat" onchange="toggleAjudante()">
+        <option value="Mão de obra">👷 Mão de obra (ajudante)</option>
+        <option value="Combustível">⛽ Combustível</option>
+        <option value="Ferramenta">🔨 Ferramenta / Equipamento</option>
+        <option value="Outro">📦 Outro</option>
+      </select>
+    </div>
+
+    <div class="fg" id="desp-ajudante-row" style="display:none">
+      <label class="fl">Nome do ajudante</label>
+      <input class="fi" id="desp-ajudante" placeholder="Ex: João, Pedro...">
+    </div>
+
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Valor (R$)</label>
+        <input class="fi" type="number" id="desp-val" placeholder="0,00" min="0" step="0.01" oninput="calcParcelaDesp()">
+      </div>
+      <div class="fg">
+        <label class="fl">Data</label>
+        <input class="fi" type="date" id="desp-dt">
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl">Forma de pagamento</label>
+      <select class="fs" id="desp-pag">
+        <option>PIX</option><option>Dinheiro</option><option>Cartão Crédito</option><option>Cartão Débito</option>
+      </select>
+    </div>
+
+    <div class="fg" style="background:var(--sur2);border-radius:10px;padding:12px;border:1px solid var(--bor)">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.84rem;font-weight:600">
+        <input type="checkbox" id="desp-parcela" onchange="toggleParcela()" style="width:16px;height:16px;cursor:pointer">
+        Despesa parcelada (cartão)
+      </label>
+      <div id="desp-parcela-row" style="display:none;margin-top:10px">
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Nº de parcelas</label>
+            <input class="fi" type="number" id="desp-nparc" placeholder="Ex: 5" min="2" max="48" oninput="calcParcelaDesp()">
+          </div>
+          <div class="fg">
+            <label class="fl">Valor por parcela</label>
+            <input class="fi" id="desp-vparc" placeholder="R$ 0,00" readonly style="color:var(--grn);font-weight:700">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarDesp()">✅ Salvar despesa</button>
+      <button class="btn btn-gho" onclick="fecha('m-desp')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Serviço -->
+<div class="overlay" id="m-srv">
+  <div class="modal">
+    <div class="mt">🔧 Novo Serviço <button class="xbtn" onclick="fecha('m-srv')">✕</button></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="s-dt"></div>
+      <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="s-hr"></div>
+    </div>
+    <div class="fg"><label class="fl">Cliente</label><input class="fi" id="s-cli" placeholder="Nome do cliente" list="dl-s" oninput="autoPreencherCliente()"><datalist id="dl-s"></datalist></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="s-tipo" placeholder="Ex: Tipo de serviço..." id-placeholder="s-tipo" list="dl-tipo"><datalist id="dl-tipo"></datalist></div>
+    <div class="fg"><label class="fl">Endereço</label><input class="fi" id="s-end" placeholder="Rua, número, bairro..."></div>
+    <div class="fg"><label class="fl">Valor combinado (R$) <span style="color:var(--mut);font-weight:400;text-transform:none;letter-spacing:0">— opcional, pode preencher depois</span></label><input class="fi" type="number" id="s-val" placeholder="Deixe em branco se não souber ainda" min="0" step="0.01"></div>
+
+    <!-- Campo prazo de entrega — aparece pra encomendas -->
+    <div class="fg" id="s-prazo-box" style="display:none">
+      <label class="fl">📅 Prazo de entrega</label>
+      <input class="fi" type="date" id="s-prazo">
+    </div>
+
+    <!-- Campo quantidade — aparece pra encomendas -->
+    <div class="fg" id="s-qtd-box" style="display:none">
+      <label class="fl">📦 Quantidade de itens</label>
+      <input class="fi" type="number" id="s-qtd" placeholder="Ex: 50 brigadeiros, 10 caixas..." min="1">
+    </div>
+
+    <!-- Pagamento em etapas — aparece pra cerimonial e construção -->
+    <div id="s-etapas-box" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:10px">
+      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">💰 Pagamento em etapas</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Entrada (R$)</label><input class="fi" type="number" id="s-entrada" placeholder="0,00" min="0" step="0.01" oninput="calcSaldo()"></div>
+        <div class="fg"><label class="fl">Saldo restante</label><input class="fi" id="s-saldo" readonly style="color:var(--org);font-weight:700"></div>
+      </div>
+    </div>
+
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()">✅ Agendar serviço</button>
+      <button class="btn btn-gho" onclick="fecha('m-srv')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Finalizar Serviço -->
+<div class="overlay" id="m-fin-srv">
+  <div class="modal modal-lg">
+    <div class="mt">⏹️ Finalizar Serviço <button class="xbtn" onclick="fecha('m-fin-srv')">✕</button></div>
+    <input type="hidden" id="fin-idx">
+
+    <div class="fg">
+      <label class="fl">O que foi feito (descrição para o relatório)</label>
+      <textarea class="fi" id="fin-desc" rows="3" placeholder="Descreva detalhadamente o serviço realizado..."></textarea>
+    </div>
+
+    <div class="fg">
+      <label class="fl">Valor final do serviço (R$)</label>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input class="fi" type="number" id="fin-val-edit" placeholder="0,00" min="0" step="0.01" oninput="renderFinMats()" style="font-size:1rem;font-weight:700;color:var(--grn)">
+        <span id="fin-val-original" style="font-size:.75rem;color:var(--mut);white-space:nowrap"></span>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label class="fl" id="fin-mat-label">Custos do serviço</label>
+      <div class="mat-lista" id="fin-mat-lista">
+        <div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum material adicionado</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 110px auto;gap:7px;margin-top:7px;align-items:end">
+        <div><label class="fl">Material / despesa</label><input class="fi" id="fin-mat-desc" placeholder="Descreva o item ou custo..."></div>
+        <div><label class="fl">Valor R$</label><input class="fi" type="number" id="fin-mat-val" placeholder="0,00" min="0" step="0.01"></div>
+        <button class="btn btn-org" onclick="addMat()" style="margin-top:auto">+ Add</button>
+      </div>
+    </div>
+
+    <div class="lucro-box" id="fin-lucro-box">
+      <div class="lucro-row"><span style="color:var(--mut)">Valor cobrado</span><span id="fin-val-show" style="color:var(--grn);font-weight:700">R$ 0,00</span></div>
+      <div class="lucro-row"><span style="color:var(--mut)">(−) Custos materiais</span><span id="fin-custo-show" style="color:var(--red);font-weight:700">R$ 0,00</span></div>
+      <div class="lucro-row"><span>Lucro líquido</span><span id="fin-lucro-show" style="font-family:'Fraunces',serif;font-size:1.15rem;color:var(--grn)">R$ 0,00</span></div>
+    </div>
+
+    <div class="frow">
+      <div class="fg"><label class="fl">Forma de pagamento</label>
+        <select class="fs" id="fin-pag">
+          <option>PIX</option><option>Dinheiro</option><option>Cartão Crédito</option><option>Cartão Débito</option><option>Transferência</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Status do pagamento</label>
+        <select class="fs" id="fin-sts-pag">
+          <option>Pago</option><option>Pendente</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="finalizarSrv()">✅ Finalizar serviço</button>
+      <button class="btn btn-gho" onclick="fecha('m-fin-srv')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp mensagens -->
+<div class="overlay" id="m-wpp">
+  <div class="modal">
+    <div class="mt">📱 Avisar Cliente <button class="xbtn" onclick="fecha('m-wpp')">✕</button></div>
+    <input type="hidden" id="wpp-idx">
+    <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px">Escolha a mensagem para enviar:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('deslocamento')">🚗 Estou a caminho!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('chegada')">📍 Cheguei no local!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('atraso')">⏰ Vou me atrasar</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('concluido')">✅ Serviço concluído!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('cobranca')">💰 Lembrete de pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Relatório do serviço -->
+<div class="overlay" id="m-rel-srv">
+  <div class="modal modal-lg">
+    <div class="mt">📄 Relatório do Serviço <button class="xbtn" onclick="fecha('m-rel-srv')">✕</button></div>
+    <input type="hidden" id="rel-srv-idx">
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;background:var(--org-bg);border:1.5px solid var(--org-bg);border-radius:9px;padding:10px 14px;font-size:.86rem;font-weight:600;color:var(--brn2)">
+      <input type="checkbox" id="rel-srv-desp" onchange="abrirRelSrv(document.getElementById('rel-srv-idx').value)" style="accent-color:var(--org);width:16px;height:16px">
+      💸 Incluir despesas e custos no relatório
+    </label>
+    <div id="rel-srv-preview"></div>
+    <div class="mf">
+      <button class="btn btn-pdf" onclick="pdfRelSrv()">📄 Baixar PDF</button>
+      <button class="btn btn-wpp" onclick="wppRelSrv()">📱 Enviar WhatsApp</button>
+      <button class="btn btn-gho" onclick="fecha('m-rel-srv')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cliente -->
+<div class="overlay" id="m-cli">
+  <div class="modal">
+    <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
+    <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="c-nm" placeholder="Nome do cliente"></div>
+    <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="c-wpp" placeholder="(11) 99999-9999"></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Tipo de serviço..."></div>
+    <div class="fg"><label class="fl">Endereço</label><input class="fi" id="c-end" placeholder="Endereço principal"></div>
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarCli()">✅ Salvar</button>
+      <button class="btn btn-gho" onclick="fecha('m-cli')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editar Cliente -->
+<div class="overlay" id="m-edit-cli">
+  <div class="modal">
+    <div class="mt">✏️ Editar Cliente <button class="xbtn" onclick="fecha('m-edit-cli')">✕</button></div>
+    <input type="hidden" id="edit-cli-idx">
+    <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="edit-cli-nm" placeholder="Nome do cliente"></div>
+    <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-cli-wpp" placeholder="(11) 99999-9999"></div>
+    <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-cli-srv" placeholder="Ex: Tipo de serviço..."></div>
+    <div class="fg"><label class="fl">Endereço</label><input class="fi" id="edit-cli-end" placeholder="Endereço principal"></div>
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarEditCli()">✅ Salvar alterações</button>
+      <button class="btn btn-gho" onclick="fecha('m-edit-cli')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Orçamento -->
+<div class="overlay" id="m-orc">
+  <div class="modal modal-lg">
+    <div class="mt">📋 Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Cliente</label><input class="fi" id="o-cli" placeholder="Nome do cliente" list="dl-o"><datalist id="dl-o"></datalist></div>
+      <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="o-dt"></div>
+    </div>
+    <div class="fg"><label class="fl">Descrição do serviço</label><input class="fi" id="o-desc" placeholder="Descreva o serviço a ser orçado..."></div>
+    <div class="fg"><label class="fl">Válido até</label><input class="fi" type="date" id="o-valid"></div>
+    <div class="fg">
+      <label class="fl">Itens do orçamento</label>
+      <div class="mat-lista" id="orc-itens-lista">
+        <div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum item adicionado</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 110px auto;gap:7px;margin-top:7px;align-items:end">
+        <div><label class="fl">Item / serviço</label><input class="fi" id="oi-desc" placeholder="Descreva o item do orçamento..."></div>
+        <div><label class="fl">Valor R$</label><input class="fi" type="number" id="oi-val" placeholder="0,00" min="0" step="0.01"></div>
+        <button class="btn btn-org" onclick="addOrcItem()" style="margin-top:auto">+ Add</button>
+      </div>
+      <div style="margin-top:10px;padding:11px 13px;background:var(--grn-bg);border-radius:9px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;font-size:.87rem">Total do orçamento:</span>
+        <span id="orc-total-prev" style="font-family:'Fraunces',serif;font-weight:700;color:var(--grn);font-size:1.15rem">R$ 0,00</span>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Observações</label><input class="fi" id="o-obs" placeholder="Prazo, condições, materiais inclusos..."></div>
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
+      <button class="btn btn-gho" onclick="fecha('m-orc')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const D = {
+  servicos:   [],
+  clientes:   [],
+  orcamentos: [],
+  notifs:     [],
+  despesas:   [],
+  perfil:     {nome:'',tipo:'',wpp:'',meta:0},
+  cfg:        {togAg:true,togRes:true,togCob:true}
+};
+let finMats  = [];
+let orcItens = [];
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+
+// ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// SEGMENTOS INTELIGENTES
+// ══════════════════════════════════════════
+const SEGMENTOS = {
+  construcao: {
+    keywords: ['construcao','construção','reforma','eletrica','elétrica',
+               'hidraulica','hidráulica','pintura','manutencao','manutenção',
+               'pedreiro','encanador','eletricista','carpinteiro','gesseiro',
+               'soldador','serralheiro','marcador'],
+    icone: '⚒️',
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',brn2:'#3d2008',bg:'#faf7f3',sur2:'#f5f0e8',bor:'#e8dfd2',mut:'#8a7060'},
+    labels: {servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Agendado','Em andamento','Realizado','Cancelado']}
+  },
+  frete: {
+    keywords: ['frete','transporte','caminhao','caminhão','entrega',
+               'motorista','mudanca','mudança','logistica','logística','mototaxista'],
+    icone: '🚛',
+    paleta: {org:'#1d6fa4',org2:'#2d8fc4',orgBg:'#e8f4fd',brn:'#0a1f30',brn2:'#0d2d42',bg:'#f5faff',sur2:'#e8f4fd',bor:'#c5dff0',mut:'#5a7a8a'},
+    labels: {servico:'Frete',servicos:'Fretes',cliente:'Contratante',
+             clientes:'Contratantes',materiais:'Custos da viagem',
+             status:['Agendado','Em rota','Entregue','Cancelado']}
+  },
+  confeitaria: {
+    keywords: ['doces','confeitaria','bolo','brigadeiro','candy',
+               'doceira','chocolate','torta','cupcake','bem casado','salgado'],
+    icone: '🍰',
+    paleta: {org:'#e879a0',org2:'#f59bc0',orgBg:'#fff0f5',brn:'#2d0a1a',brn2:'#4a1428',bg:'#fff8fb',sur2:'#fff0f5',bor:'#f5c0d5',mut:'#8a5a6a'},
+    labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Ingredientes',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  cerimonial: {
+    keywords: ['cerimonial','cerimonia','eventos','casamento','formatura',
+               'buffet','decoracao','decoração','aniversario','aniversário','debutante'],
+    icone: '🎊',
+    paleta: {org:'#c9a84c',org2:'#e0c068',orgBg:'#fdf8ec',brn:'#1a1200',brn2:'#2d2000',bg:'#fdfaf0',sur2:'#f8f2dc',bor:'#e8d898',mut:'#7a6a30'},
+    labels: {servico:'Evento',servicos:'Eventos',cliente:'Contratante',
+             clientes:'Contratantes',materiais:'Fornecedores',
+             status:['Proposta enviada','Contrato assinado','Em preparacao','Realizado']}
+  },
+  artesanato: {
+    keywords: ['papelaria','artesanato','biblia','biblia','portaretrato',
+               'scrapbook','personalizado','personalizada','feltro','croche','bordado','costura'],
+    icone: '✂️',
+    paleta: {org:'#4a9b6f',org2:'#6ab88a',orgBg:'#f0faf4',brn:'#0a1f12',brn2:'#153d22',bg:'#f5faf7',sur2:'#e0f0e8',bor:'#b8dcc8',mut:'#4a7060'},
+    labels: {servico:'Encomenda',servicos:'Encomendas',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  embalagens: {
+    keywords: ['embalagens','caixas','baloes','balões','lembranca','lembrança',
+               'kit','presente','mimo','laco','laço','ribbon'],
+    icone: '🎁',
+    paleta: {org:'#9b6fd4',org2:'#b48ee0',orgBg:'#f5f0fd',brn:'#1a0a2d',brn2:'#2d1550',bg:'#faf7ff',sur2:'#ede8f8',bor:'#c8b8e8',mut:'#6a5080'},
+    labels: {servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Recebido','Em producao','Pronto','Entregue']}
+  },
+  beleza: {
+    keywords: ['cabelo','unha','estetica','estética','manicure','cabeleireiro',
+               'makeup','maquiagem','sobrancelha','lash','depilacao','depilação','massagem','nail'],
+    icone: '💅',
+    paleta: {org:'#b06fd4',org2:'#c98ee0',orgBg:'#faf0fd',brn:'#200a2d',brn2:'#380f4a',bg:'#fdf7ff',sur2:'#f0e8f8',bor:'#d0b8e8',mut:'#7a5888'},
+    labels: {servico:'Atendimento',servicos:'Atendimentos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Produtos',
+             status:['Agendado','Em atendimento','Concluido','Cancelado']}
+  },
+  fotografia: {
+    keywords: ['foto','fotografia','ensaio','fotografo','fotógrafo',
+               'video','vídeo','filmagem','drone','retratos'],
+    icone: '📷',
+    paleta: {org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',brn2:'#1a1c22',bg:'#f9fafb',sur2:'#e8eaef',bor:'#c8ccd8',mut:'#6a7080'},
+    labels: {servico:'Sessao',servicos:'Sessoes',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Equipamentos',
+             status:['Agendado','Em andamento','Editando','Entregue']}
+  },
+  geral: {
+    keywords: [],
+    icone: '🛠️',
+    paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',brn2:'#3d2008',bg:'#faf7f3',sur2:'#f5f0e8',bor:'#e8dfd2',mut:'#8a7060'},
+    labels: {servico:'Servico',servicos:'Servicos',cliente:'Cliente',
+             clientes:'Clientes',materiais:'Materiais',
+             status:['Agendado','Em andamento','Realizado','Cancelado']}
+  }
+};
+
+function detectarSegmento(tipo){
+  if(!tipo) return 'geral';
+  const t = tipo.toLowerCase();
+  for(const [key,seg] of Object.entries(SEGMENTOS)){
+    if(key==='geral') continue;
+    if(seg.keywords.some(k=>t.includes(k))) return key;
+  }
+  return 'geral';
+}
+
+const PLACEHOLDERS_SEG = {
+  construcao: 'Ex: Pintura, instalacao eletrica, reforma...',
+  frete:      'Ex: Frete urbano, mudanca, entrega...',
+  confeitaria:'Ex: Bolo personalizado, brigadeiros...',
+  cerimonial: 'Ex: Casamento, aniversario, formatura...',
+  artesanato: 'Ex: Papelaria, portaretrato, bordado...',
+  embalagens: 'Ex: Caixas personalizadas, baloes...',
+  beleza:     'Ex: Corte de cabelo, manicure, maquiagem...',
+  fotografia: 'Ex: Ensaio fotografico, casamento...',
+  geral:      'Ex: Tipo de servico prestado...'
+};
+
+const ICONES_CLI_SEG = {
+  construcao: '👷', frete:'🚛', confeitaria:'🍰',
+  cerimonial: '💍', artesanato:'✂️', embalagens:'🎁',
+  beleza:     '💅', fotografia:'📷', geral:'👤'
+};
+
+function aplicarSegmento(seg){
+  if(!seg) seg = SEGMENTOS.geral;
+  const key = Object.keys(SEGMENTOS).find(k=>SEGMENTOS[k]===seg) || 'geral';
+  const p = seg.paleta;
+  const r = document.documentElement.style;
+
+  // Cores primárias
+  r.setProperty('--org',    p.org);
+  r.setProperty('--org2',   p.org2);
+  r.setProperty('--org-bg', p.orgBg);
+  r.setProperty('--brn',    p.brn);
+  r.setProperty('--brn2',   p.brn2  || p.brn);
+  r.setProperty('--bg',     p.bg);
+  r.setProperty('--txt',    p.brn);
+  r.setProperty('--sur2',   p.sur2  || p.bg);
+  r.setProperty('--bor',    p.bor   || p.bg);
+  r.setProperty('--mut',    p.mut   || '#8a7060');
+
+  // Sidebar usa --brn como fundo - atualiza
+  const sidebar = document.querySelector('.sidebar');
+  if(sidebar) sidebar.style.background = p.brn;
+
+  // Mobile bar
+  const mobBar = document.querySelector('.mob-bar');
+  if(mobBar) mobBar.style.background = p.brn;
+  const mobMore = document.querySelector('.mob-more-menu');
+  if(mobMore) mobMore.style.background = p.brn;
+
+  // Theme color PWA
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', p.org);
+
+  // Ícone principal
+  const logoIco = document.querySelector('.logo-ico');
+  if(logoIco) logoIco.textContent = seg.icone;
+  const welcomeIco = document.getElementById('welcome-ico');
+  if(welcomeIco) welcomeIco.textContent = seg.icone;
+
+  // Ícone de cliente
+  const icoC = ICONES_CLI_SEG[key] || '👤';
+  ['nav-cli-ico','mob-cli-ico','empty-cli-ico','modal-cli-ico'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = icoC;
+  });
+
+  // Ícone tela vazia de serviços
+  const emptySrv = document.getElementById('empty-srv-ico');
+  if(emptySrv) emptySrv.textContent = seg.icone;
+
+  // Placeholder tipo de serviço
+  const tipoInp = document.getElementById('s-tipo');
+  if(tipoInp) tipoInp.placeholder = PLACEHOLDERS_SEG[key] || 'Ex: Tipo de servico...';
+
+  // Label "Clientes" no nav vira nome do segmento
+  const L = seg.labels;
+  if(L){
+    // Botões de novo serviço
+    document.querySelectorAll('[onclick="abreSrv()"]').forEach(b=>{
+      if(b.textContent.includes('Novo')||b.textContent.includes('Cadastrar'))
+        b.textContent = b.textContent.includes('primeiro')
+          ? '+ Cadastrar primeiro ' + L.servico.toLowerCase()
+          : '+ Novo ' + L.servico;
+    });
+  }
+}
+
+// ══════════════════════════════════════════
+// SERVICE WORKER + DETECÇÃO DE ATUALIZAÇÃO
+// ══════════════════════════════════════════
+let swRegistration = null;
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    swRegistration = reg;
+
+    // Verifica atualização imediatamente
+    reg.update();
+
+    // Novo SW esperando → mostra banner
+    if(reg.waiting) mostrarBannerUpdate();
+
+    reg.addEventListener('updatefound', () => {
+      const novoSW = reg.installing;
+      novoSW.addEventListener('statechange', () => {
+        if(novoSW.state === 'installed' && navigator.serviceWorker.controller){
+          mostrarBannerUpdate();
+        }
+      });
+    });
+  });
+
+  // Quando SW assume controle → recarrega página
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+
+function mostrarBannerUpdate(){
+  const banner = document.getElementById('update-banner');
+  if(banner) banner.style.display = 'flex';
+}
+
+function atualizarApp(){
+  if(swRegistration && swRegistration.waiting){
+    swRegistration.waiting.postMessage({type:'SKIP_WAITING'});
+  } else {
+    window.location.reload(true);
+  }
+}
+
+window.onload = () => {
+  load();
+  document.getElementById('data-hoje').textContent =
+    new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('s-dt').value = hj();
+  document.getElementById('o-dt').value = hj();
+  const v = new Date(); v.setDate(v.getDate()+7);
+  document.getElementById('o-valid').value = v.toISOString().split('T')[0];
+  relMesAtual();
+  render();
+  renderRel();
+  iniciarNotificacoes();
+  atualizarBadge();
+  uiPerfil();
+  if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
+  // Aplicar segmento DEPOIS de tudo — garante que DOM está pronto
+  setTimeout(function(){
+    if(typeof SEGMENTOS !== 'undefined'){
+      const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
+      aplicarSegmento(SEGMENTOS[segSalvo] || SEGMENTOS.geral);
+    }
+
+  }, 0);
+};
+
+// Gerador de ID sequencial seguro (evita colisão do Date.now)
+function gerarId(){
+  const ultimo = parseInt(localStorage.getItem('sp4_id_seq') || '0');
+  const novo   = ultimo + 1;
+  localStorage.setItem('sp4_id_seq', novo);
+  return novo;
+}
+
+function hj(){
+  const d = new Date();
+  const offset = d.getTimezoneOffset();
+  const local  = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().split('T')[0];
+}
+
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+function load(){
+  try{
+    D.servicos   = JSON.parse(localStorage.getItem('sp4_srv')   || '[]');
+    D.clientes   = JSON.parse(localStorage.getItem('sp4_cli')   || '[]');
+    D.orcamentos = JSON.parse(localStorage.getItem('sp4_orc')   || '[]');
+    D.notifs     = JSON.parse(localStorage.getItem('sp4_nf')    || '[]');
+    D.despesas   = JSON.parse(localStorage.getItem('sp4_desp')  || '[]');
+    D.perfil     = JSON.parse(localStorage.getItem('sp4_perf')  || '{"nome":"","tipo":"","wpp":""}');
+    D.cfg        = JSON.parse(localStorage.getItem('sp4_cfg')   || '{"togAg":true,"togRes":true,"togCob":true}');
+    document.getElementById('tog-ag').checked  = D.cfg.togAg;
+    document.getElementById('tog-res').checked = D.cfg.togRes;
+    document.getElementById('tog-cob').checked = D.cfg.togCob;
+  }catch(e){ console.warn('Load error',e); }
+}
+function save(){
+  try{
+    localStorage.setItem('sp4_srv',  JSON.stringify(D.servicos));
+    localStorage.setItem('sp4_cli',  JSON.stringify(D.clientes));
+    localStorage.setItem('sp4_orc',  JSON.stringify(D.orcamentos));
+    localStorage.setItem('sp4_nf',   JSON.stringify(D.notifs));
+    localStorage.setItem('sp4_desp', JSON.stringify(D.despesas));
+    localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+    localStorage.setItem('sp4_cfg',  JSON.stringify(D.cfg));
+    // Aviso se localStorage acima de 80% (~4MB)
+    const uso = JSON.stringify(localStorage).length;
+    if(uso > 4000000) toast('⚠️ Armazenamento quase cheio. Considere limpar dados antigos.');
+  }catch(e){
+    toast('⚠️ Erro ao salvar dados. Armazenamento pode estar cheio.');
+    console.error('Save error', e);
+  }
+}
+
+// ══════════════════════════════════════════
+// PERFIL
+// ══════════════════════════════════════════
+function salvarPerfil(){
+  const nm = document.getElementById('p-nome').value.trim();
+  if(!nm) return toast('⚠️ Digite seu nome');
+  D.perfil.nome = nm;
+  D.perfil.tipo = document.getElementById('p-tipo').value.trim();
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  document.getElementById('welcome').classList.remove('open');
+  uiPerfil(); render();
+  const segKey = detectarSegmento(D.perfil.tipo);
+  toast('Bem-vindo, ' + nm + '! ' + SEGMENTOS[segKey].icone);
+}
+
+function atualizarPerfil(){
+  D.perfil.nome = document.getElementById('edit-nome').value.trim();
+  D.perfil.tipo = document.getElementById('edit-tipo').value.trim();
+  D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  uiPerfil();
+  toast('✅ Perfil atualizado!');
+}
+
+function uiPerfil(){
+  const nm  = D.perfil.nome || '';
+  const tp  = D.perfil.tipo || '';
+  const key = detectarSegmento(tp);
+  const SEG = SEGMENTOS[key];
+  const ico = SEG.icone;
+  D.perfil.segmento = key;
+  document.getElementById('dash-ola').textContent = nm ? `Ola, ${nm.split(' ')[0]}! ${ico}` : `Ola! ${ico}`;
+  document.getElementById('sb-tipo').textContent  = tp || 'Gestao de Servicos';
+  document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
+  aplicarSegmento(SEG);
+  const en = document.getElementById('edit-nome'); if(en) en.value = D.perfil.nome;
+  const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
+  const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
+  const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
+  atualizarPreviewMeta();
+  renderMeusSrvs();
+  atualizarDatalistTipo();
+}
+
+function atualizarPreviewMeta(){
+  const meta = parseFloat(document.getElementById('edit-meta')?.value) || 0;
+  const prev = document.getElementById('meta-preview');
+  const txt  = document.getElementById('meta-preview-txt');
+  if(!prev || !txt) return;
+  if(meta > 0){
+    prev.style.display = 'block';
+    const diasMes = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+    const porDia  = (meta / diasMes).toFixed(2);
+    txt.textContent = `Meta: ${R$(meta)}/mês — ${R$(porDia)}/dia em média`;
+  } else {
+    prev.style.display = 'none';
+  }
+}
+
+function salvarMeta(){
+  const meta = parseFloat(document.getElementById('edit-meta').value) || 0;
+  if(!meta) return toast('⚠️ Digite um valor de meta');
+  D.perfil.meta = meta;
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  atualizarPreviewMeta();
+  rDash();
+  toast('🎯 Meta de ' + R$(meta) + ' definida!');
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function ir(pg, el){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb,.mb').forEach(b => b.classList.remove('on'));
+  const pgEl = document.getElementById('pg-'+pg);
+  if(pgEl) pgEl.classList.add('active');
+  if(el){
+    el.classList.add('on');
+  } else {
+    const navMap = ['dashboard','servicos','recebimentos','clientes','orcamentos','relatorio','notificacoes','perfil','config'];
+    const ni = navMap.indexOf(pg);
+    if(ni >= 0) document.querySelectorAll('.nb')[ni]?.classList.add('on');
+    const mobMap = ['dashboard','servicos','orcamentos','recebimentos'];
+    const mi = mobMap.indexOf(pg);
+    if(mi >= 0) document.querySelectorAll('.mb')[mi]?.classList.add('on');
+  }
+  fecharMais();
+  render();
+  // Reaplicar segmento sempre que navegar - mantém paleta e ícones
+  if(typeof SEGMENTOS !== 'undefined' && D.perfil.segmento){
+    aplicarSegmento(SEGMENTOS[D.perfil.segmento] || SEGMENTOS.geral);
+  }
+  if(pg === 'relatorio') setTimeout(renderRel, 30);
+}
+
+function toggleMais(){
+  document.getElementById('mob-more').classList.toggle('open');
+  document.getElementById('mb-mais').classList.toggle('on');
+}
+function fecharMais(){
+  document.getElementById('mob-more').classList.remove('open');
+  if(!['dashboard','servicos','orcamentos','recebimentos'].includes(paginaAtiva()))
+    document.getElementById('mb-mais')?.classList.remove('on');
+}
+function paginaAtiva(){ return document.querySelector('.page.active')?.id.replace('pg-','') || ''; }
+
+// ══════════════════════════════════════════
+// MODAIS
+// ══════════════════════════════════════════
+function abre(id){
+  document.getElementById(id).classList.add('open');
+  updDL();
+  if(id === 'm-orc'){ orcItens = []; renderOrcItens(); }
+}
+function fecha(id){ document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.overlay').forEach(o =>
+  o.addEventListener('click', e => { if(e.target === o) o.classList.remove('open'); })
+);
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function R$(v){ return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fd(d){
+  if(!d) return '—';
+  const p = String(d).split('-');
+  return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+}
+function bdg(s){
+  const m = {
+    'Realizado':'b-g','Pago':'b-g','Aprovado':'b-g',
+    'Agendado':'b-b','Enviado':'b-b','Em andamento':'b-p',
+    'Pendente':'b-o','Cancelado':'b-r','Recusado':'b-r'
+  };
+  return `<span class="badge ${m[s]||'b-b'}">${s||'—'}</span>`;
+}
+function clr(...ids){ ids.forEach(id =>{ const e=document.getElementById(id); if(e) e.value=''; }); }
+function nomeMes(ym){ const [y,m]=ym.split('-'); return new Date(+y,+m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}); }
+function updDL(){
+  const o = D.clientes.map(c => `<option value="${c.nm}">`).join('');
+  ['dl-s','dl-o'].forEach(id =>{ const el=document.getElementById(id); if(el) el.innerHTML=o; });
+}
+
+// ══════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderNotifs(); rDespesas(); }
+
+function rDash(){
+  const mes = hj().slice(0,7);
+  const srvMes  = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais   = srvMes.filter(s=>s.sts_srv==='Realizado');
+  const pagos   = reais.filter(s=>s.sts_pag==='Pago');
+  const pends   = D.servicos.filter(s=>s.sts_srv==='Realizado'&&s.sts_pag==='Pendente');
+  const tRec    = pagos.reduce((a,b)=>a+(+b.val),0);
+  const tPend   = pends.reduce((a,b)=>a+(+b.val),0);
+  const tMateri = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
+  const tDesp   = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes)).reduce((a,b)=>a+(+b.val),0);
+  const tCusto  = tMateri + tDesp;
+  const lucro   = tRec - tCusto;
+
+  const oculto = localStorage.getItem('sp_ocultar') === '1';
+  const mask = '••••••';
+  document.getElementById('v-rec').textContent    = oculto ? mask : R$(tRec);
+  document.getElementById('v-pend').textContent   = oculto ? mask : R$(tPend);
+  document.getElementById('v-custo').textContent  = oculto ? mask : R$(tCusto);
+  document.getElementById('v-lucro').textContent  = oculto ? mask : R$(lucro);
+  document.getElementById('v-lucro').style.color  = oculto ? 'var(--mut)' : (lucro>=0 ? 'var(--grn)':'var(--red)');
+  document.getElementById('v-rec-h').textContent  = oculto ? '' : pagos.length+' serviços pagos';
+  document.getElementById('v-pend-h').textContent = oculto ? '' : pends.length+' pendentes';
+  // Atualiza botão
+  const btnOc = document.getElementById('btn-ocultar');
+  if(btnOc) btnOc.innerHTML = oculto ? '👁 Mostrar' : '👁 Ocultar';
+
+  const hoje = hj();
+  const agHj = D.servicos.filter(s=>s.dt===hoje);
+  const dhEl = document.getElementById('dash-hoje');
+  dhEl.innerHTML = agHj.length
+    ? [...agHj].sort((a,b)=>(a.hr||'').localeCompare(b.hr||'')).map(s=>`
+        <div class="ag-row" onclick="ir('servicos')">
+          <div class="ag-time">${s.hr||'--:--'}</div>
+          <div style="flex:1"><div class="ag-name">${s.cli||'—'}</div><div class="ag-srv">${s.tipo||'—'}${s.end?' · '+s.end:''}</div></div>
+          <div style="text-align:right">
+            <div style="font-family:'Fraunces',serif;font-weight:700;font-size:.87rem;color:var(--grn)">${R$(s.val)}</div>
+            <div style="margin-top:3px">${bdg(s.sts_srv)}</div>
+          </div>
+        </div>`).join('')
+    : '<div class="empty"><div class="empty-ico">🗓</div>Nenhum serviço hoje</div>';
+
+  // Ocultar meta box se valores ocultos
+  const metaBox = document.getElementById('dash-meta-box');
+  if(oculto && metaBox){ metaBox.style.display = 'none'; }
+  const META_MES = D.perfil.meta || 0;
+  if(META_MES > 0 && metaBox){
+    metaBox.style.display = 'flex';
+    const pct = Math.min(100, Math.round((tRec/META_MES)*100));
+    const falta = Math.max(0, META_MES - tRec);
+    const hoje = new Date();
+    const diasMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate();
+    const diasRest = diasMes - hoje.getDate() + 1;
+    const porDia = diasRest > 0 ? (falta/diasRest) : 0;
+    let frase = '';
+    if(tRec === 0)     frase = `Meta: ${R$(META_MES)}. Você precisa de ${R$(porDia)}/dia 💪`;
+    else if(pct < 25)  frase = `${R$(tRec)} faturados. Faltam ${R$(falta)} — ${R$(porDia)}/dia 🔥`;
+    else if(pct < 50)  frase = `Quase na metade! Faltam ${R$(falta)} em ${diasRest} dias 🚀`;
+    else if(pct < 75)  frase = `Mais da metade! Faltam só ${R$(falta)} pra meta! 😤`;
+    else if(pct < 100) frase = `Quase lá! Só faltam ${R$(falta)} — você consegue! 🏅`;
+    else               frase = `🏆 Meta de ${R$(META_MES)} batida! Você é fera!`;
+    document.getElementById('dash-meta-txt').textContent = frase;
+    document.getElementById('dash-meta-pct').textContent = pct + '%';
+  } else if(metaBox){
+    metaBox.style.display = 'none';
+  }
+
+  const ult = [...D.servicos].sort((a,b)=>(b.dt||'').localeCompare(a.dt||'')).slice(0,6);
+  document.getElementById('tb-dash').innerHTML = ult.length
+    ? ult.map(s=>`<tr>
+        <td><strong>${s.cli||'—'}</strong></td>
+        <td class="hide-mob">${s.tipo||'—'}</td>
+        <td class="hide-mob">${fd(s.dt)}</td>
+        <td><strong>${oculto?'••••••':R$(s.val)}</strong></td>
+        <td>${bdg(s.sts_srv)}</td>
+        <td class="hide-mob">${s.sts_pag ? bdg(s.sts_pag):'—'}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="6"><div class="empty" style="padding:36px 20px">
+        <div class="empty-ico" id="empty-srv-ico" style="font-size:2.4rem;margin-bottom:10px">🚀</div>
+        <div style="font-weight:700;margin-bottom:6px">Tudo começa com o primeiro serviço!</div>
+        <div style="margin-bottom:16px">Cadastre um serviço e veja seu negócio crescer aqui.</div>
+        <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
+      </div></td></tr>`
+
+  rChart();
+}
+
+function toggleOcultar(){
+  const atual = localStorage.getItem('sp_ocultar') === '1';
+  localStorage.setItem('sp_ocultar', atual ? '0' : '1');
+  rDash();
+}
+
+function rChart(){
+  const now = new Date();
+  const tots = Array.from({length:7},(_,i)=>{
+    const d = new Date(now); d.setDate(d.getDate()-(6-i)*7);
+    const ini = new Date(d); ini.setDate(d.getDate()-d.getDay());
+    const fim = new Date(ini); fim.setDate(ini.getDate()+6);
+    return D.servicos.filter(s=>{
+      if(!s.dt||s.sts_pag!=='Pago') return false;
+      const sd = new Date(s.dt); return sd>=ini && sd<=fim;
+    }).reduce((a,b)=>a+(+b.val),0);
+  });
+  const mx = Math.max(...tots,1);
+  document.getElementById('chart').innerHTML = tots.map((t,i)=>`
+    <div class="cw">
+      <div class="cb ${i===6?'now':''}" style="height:${Math.round((t/mx)*92)+3}px" title="${R$(t)}"></div>
+    </div>`).join('');
+  const ns=['S-6','S-5','S-4','S-3','S-2','Ant','Atual'];
+  document.getElementById('chart-lbl').innerHTML = ns.map(n=>`<div style="flex:1;text-align:center;font-size:.6rem;color:var(--mut)">${n}</div>`).join('');
+}
+
+function rServicos(){
+  const filtro = document.getElementById('srv-filtro')?.value || '';
+  let lista = filtro ? D.servicos.filter(s=>s.sts_srv===filtro) : [...D.servicos];
+  lista = [...lista].sort((a,b)=>(b.dt||'').localeCompare(a.dt||'')||(b.hr||'').localeCompare(a.hr||''));
+  const el = document.getElementById('srv-lista');
+  if(!lista.length){
+    if(!D.servicos.length){
+    el.innerHTML=`<div class="empty" style="padding:48px 20px">
+      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">🛠️</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum serviço ainda</div>
+      <div style="margin-bottom:18px">Cadastre seu primeiro serviço e comece a faturar!</div>
+      <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
+    </div>`;
+  } else {
+    el.innerHTML='<div class="empty"><div class="empty-ico">🔧</div>Nenhum serviço encontrado</div>';
+  }
+    return;
+  }
+  el.innerHTML = lista.map(srv=>{
+    const i = D.servicos.indexOf(srv);
+    const custo  = (srv.materiais||[]).reduce((a,b)=>a+(+b.val),0);
+    const lucro  = (+srv.val) - custo;
+    const isAg   = srv.sts_srv === 'Agendado';
+    const isAnd  = srv.sts_srv === 'Em andamento';
+    const isReal = srv.sts_srv === 'Realizado';
+    const isCan  = srv.sts_srv === 'Cancelado';
+
+    return `
+    <div class="srv-card ${isAnd?'sts-andamento':''} ${isReal?'sts-realizado':''} ${isCan?'sts-cancelado':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div>
+          <div class="srv-cli">${srv.cli||'—'}</div>
+          <div class="srv-tipo">${srv.tipo||'—'}${srv.qtd?' · '+srv.qtd+' unid.':''}</div>
+          ${srv.end?`<div class="srv-end">📍 ${srv.end}</div>`:''}
+          ${srv.prazo?`<div class="srv-prazo">📅 Entrega: ${fd(srv.prazo)}</div>`:''}
+          ${srv.entrada?`<div class="srv-etapas">💰 Entrada: ${R$(srv.entrada)} · Saldo: ${R$(srv.saldo||0)}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--grn)">${R$(srv.val)}</div>
+          ${isReal&&custo>0?`<div style="font-size:.73rem;color:var(--red)">Custo: ${R$(custo)}</div>`:''}
+          ${isReal&&custo>0?`<div style="font-size:.73rem;font-weight:700;color:var(--grn)">Lucro: ${R$(lucro)}</div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:.78rem;color:var(--mut)">📅 ${fd(srv.dt)}${srv.hr?' às '+srv.hr:''}</span>
+        ${bdg(srv.sts_srv)}
+        ${srv.sts_pag ? bdg(srv.sts_pag) : ''}
+        ${srv.pag?`<span style="font-size:.75rem;color:var(--mut)">· ${srv.pag}</span>`:''}
+      </div>
+      ${isReal&&srv.desc_feito?`<div style="font-size:.79rem;color:var(--mut);background:var(--bg);padding:8px 10px;border-radius:7px;margin-bottom:10px;border:1px solid var(--bor)">📝 ${srv.desc_feito}</div>`:''}
+      ${isReal&&(srv.materiais||[]).length>0?`
+        <div style="font-size:.76rem;color:var(--mut);margin-bottom:10px">
+          💸 Materiais: ${(srv.materiais||[]).map(m=>`${m.desc} (${R$(m.val)})`).join(', ')}
+        </div>`:''}
+      <div class="srv-card-actions">
+        ${isAg?`<button class="btn btn-grn btn-sm" onclick="iniciarSrv(${i})">▶️ Iniciar</button>`:''}
+        ${isAg?`<button class="btn btn-del btn-sm" onclick="cancelarSrv(${i})">❌ Cancelar</button>`:''}
+        ${isAnd?`<button class="btn btn-org btn-sm" onclick="abrirFinalizar(${i})">⏹️ Finalizar</button>`:''}
+        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">✅ Marcar pago</button>`:''}
+        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
+        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Marcar pendente</button>`:''}
+        ${isReal?`<button class="btn btn-pdf btn-sm" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
+        <button class="btn btn-wpp btn-sm" onclick="abrirWpp(${i})">📱 WhatsApp</button>
+        <button class="btn btn-del btn-sm" onclick="delSrv(${i})" style="margin-left:auto">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rRecebimentos(){
+  const mes = hj().slice(0,7);
+  const reais = D.servicos.filter(s=>s.sts_srv==='Realizado');
+  const tRec  = reais.filter(s=>s.sts_pag==='Pago'&&(s.dt||'').startsWith(mes)).reduce((a,b)=>a+(+b.val),0);
+  const tPend = reais.filter(s=>s.sts_pag==='Pendente').reduce((a,b)=>a+(+b.val),0);
+
+  document.getElementById('r-rec').textContent  = R$(tRec);
+  document.getElementById('r-pend').textContent = R$(tPend);
+  document.getElementById('r-tot').textContent  = R$(tRec+tPend);
+
+  const s = [...reais].sort((a,b)=>(b.dt||'').localeCompare(a.dt||''));
+  document.getElementById('tb-rec').innerHTML = s.length
+    ? s.map(srv=>{
+        const i = D.servicos.indexOf(srv);
+        return `<tr>
+          <td class="hide-mob">${fd(srv.dt)}</td>
+          <td><strong>${srv.cli||'—'}</strong></td>
+          <td class="hide-mob">${srv.tipo||'—'}</td>
+          <td class="hide-mob">${srv.pag||'—'}</td>
+          <td><strong>${R$(srv.val)}</strong></td>
+          <td>${bdg(srv.sts_pag||'Pendente')}</td>
+          <td>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              ${srv.sts_pag==='Pendente'?`
+                <button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">✅ Pago</button>
+                <button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌</button>`:''}
+              ${srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
+              ${srv.sts_pag==='Cancelado'?`<span style="font-size:.75rem;color:var(--red)">Cancelado</span>`:''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="7" class="empty">Nenhum serviço realizado ainda</td></tr>';
+}
+
+function rClientes(){
+  if(!D.clientes.length){
+    document.getElementById('tb-cli').innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:40px 20px">
+      <div class="empty-ico" id="empty-cli-ico" style="font-size:2.4rem;margin-bottom:10px">👤</div>
+      <div style="font-weight:700;margin-bottom:6px">Nenhum cliente ainda</div>
+      <div style="margin-bottom:16px">Os clientes aparecem aqui automaticamente quando você agenda um serviço!</div>
+      <button class="btn btn-org" onclick="abreSrv()">+ Novo serviço</button>
+    </div></td></tr>`;
+    return;
+  }
+  document.getElementById('tb-cli').innerHTML = D.clientes.map((c,i)=>{
+    const gasto = D.servicos.filter(s=>s.cli===c.nm&&s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
+    const ult   = [...D.servicos].filter(s=>s.cli===c.nm).sort((a,b)=>(b.dt||'').localeCompare(a.dt||''))[0];
+    const semWpp = !c.wpp;
+    return `<tr>
+      <td><strong>${c.nm}</strong></td>
+      <td>${c.wpp
+        ? `<a href="https://wa.me/55${c.wpp.replace(/\D/g,'')}" target="_blank" style="color:var(--grn);font-weight:600;text-decoration:none">📱 ${c.wpp}</a>`
+        : `<span style="color:var(--org);font-size:.76rem;font-weight:600;cursor:pointer" onclick="editarWppCli(${i})">⚠️ Sem WhatsApp — cadastrar</span>`}
+      </td>
+      <td>${c.srv||'—'}</td>
+      <td><strong style="color:var(--grn)">${R$(gasto)}</strong></td>
+      <td>${ult?fd(ult.dt):'—'}</td>
+      <td style="display:flex;gap:5px">
+        <button class="btn btn-gho btn-sm" onclick="abrirEditCli(${i})">✏️</button>
+        <button class="btn btn-del btn-sm" onclick="delCli(${i})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function abrirEditCli(i){
+  const c = D.clientes[i];
+  document.getElementById('edit-cli-idx').value = i;
+  document.getElementById('edit-cli-nm').value  = c.nm  || '';
+  document.getElementById('edit-cli-wpp').value = c.wpp || '';
+  document.getElementById('edit-cli-srv').value = c.srv || '';
+  document.getElementById('edit-cli-end').value = c.end || '';
+  abre('m-edit-cli');
+}
+
+function salvarEditCli(){
+  const i  = +document.getElementById('edit-cli-idx').value;
+  const nm = document.getElementById('edit-cli-nm').value.trim();
+  if(!nm){ toast('Informe o nome do cliente'); return; }
+  const nomeAntigo = D.clientes[i].nm;
+  D.clientes[i].nm  = nm;
+  D.clientes[i].wpp = document.getElementById('edit-cli-wpp').value.trim();
+  D.clientes[i].srv = document.getElementById('edit-cli-srv').value.trim();
+  D.clientes[i].end = document.getElementById('edit-cli-end').value.trim();
+  // Atualiza nome nos serviços e orçamentos vinculados
+  if(nomeAntigo !== nm){
+    D.servicos.forEach(s=>{ if(s.cli===nomeAntigo) s.cli=nm; });
+    D.orcamentos.forEach(o=>{ if(o.cli===nomeAntigo) o.cli=nm; });
+  }
+  save(); fecha('m-edit-cli'); render();
+  toast('✅ Cliente atualizado!');
+}
+
+function rOrcamentos(){
+  const q    = (document.getElementById('orc-search')?.value||'').toLowerCase();
+  const fsts = document.getElementById('orc-filtro-sts')?.value||'';
+  let lista  = [...D.orcamentos].reverse();
+  if(q)    lista = lista.filter(o=>(o.cli||'').toLowerCase().includes(q)||(o.desc||'').toLowerCase().includes(q)||(o.sts||'').toLowerCase().includes(q));
+  if(fsts) lista = lista.filter(o=>o.sts===fsts);
+
+  const el = document.getElementById('orc-lista');
+  if(!lista.length){
+    el.innerHTML='<div class="empty"><div class="empty-ico">📋</div>Nenhum orçamento encontrado</div>';
+    return;
+  }
+  el.innerHTML = lista.map(o=>{
+    const i     = D.orcamentos.indexOf(o);
+    const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+    return `
+    <div class="orc-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--mut);margin-bottom:2px">Orçamento #${String(D.orcamentos.indexOf(o)+1).padStart(3,'0')} · ${fd(o.dt)}</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700">${o.cli||'—'}</div>
+          ${o.desc?`<div style="font-size:.78rem;color:var(--mut);margin-top:2px">${o.desc}</div>`:''}
+        </div>
+        <select class="fi" style="width:120px;font-size:.76rem;padding:5px 8px;flex:none" onchange="mudarStsOrc(${i},this.value)">
+          <option ${o.sts==='Pendente'?'selected':''}>Pendente</option>
+          <option ${o.sts==='Enviado'?'selected':''}>Enviado</option>
+          <option ${o.sts==='Aprovado'?'selected':''}>Aprovado</option>
+          <option ${o.sts==='Recusado'?'selected':''}>Recusado</option>
+        </select>
+      </div>
+      <div style="border-top:1px solid var(--bor);padding-top:9px;margin-bottom:9px">
+        ${(o.itens||[]).map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:2px solid var(--bor)">
+        <span style="font-weight:700">Total</span>
+        <span style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--grn)">${R$(total)}</span>
+      </div>
+      ${o.valid?`<div style="font-size:.73rem;color:var(--mut);margin-top:5px">⏳ Válido até: ${fd(o.valid)}</div>`:''}
+      ${o.obs?`<div style="font-size:.78rem;color:var(--mut);background:var(--bg);padding:7px 9px;border-radius:7px;margin-top:8px;border:1px solid var(--bor)">📌 ${o.obs}</div>`:''}
+      <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-pdf btn-sm" onclick="pdfOrc(${i})">📄 PDF</button>
+        <button class="btn btn-wpp btn-sm" onclick="wppOrc(${i})">📱 WhatsApp</button>
+        <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">✅ Converter</button>
+        <button class="btn btn-del btn-sm" onclick="delOrc(${i})" style="margin-left:auto">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// SERVIÇO ACTIONS
+// ══════════════════════════════════════════
+// Sugestões de tipo de serviço por segmento
+const SUGESTOES_SEG = {
+  construcao: ['Pintura','Instalacao eletrica','Hidraulica','Reforma','Gesso','Massa corrida','Piso','Telhado','Alvenaria','Outro'],
+  frete:      ['Frete urbano','Frete interestadual','Mudanca','Entrega expressa','Coleta','Outro'],
+  confeitaria:['Bolo personalizado','Brigadeiros','Salgados','Mesa de doces','Bem casado','Cupcake','Torta','Outro'],
+  cerimonial: ['Casamento','Aniversario','Formatura','Festa infantil','Corporativo','Debutante','Outro'],
+  artesanato: ['Papelaria personalizada','Reforma de biblia','Porta retrato','Scrapbook','Bordado','Croche','Outro'],
+  embalagens: ['Caixas personalizadas','Baloes decorados','Kit presente','Lembrancinha','Mimo','Outro'],
+  beleza:     ['Corte de cabelo','Coloracao','Escova','Manicure','Pedicure','Maquiagem','Depilacao','Sobrancelha','Outro'],
+  fotografia: ['Ensaio fotografico','Casamento','Aniversario','Formatura','Newborn','Produto','Video','Outro'],
+  geral:      ['Servico geral','Manutencao','Reparo','Consultoria','Outro']
+};
+
+function atualizarDatalistTipo(){
+  const seg   = D.perfil.segmento || 'geral';
+  const sugs  = SUGESTOES_SEG[seg] || SUGESTOES_SEG.geral;
+  const meus  = D.perfil.meusSrvs || [];
+  const todos = [...new Set([...meus, ...sugs])];
+  const dl    = document.getElementById('dl-tipo');
+  if(dl) dl.innerHTML = todos.map(s=>`<option value="${s}">`).join('');
+}
+
+function adicionarMeuSrv(){
+  const inp = document.getElementById('novo-srv-tipo');
+  const val = inp?.value.trim();
+  if(!val) return toast('Digite o tipo de servico');
+  if(!D.perfil.meusSrvs) D.perfil.meusSrvs = [];
+  if(D.perfil.meusSrvs.includes(val)) return toast('Ja cadastrado!');
+  D.perfil.meusSrvs.push(val);
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  inp.value = '';
+  renderMeusSrvs();
+  atualizarDatalistTipo();
+  toast('Servico adicionado!');
+}
+
+function removerMeuSrv(i){
+  D.perfil.meusSrvs.splice(i,1);
+  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  renderMeusSrvs();
+  atualizarDatalistTipo();
+}
+
+function renderMeusSrvs(){
+  const el   = document.getElementById('meus-srvs-lista');
+  const lista = D.perfil.meusSrvs || [];
+  if(!el) return;
+  if(!lista.length){
+    el.innerHTML = '<div style="font-size:.8rem;color:var(--mut);margin-bottom:8px">Nenhum servico cadastrado ainda.</div>';
+    return;
+  }
+  el.innerHTML = lista.map((s,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--bor);margin-bottom:6px;font-size:.85rem">
+      <span>${s}</span>
+      <button class="btn btn-del btn-sm" onclick="removerMeuSrv(${i})" style="padding:3px 8px">✕</button>
+    </div>`).join('');
+}
+
+function autoPreencherCliente(){
+  const nome = document.getElementById('s-cli')?.value.trim();
+  if(!nome) return;
+  const cli = D.clientes.find(c=>c.nm.toLowerCase()===nome.toLowerCase());
+  if(!cli) return;
+  const end = document.getElementById('s-end');
+  if(end && !end.value && cli.end) end.value = cli.end;
+}
+
+function abreSrv(){
+  // Mostrar campos conforme segmento atual
+  const seg = D.perfil.segmento || 'geral';
+  const segsP = ['confeitaria','artesanato','embalagens','fotografia'];
+  const segsQ = ['confeitaria','embalagens'];
+  const segsE = ['cerimonial','construcao','frete'];
+  const prazoBox  = document.getElementById('s-prazo-box');
+  const qtdBox    = document.getElementById('s-qtd-box');
+  const etapasBox = document.getElementById('s-etapas-box');
+  if(prazoBox)  prazoBox.style.display  = segsP.includes(seg) ? '' : 'none';
+  if(qtdBox)    qtdBox.style.display    = segsQ.includes(seg) ? '' : 'none';
+  if(etapasBox) etapasBox.style.display = segsE.includes(seg) ? '' : 'none';
+  atualizarDatalistTipo();
+  abre('m-srv');
+}
+
+function calcSaldo(){
+  const val     = parseFloat(document.getElementById('s-val')?.value) || 0;
+  const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
+  const saldo   = Math.max(0, val - entrada);
+  const el      = document.getElementById('s-saldo');
+  if(el) el.value = saldo > 0 ? 'R$ ' + saldo.toFixed(2).replace('.',',') : 'R$ 0,00';
+}
+
+function salvarSrv(){
+  const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
+  const val     = parseFloat(document.getElementById('s-val').value) || 0;
+  const o = {
+    id: gerarId(),
+    dt: document.getElementById('s-dt').value,
+    hr: document.getElementById('s-hr').value,
+    cli: document.getElementById('s-cli').value.trim(),
+    tipo: document.getElementById('s-tipo').value.trim(),
+    end: document.getElementById('s-end').value.trim(),
+    val: val || 0,
+    prazo: document.getElementById('s-prazo')?.value || null,
+    qtd: document.getElementById('s-qtd')?.value || null,
+    entrada: entrada || null,
+    saldo: entrada > 0 ? val - entrada : null,
+    sts_srv: 'Agendado', sts_pag: null, pag: null,
+    materiais: [], desc_feito: '', inicio: null, fim: null
+  };
+  if(!o.cli || !o.dt) return toast('⚠️ Preencha data e nome do cliente');
+  D.servicos.push(o);
+
+  // Cadastro automático do cliente se não existir
+  const jaExiste = D.clientes.find(c => c.nm.toLowerCase() === o.cli.toLowerCase());
+  if(!jaExiste){
+    D.clientes.push({ nm: o.cli, wpp: '', srv: o.tipo || '', end: o.end || '' });
+    toast('✅ Serviço agendado! Cliente cadastrado automaticamente 👤');
+  } else {
+    toast('✅ Serviço agendado!');
+  }
+
+  save(); fecha('m-srv'); render();
+  clr('s-cli','s-hr','s-tipo','s-end','s-val','s-prazo','s-qtd','s-entrada');
+  const el = document.getElementById('s-saldo'); if(el) el.value = '';
+}
+
+function iniciarSrv(i){
+  D.servicos[i].sts_srv = 'Em andamento';
+  D.servicos[i].inicio  = new Date().toISOString();
+  save(); render();
+  toast('▶️ Serviço iniciado!');
+  addNotif('agenda','▶️ Serviço iniciado',`Serviço com ${D.servicos[i].cli} iniciado agora.`);
+}
+
+function cancelarSrv(i){
+  if(!confirm('Cancelar este serviço?')) return;
+  D.servicos[i].sts_srv = 'Cancelado';
+  save(); render();
+  toast('❌ Serviço cancelado');
+}
+
+function abrirFinalizar(i){
+  // Atualizar label de materiais conforme segmento
+  const seg = D.perfil.segmento || 'geral';
+  const SEG = SEGMENTOS[seg];
+  const lbl = document.getElementById('fin-mat-label');
+  if(lbl) lbl.textContent = SEG ? SEG.labels.materiais : 'Custos do servico';
+  document.getElementById('fin-idx').value = i;
+  finMats = [];
+  clr('fin-desc','fin-mat-desc','fin-mat-val');
+  document.getElementById('fin-val-edit').value = D.servicos[i].val || '';
+  document.getElementById('fin-val-original').textContent = D.servicos[i].val ? `Valor combinado: ${R$(D.servicos[i].val)}` : '';
+  renderFinMats(i);
+  document.getElementById('m-fin-srv').classList.add('open');
+}
+
+function renderFinMats(idx){
+  const i = idx !== undefined ? idx : +document.getElementById('fin-idx').value;
+  const el = document.getElementById('fin-mat-lista');
+  el.innerHTML = finMats.length
+    ? finMats.map((m,j)=>`
+        <div class="mat-row">
+          <span class="mat-desc">${m.desc}</span>
+          <span class="mat-val-r">${R$(m.val)}</span>
+          <button class="btn btn-del btn-sm" onclick="remMat(${j})" style="padding:3px 7px">✕</button>
+        </div>`).join('')
+    : '<div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum material adicionado</div>';
+
+  const tc  = finMats.reduce((a,b)=>a+(+b.val),0);
+  const val = parseFloat(document.getElementById('fin-val-edit')?.value) || (i>=0&&D.servicos[i] ? (+D.servicos[i].val) : 0);
+  const lucro = val - tc;
+  document.getElementById('fin-custo-show').textContent = R$(tc);
+  document.getElementById('fin-val-show').textContent   = R$(val);
+  document.getElementById('fin-lucro-show').textContent = R$(lucro);
+  document.getElementById('fin-lucro-show').style.color = lucro>=0 ? 'var(--grn)':'var(--red)';
+}
+
+function addMat(){
+  const desc = document.getElementById('fin-mat-desc').value.trim();
+  const val  = document.getElementById('fin-mat-val').value;
+  if(!desc||!val) return toast('⚠️ Preencha o material e o valor');
+  finMats.push({desc, val: parseFloat(val)||0});
+  clr('fin-mat-desc','fin-mat-val');
+  document.getElementById('fin-mat-desc').focus();
+  renderFinMats();
+}
+function remMat(j){ finMats.splice(j,1); renderFinMats(); }
+
+document.getElementById('fin-mat-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addMat(); });
+
+function finalizarSrv(){
+  const i       = +document.getElementById('fin-idx').value;
+  const desc    = document.getElementById('fin-desc').value.trim();
+  const pag     = document.getElementById('fin-pag').value;
+  const sts_pag = document.getElementById('fin-sts-pag').value;
+  const valFinal= parseFloat(document.getElementById('fin-val-edit').value) || (+D.servicos[i].val) || 0;
+
+  D.servicos[i].sts_srv   = 'Realizado';
+  D.servicos[i].sts_pag   = sts_pag;
+  D.servicos[i].pag       = pag;
+  D.servicos[i].val       = valFinal;
+  D.servicos[i].materiais = [...finMats];
+  D.servicos[i].desc_feito= desc;
+  D.servicos[i].fim       = new Date().toISOString();
+
+  save(); fecha('m-fin-srv'); render();
+  toast('✅ Serviço finalizado!');
+  addNotif('sistema','✅ Serviço concluído',
+    `${D.servicos[i].cli} — ${D.servicos[i].tipo}. ${sts_pag==='Pago'?'Pagamento confirmado! 💰':'Pagamento pendente ⏳'}`
+  );
+}
+
+function marcarPago(i){
+  D.servicos[i].sts_pag = 'Pago';
+  save(); render();
+  toast('✅ Marcado como pago!');
+}
+function marcarPendente(i){
+  D.servicos[i].sts_pag = 'Pendente';
+  save(); render();
+  toast('⏳ Marcado como pendente');
+}
+function cancelarPag(i){
+  if(!confirm('Cancelar este pagamento?')) return;
+  D.servicos[i].sts_pag = 'Cancelado';
+  save(); render();
+  toast('❌ Pagamento cancelado');
+}
+function delSrv(i){
+  if(!confirm('Remover este serviço?')) return;
+  D.servicos.splice(i,1); save(); render(); toast('🗑 Removido');
+}
+
+// ══════════════════════════════════════════
+// WHATSAPP
+// ══════════════════════════════════════════
+function abrirWpp(i){ document.getElementById('wpp-idx').value = i; abre('m-wpp'); }
+
+function enviarWpp(tipo){
+  const i    = +document.getElementById('wpp-idx').value;
+  const s    = D.servicos[i];
+  const cli  = D.clientes.find(c=>c.nm===s.cli);
+  const tel  = cli?.wpp?.replace(/\D/g,'')||'';
+  const nome = D.perfil.nome || 'Prestador';
+  const msgs = {
+    deslocamento: `Olá ${s.cli}! 😊 Aqui é ${nome}. Estou a caminho para realizar o serviço. Em breve estarei aí! 🚗`,
+    chegada:      `Olá ${s.cli}! Aqui é ${nome}. Acabei de chegar no local. Pode me receber! 📍`,
+    atraso:       `Olá ${s.cli}! Aqui é ${nome}. Peço desculpas, vou me atrasar um pouco. Em breve estarei aí! ⏰`,
+    concluido:    `Olá ${s.cli}! Serviço de *${s.tipo||'serviço'}* concluído com sucesso! ✅\n\nFoi um prazer atendê-lo. Qualquer dúvida, estou à disposição!\n\n_${nome}_`,
+    cobranca:     `Olá ${s.cli}! Tudo bem? 😊\n\nPassando para lembrar sobre o pagamento de *${R$(s.val)}* referente ao serviço de *${s.tipo||'serviço'}*.\n\nQuando puder, entre em contato! 💰\n\n_${nome}_`
+  };
+  const msg = msgs[tipo]||'';
+  const url = tel
+    ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  fecha('m-wpp');
+  toast('📱 Abrindo WhatsApp...');
+}
+
+// ══════════════════════════════════════════
+// RELATÓRIO DO SERVIÇO
+// ══════════════════════════════════════════
+function abrirRelSrv(i){
+  i = +i;
+  document.getElementById('rel-srv-idx').value = i;
+  const s = D.servicos[i];
+  const inclDesp = document.getElementById('rel-srv-desp')?.checked;
+  const mats = s.materiais||[];
+  const tMat = mats.reduce((a,b)=>a+(+b.val),0);
+  const lucroSrv = (+s.val) - tMat;
+
+  const blocoDesp = inclDesp && mats.length ? `
+    <div style="margin-top:10px;padding:9px 12px;background:var(--red-bg);border-radius:8px;border:1px solid rgba(184,50,50,.15)">
+      <div style="font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:6px;text-transform:uppercase">💸 Custos e materiais</div>
+      ${mats.map(m=>`<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;border-bottom:1px dashed var(--bor)">
+        <span>${m.desc}</span><span style="color:var(--red);font-weight:600">${R$(m.val)}</span>
+      </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:.84rem;font-weight:700;margin-top:6px">
+        <span>Total custos</span><span style="color:var(--red)">${R$(tMat)}</span>
+      </div>
+    </div>` : '';
+
+  const blocoLucro = inclDesp ? `
+    <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:${lucroSrv>=0?'var(--grn-bg)':'var(--red-bg)'};border-radius:8px;border:1px solid ${lucroSrv>=0?'rgba(26,107,60,.15)':'rgba(184,50,50,.15)'}">
+      <div style="font-size:.82rem;font-weight:700;color:var(--mut)">💰 Lucro real do serviço</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:${lucroSrv>=0?'var(--grn)':'var(--red)'}">${R$(lucroSrv)}</div>
+    </div>` : '';
+
+  document.getElementById('rel-srv-preview').innerHTML = `
+    <div style="background:var(--bg);border-radius:12px;padding:16px;border:1px solid var(--bor)">
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Pré-visualização do relatório</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;margin-bottom:2px">${s.cli||'—'}</div>
+      <div style="font-size:.82rem;color:var(--mut)">📅 ${fd(s.dt)}${s.hr?' às '+s.hr:''}</div>
+      ${s.end?`<div style="font-size:.8rem;color:var(--mut)">📍 ${s.end}</div>`:''}
+      <div style="margin-top:10px;padding:9px 12px;background:var(--sur);border-radius:8px;border:1px solid var(--bor)">
+        <div style="font-size:.75rem;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase">Serviço realizado</div>
+        <div style="font-size:.9rem;font-weight:600;color:var(--org)">${s.tipo||'—'}</div>
+        ${s.desc_feito?`<div style="font-size:.82rem;color:var(--txt);margin-top:5px;line-height:1.5">${s.desc_feito}</div>`:''}
+      </div>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--grn-bg);border-radius:8px;border:1px solid rgba(26,107,60,.15)">
+        <div>
+          <div style="font-size:.75rem;color:var(--mut)">Valor cobrado</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--grn)">${R$(s.val)}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.8rem;color:var(--mut)">${s.pag||'—'}</div>
+          <div style="margin-top:3px">${bdg(s.sts_pag||'Pendente')}</div>
+        </div>
+      </div>
+      ${blocoDesp}
+      ${blocoLucro}
+      ${!inclDesp?'<div style="font-size:.72rem;color:var(--mut);margin-top:8px;font-style:italic">* Marque a opção acima para incluir custos e lucro real</div>':''}
+    </div>
+  `;
+  document.getElementById('m-rel-srv').classList.add('open');
+}
+
+function pdfRelSrv(){
+  const i = +document.getElementById('rel-srv-idx').value;
+  const s = D.servicos[i];
+  if(!window.jspdf){ toast('⚠️ Aguarde carregar...'); return; }
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const pw  = doc.internal.pageSize.getWidth();
+  const nome = D.perfil.nome || 'AutônomoPro';
+
+  doc.setFillColor(30,15,0); doc.rect(0,0,pw,30,'F');
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text(nome,14,14);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(D.perfil.tipo||'Prestador de Serviços',14,22);
+  doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('RELATÓRIO DE SERVIÇO',pw-14,14,{align:'right'});
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(fd(s.dt),pw-14,22,{align:'right'});
+
+  let y = 40;
+
+  // Cliente box
+  doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,22,3,3,'F');
+  doc.setFontSize(7);doc.setFont('helvetica','bold');doc.setTextColor(138,112,96);
+  doc.text('CLIENTE',18,y+8);
+  doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+  doc.text(s.cli||'—',18,y+17);
+  if(s.end){ doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(100,80,60); doc.text('📍 '+s.end,pw-18,y+17,{align:'right'}); }
+  y += 30;
+
+  // Serviço
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(138,112,96);
+  doc.text('SERVIÇO REALIZADO',14,y); y+=6;
+  doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(224,123,42);
+  doc.text(s.tipo||'—',14,y); y+=9;
+
+  if(s.desc_feito){
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(50,35,20);
+    const lines = doc.splitTextToSize(s.desc_feito, pw-28);
+    doc.text(lines,14,y); y += lines.length*5.5+8;
+  }
+
+  // Pagamento
+  doc.setFillColor(26,107,60); doc.roundedRect(14,y,pw-28,18,3,3,'F');
+  doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(200,240,215);
+  doc.text('VALOR DO SERVIÇO',18,y+8);
+  doc.setFontSize(15);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text(R$(s.val),pw-18,y+14,{align:'right'});
+  y += 25;
+
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(70,50,30);
+  doc.text(`Forma: ${s.pag||'—'}   ·   Status: ${s.sts_pag||'—'}`,14,y); y+=10;
+
+  if(D.perfil.wpp){ doc.setFontSize(8);doc.setTextColor(90,70,50); doc.text(`Contato: ${D.perfil.wpp}`,14,y); y+=8; }
+
+  // Bloco de custos e lucro - só se marcado
+  const inclDesp = document.getElementById('rel-srv-desp')?.checked;
+  const mats = s.materiais||[];
+  if(inclDesp && mats.length){
+    y+=4;
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(184,50,50);
+    doc.text('CUSTOS E MATERIAIS',14,y); y+=5;
+    doc.setFillColor(253,234,234); doc.roundedRect(14,y,pw-28,mats.length*7+12,3,3,'F');
+    y+=5;
+    mats.forEach(m=>{
+      doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(50,35,20);
+      doc.text(m.desc,18,y);
+      doc.setFont('helvetica','bold');doc.setTextColor(184,50,50);
+      doc.text(R$(m.val),pw-18,y,{align:'right'});
+      y+=7;
+    });
+    const tMat = mats.reduce((a,b)=>a+(+b.val),0);
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(184,50,50);
+    doc.text(`Total custos: ${R$(tMat)}`,pw-18,y,{align:'right'}); y+=10;
+    const lucroSrv = (+s.val) - tMat;
+    doc.setFillColor(lucroSrv>=0?26:184, lucroSrv>=0?107:50, lucroSrv>=0?60:50);
+    doc.roundedRect(14,y,pw-28,14,3,3,'F');
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('LUCRO REAL DO SERVIÇO',18,y+9);
+    doc.setFontSize(13);doc.text(R$(lucroSrv),pw-18,y+9,{align:'right'}); y+=20;
+  }
+
+  doc.setFontSize(7);doc.setTextColor(160,140,120);
+  doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')} · ${nome}`,pw/2,287,{align:'center'});
+
+  doc.save(`relatorio-${(s.cli||'servico').replace(/\s/g,'-')}-${s.dt||'data'}.pdf`);
+  toast('📄 PDF do relatório gerado!');
+}
+
+function wppRelSrv(){
+  const i = +document.getElementById('rel-srv-idx').value;
+  const s = D.servicos[i];
+  const nome = D.perfil.nome || 'Prestador';
+  let msg = `📋 *Relatório de Serviço*\n\n`;
+  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  msg += `${_ico} *${nome}*\n`;
+  msg += `👤 Cliente: ${s.cli||'—'}\n`;
+  msg += `📅 Data: ${fd(s.dt)}\n`;
+  if(s.end) msg += `📍 Local: ${s.end}\n`;
+  msg += `\n🔧 *Serviço: ${s.tipo||'—'}*\n`;
+  if(s.desc_feito) msg += `\n📝 O que foi feito:\n${s.desc_feito}\n`;
+  msg += `\n💰 *Valor: ${R$(s.val)}*\n`;
+  msg += `💳 Pagamento: ${s.pag||'—'} · ${s.sts_pag||'—'}\n`;
+  if(D.perfil.wpp) msg += `\n📱 ${D.perfil.wpp}`;
+  msg += `\n\n_Enviado via AutônomoPro_`;
+
+  const cli = D.clientes.find(c=>c.nm===s.cli);
+  const tel = cli?.wpp?.replace(/\D/g,'')||'';
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  fecha('m-rel-srv');
+  toast('📱 Abrindo WhatsApp...');
+}
+
+// ══════════════════════════════════════════
+// CLIENTES
+// ══════════════════════════════════════════
+function salvarCli(){
+  const o = {
+    nm:  document.getElementById('c-nm').value.trim(),
+    wpp: document.getElementById('c-wpp').value.trim(),
+    srv: document.getElementById('c-srv').value.trim(),
+    end: document.getElementById('c-end').value.trim()
+  };
+  if(!o.nm) return toast('⚠️ Digite o nome do cliente');
+  if(D.clientes.find(c=>c.nm.toLowerCase()===o.nm.toLowerCase())) return toast('⚠️ Cliente já cadastrado');
+  D.clientes.push(o); save(); fecha('m-cli'); render();
+  toast('✅ Cliente cadastrado!');
+  clr('c-nm','c-wpp','c-srv','c-end');
+}
+function delCli(i){
+  if(!confirm('Remover cliente?')) return;
+  D.clientes.splice(i,1); save(); render(); toast('🗑 Removido');
+}
+
+function editarWppCli(i){
+  // Redireciona pro modal de edição completo
+  abrirEditCli(i);
+  // Legado mantido por compatibilidade - não usa prompt()
+  return;
+  const wpp = prompt('Digite o WhatsApp de ' + D.clientes[i].nm + ':', '');
+  if(wpp === null) return;
+  D.clientes[i].wpp = wpp.trim();
+  save(); render();
+  toast('✅ WhatsApp cadastrado!');
+}
+
+// ══════════════════════════════════════════
+// DESPESAS
+// ══════════════════════════════════════════
+function toggleAjudante(){
+  const cat = document.getElementById('desp-cat').value;
+  document.getElementById('desp-ajudante-row').style.display = cat === 'Mão de obra' ? 'block' : 'none';
+}
+
+function toggleParcela(){
+  const chk = document.getElementById('desp-parcela').checked;
+  document.getElementById('desp-parcela-row').style.display = chk ? 'block' : 'none';
+  calcParcelaDesp();
+}
+
+function calcParcelaDesp(){
+  const val  = parseFloat(document.getElementById('desp-val').value) || 0;
+  const npar = parseInt(document.getElementById('desp-nparc')?.value) || 0;
+  const el   = document.getElementById('desp-vparc');
+  if(el && npar > 0 && val > 0){
+    el.value = 'R$ ' + (val / npar).toFixed(2).replace('.',',');
+  } else if(el) {
+    el.value = '';
+  }
+}
+
+function abreDesp(){
+  document.getElementById('desp-edit-idx').value = -1;
+  document.getElementById('desp-dt').value = hj();
+  document.getElementById('desp-parcela').checked = false;
+  document.getElementById('desp-parcela-row').style.display = 'none';
+  document.getElementById('desp-ajudante-row').style.display = 'block';
+  clr('desp-nm','desp-val','desp-ajudante','desp-nparc','desp-vparc');
+  abre('m-desp');
+}
+
+function salvarDesp(){
+  const nm   = document.getElementById('desp-nm').value.trim();
+  const cat  = document.getElementById('desp-cat').value;
+  const val  = parseFloat(document.getElementById('desp-val').value) || 0;
+  const dt   = document.getElementById('desp-dt').value;
+  const pag  = document.getElementById('desp-pag').value;
+  const ajud = document.getElementById('desp-ajudante').value.trim();
+  const parc = document.getElementById('desp-parcela').checked;
+  const npar = parseInt(document.getElementById('desp-nparc')?.value) || 1;
+
+  if(!nm)  return toast('⚠️ Digite o nome da despesa');
+  if(!val) return toast('⚠️ Digite o valor');
+  if(!dt)  return toast('⚠️ Selecione a data');
+
+  const nomeCompleto = (cat === 'Mão de obra' && ajud) ? nm + ' - ' + ajud : nm;
+
+  if(parc && npar > 1){
+    // Gerar uma entrada por parcela
+    const valParc = val / npar;
+    const [y,m,d] = dt.split('-').map(Number);
+    const grupoId = gerarId();
+    for(let p = 0; p < npar; p++){
+      const dataPar = new Date(y, m - 1 + p, d);
+      const offset  = dataPar.getTimezoneOffset();
+      const local   = new Date(dataPar.getTime() - offset * 60000);
+      const dtStr   = local.toISOString().split('T')[0];
+      D.despesas.push({
+        id: gerarId(),
+        nm: nomeCompleto,
+        cat,
+        val: valParc,
+        dt: dtStr,
+        pag,
+        parcela: p + 1,
+        totalParcelas: npar,
+        grupo: grupoId
+      });
+    }
+    toast(`✅ Despesa em ${npar}x salva!`);
+  } else {
+    D.despesas.push({
+      id: gerarId(),
+      nm: nomeCompleto,
+      cat,
+      val,
+      dt,
+      pag,
+      parcela: null,
+      totalParcelas: null
+    });
+    toast('✅ Despesa salva!');
+  }
+
+  save(); fecha('m-desp'); rDespesas();
+  clr('desp-nm','desp-val','desp-ajudante','desp-nparc','desp-vparc');
+}
+
+function delDesp(id){
+  const d = D.despesas.find(x=>x.id===id);
+  if(!d) return;
+  // Se for parcelada, pergunta se remove todas
+  if(d.grupo && d.totalParcelas > 1){
+    const todas = confirm(`Remover todas as ${d.totalParcelas} parcelas desta despesa?`);
+    if(todas){
+      D.despesas = D.despesas.filter(x=>x.grupo !== d.grupo);
+    } else {
+      D.despesas = D.despesas.filter(x=>x.id !== id);
+    }
+  } else {
+    if(!confirm('Remover esta despesa?')) return;
+    D.despesas = D.despesas.filter(x=>x.id !== id);
+  }
+  save(); rDespesas(); toast('🗑 Removida');
+}
+
+function rDespesas(){
+  // Popular select de meses
+  const meses = [...new Set(D.despesas.map(d=>d.dt.slice(0,7)))].sort().reverse();
+  const sel   = document.getElementById('desp-mes');
+  const mesAtual = hj().slice(0,7);
+  const mesSel   = sel?.value || mesAtual;
+
+  if(sel){
+    const opts = [mesAtual, ...meses.filter(m=>m!==mesAtual)];
+    sel.innerHTML = [...new Set(opts)].map(m=>`<option value="${m}" ${m===mesSel?'selected':''}>${nomeMes(m)}</option>`).join('');
+  }
+
+  const mes = sel?.value || mesAtual;
+  const q   = (document.getElementById('desp-search')?.value||'').toLowerCase();
+  let lista = D.despesas.filter(d=>d.dt.startsWith(mes));
+  if(q) lista = lista.filter(d=>(d.nm||'').toLowerCase().includes(q)||(d.cat||'').toLowerCase().includes(q));
+  lista = lista.sort((a,b)=>b.dt.localeCompare(a.dt));
+
+  // Cards de resumo
+  const tot  = lista.reduce((a,b)=>a+(+b.val),0);
+  const mdo  = lista.filter(d=>d.cat==='Mão de obra').reduce((a,b)=>a+(+b.val),0);
+  const out  = tot - mdo;
+  const dtot = document.getElementById('desp-tot'); if(dtot) dtot.textContent = R$(tot);
+  const dmdo = document.getElementById('desp-mdo'); if(dmdo) dmdo.textContent = R$(mdo);
+  const dout = document.getElementById('desp-out'); if(dout) dout.textContent = R$(out);
+
+  const el = document.getElementById('desp-lista');
+  if(!el) return;
+
+  if(!lista.length){
+    el.innerHTML = `<div class="empty" style="padding:48px 20px">
+      <div class="empty-ico" style="font-size:2.4rem;margin-bottom:12px">💸</div>
+      <div style="font-weight:700;margin-bottom:6px">Nenhuma despesa em ${nomeMes(mes)}</div>
+      <div style="margin-bottom:18px">Registre combustível, ajudantes e outras despesas do seu negócio.</div>
+      <button class="btn btn-org" onclick="abreDesp()">+ Registrar despesa</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="tw"><table>
+    <thead><tr>
+      <th>Data</th><th>Descrição</th><th>Categoria</th>
+      <th>Forma</th><th>Valor</th><th>Parcela</th><th></th>
+    </tr></thead>
+    <tbody>
+      ${lista.map(d=>`<tr>
+        <td>${fd(d.dt)}</td>
+        <td><strong>${d.nm}</strong></td>
+        <td><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></td>
+        <td>${d.pag||'—'}</td>
+        <td style="color:var(--red);font-weight:700">${R$(d.val)}</td>
+        <td style="font-size:.76rem;color:var(--mut)">${d.parcela?`${d.parcela}/${d.totalParcelas}`:'—'}</td>
+        <td><button class="btn btn-del btn-sm" onclick="delDesp(${d.id})">🗑</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+// ══════════════════════════════════════════
+// ORÇAMENTOS
+// ══════════════════════════════════════════
+function renderOrcItens(){
+  const el = document.getElementById('orc-itens-lista');
+  el.innerHTML = orcItens.length
+    ? orcItens.map((m,j)=>`
+        <div class="mat-row">
+          <span class="mat-desc">${m.desc}</span>
+          <span class="mat-val-g">${R$(m.val)}</span>
+          <button class="btn btn-del btn-sm" onclick="remOrcItem(${j})" style="padding:3px 7px">✕</button>
+        </div>`).join('')
+    : '<div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum item adicionado</div>';
+  const t = orcItens.reduce((a,b)=>a+(+b.val),0);
+  document.getElementById('orc-total-prev').textContent = R$(t);
+}
+function addOrcItem(){
+  const desc = document.getElementById('oi-desc').value.trim();
+  const val  = document.getElementById('oi-val').value;
+  if(!desc||!val) return toast('⚠️ Preencha item e valor');
+  orcItens.push({desc, val: parseFloat(val)||0});
+  clr('oi-desc','oi-val');
+  document.getElementById('oi-desc').focus();
+  renderOrcItens();
+}
+function remOrcItem(j){ orcItens.splice(j,1); renderOrcItens(); }
+
+document.getElementById('oi-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addOrcItem(); });
+
+function salvarOrc(){
+  if(!orcItens.length) return toast('⚠️ Adicione pelo menos 1 item');
+  const o = {
+    dt:    document.getElementById('o-dt').value,
+    cli:   document.getElementById('o-cli').value.trim(),
+    desc:  document.getElementById('o-desc').value.trim(),
+    valid: document.getElementById('o-valid').value,
+    obs:   document.getElementById('o-obs').value.trim(),
+    itens: [...orcItens],
+    sts:   'Pendente'
+  };
+  if(!o.cli) return toast('⚠️ Informe o cliente');
+  D.orcamentos.push(o); save(); fecha('m-orc'); render();
+  toast('✅ Orçamento salvo!');
+  clr('o-cli','o-desc','o-obs');
+}
+function mudarStsOrc(i,sts){ D.orcamentos[i].sts=sts; save(); rOrcamentos(); }
+
+function abrirConverterOrc(i){
+  const o = D.orcamentos[i];
+  document.getElementById('conv-orc-idx').value = i;
+  document.getElementById('conv-dt').value = hj();
+  document.getElementById('conv-hr').value = '08:00';
+  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  document.getElementById('conv-orc-preview').innerHTML = `
+    <strong>${o.cli}</strong> — ${o.desc||'Serviço'}<br>
+    <span style="color:var(--grn);font-weight:700">${R$(total)}</span>
+    <span style="color:var(--mut);font-size:.76rem"> · ${(o.itens||[]).length} item(ns)</span>
+  `;
+  document.getElementById('m-conv-orc').classList.add('open');
+}
+
+function converterOrcSrv(){
+  const i  = +document.getElementById('conv-orc-idx').value;
+  const o  = D.orcamentos[i];
+  const dt = document.getElementById('conv-dt').value;
+  const hr = document.getElementById('conv-hr').value;
+  if(!dt) return toast('⚠️ Selecione a data');
+
+  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const desc  = (o.itens||[]).map(it=>it.desc).join(', ');
+
+  // Criar serviço
+  D.servicos.push({
+    id: gerarId(),
+    dt, hr,
+    cli:  o.cli,
+    tipo: o.desc || desc,
+    end:  '',
+    val:  total,
+    sts_srv: 'Agendado', sts_pag: null, pag: null,
+    materiais: [], desc_feito: '', inicio: null, fim: null,
+    orcamento_origem: i
+  });
+
+  // Marca orçamento como aprovado
+  D.orcamentos[i].sts = 'Aprovado';
+
+  // Cadastra cliente se não existir
+  const jaExiste = D.clientes.find(c=>c.nm.toLowerCase()===o.cli.toLowerCase());
+  if(!jaExiste) D.clientes.push({nm:o.cli, wpp:'', srv:o.desc||'', end:''});
+
+  save(); fecha('m-conv-orc'); render();
+  toast('✅ Serviço criado! Orçamento aprovado 🎉');
+  addNotif('sistema','✅ Orçamento convertido',`${o.cli} — serviço agendado para ${fd(dt)}`);
+  ir('servicos');
+}
+function delOrc(i){
+  if(!confirm('Remover orçamento?')) return;
+  D.orcamentos.splice(i,1); save(); rOrcamentos(); toast('🗑 Removido');
+}
+
+function pdfOrc(i){
+  const o = D.orcamentos[i];
+  if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
+  const {jsPDF} = window.jspdf;
+  const doc  = new jsPDF({unit:'mm',format:'a4'});
+  const pw   = doc.internal.pageSize.getWidth();
+  const nome = D.perfil.nome || 'AutônomoPro';
+
+  doc.setFillColor(30,15,0); doc.rect(0,0,pw,30,'F');
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text(nome,14,14);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(D.perfil.tipo||'Prestador de Serviços',14,22);
+  doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('ORÇAMENTO',pw-14,14,{align:'right'});
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(`#${String(i+1).padStart(3,'0')} · ${fd(o.dt)}`,pw-14,22,{align:'right'});
+
+  let y = 40;
+
+  doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,22,3,3,'F');
+  doc.setFontSize(7);doc.setFont('helvetica','bold');doc.setTextColor(138,112,96);
+  doc.text('CLIENTE',18,y+8);
+  doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+  doc.text(o.cli||'—',18,y+17);
+  if(o.valid){ doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96); doc.text(`Válido até: ${fd(o.valid)}`,pw-18,y+17,{align:'right'}); }
+  y += 30;
+
+  if(o.desc){ doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40); doc.text(o.desc,14,y); y+=9; }
+
+  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+  doc.text('ITENS DO ORÇAMENTO',14,y); y+=5;
+  doc.setFillColor(30,15,0); doc.rect(14,y,pw-28,7,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(8);
+  doc.text('Descrição',18,y+4.8); doc.text('Valor',pw-18,y+4.8,{align:'right'});
+  y+=7;
+
+  (o.itens||[]).forEach((it,j)=>{
+    if(j%2===0){ doc.setFillColor(250,247,243); doc.rect(14,y,pw-28,7,'F'); }
+    doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text(String(it.desc).slice(0,58),18,y+4.8);
+    doc.setFont('helvetica','bold'); doc.text(R$(it.val),pw-18,y+4.8,{align:'right'});
+    y+=7;
+  });
+
+  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  doc.setFillColor(26,107,60); doc.rect(14,y,pw-28,12,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(12);
+  doc.text('TOTAL',18,y+8.5); doc.text(R$(total),pw-18,y+8.5,{align:'right'});
+  y+=18;
+
+  if(o.obs){
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
+    const lines = doc.splitTextToSize('📌 '+o.obs,pw-28);
+    doc.text(lines,14,y); y+=lines.length*5+6;
+  }
+  if(D.perfil.wpp){ doc.setFontSize(8);doc.setTextColor(90,70,50); doc.text(`📱 Contato: ${D.perfil.wpp}`,14,y); }
+  doc.setFontSize(7);doc.setTextColor(160,140,120);
+  doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')} · ${nome}`,pw/2,287,{align:'center'});
+  doc.save(`orcamento-${(o.cli||'cliente').replace(/\s/g,'-')}-${o.dt||'data'}.pdf`);
+  toast('📄 PDF do orçamento gerado!');
+}
+
+function wppOrc(i){
+  const o     = D.orcamentos[i];
+  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const nome  = D.perfil.nome || 'Prestador';
+  let msg = `📋 *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
+  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  msg += `${_ico} *${nome}*\n`;
+  msg += `👤 Cliente: ${o.cli||'—'}\n`;
+  msg += `📅 Data: ${fd(o.dt)}\n`;
+  if(o.desc) msg += `📋 ${o.desc}\n`;
+  msg += `\n*Itens:*\n`;
+  (o.itens||[]).forEach(it=>{ msg += `• ${it.desc}: ${R$(it.val)}\n`; });
+  msg += `\n*💰 Total: ${R$(total)}*\n`;
+  if(o.valid) msg += `⏳ Válido até: ${fd(o.valid)}\n`;
+  if(o.obs)   msg += `\n📌 ${o.obs}`;
+  if(D.perfil.wpp) msg += `\n\n📱 ${D.perfil.wpp}`;
+  msg += `\n\n_Enviado via AutônomoPro_`;
+
+  const cli = D.clientes.find(c=>c.nm===o.cli);
+  const tel = cli?.wpp?.replace(/\D/g,'')||'';
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  D.orcamentos[i].sts = 'Enviado'; save(); rOrcamentos();
+  toast('📱 Abrindo WhatsApp...');
+}
+
+// ══════════════════════════════════════════
+// RELATÓRIOS
+// ══════════════════════════════════════════
+function relMesAtual(){ document.getElementById('rel-mes').value = hj().slice(0,7); renderRel(); }
+function relMesAnterior(){
+  const [y,m] = document.getElementById('rel-mes').value.split('-').map(Number);
+  document.getElementById('rel-mes').value = new Date(y,m-2,1).toISOString().slice(0,7);
+  renderRel();
+}
+
+function setModoRel(modo){
+  const detalhado = modo === 'detalhado';
+  document.getElementById('btn-rel-resumido').className = detalhado ? 'btn btn-gho btn-sm' : 'btn btn-brn btn-sm';
+  document.getElementById('btn-rel-detalhado').className = detalhado ? 'btn btn-brn btn-sm' : 'btn btn-gho btn-sm';
+  const body = document.getElementById('rel-detalhado-body');
+  if(!body) return;
+  if(detalhado){
+    body.classList.remove('rel-oculto');
+    preencherTabelasRel();
+  } else {
+    body.classList.add('rel-oculto');
+  }
+}
+
+function renderRel(){
+  const mes = document.getElementById('rel-mes')?.value; if(!mes) return;
+  const srvMes  = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais   = srvMes.filter(s=>s.sts_srv==='Realizado');
+  const pagos   = reais.filter(s=>s.sts_pag==='Pago');
+  const pends   = reais.filter(s=>s.sts_pag==='Pendente');
+  const tRec    = pagos.reduce((a,b)=>a+(+b.val),0);
+  const tPend   = pends.reduce((a,b)=>a+(+b.val),0);
+  const tCusto  = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
+  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes));
+  const tDesp   = despMes.reduce((a,b)=>a+(+b.val),0);
+  const lucro   = tRec - tCusto - tDesp;
+  const ticket  = pagos.length>0 ? tRec/pagos.length : 0;
+
+  document.getElementById('rel-cards').innerHTML = `
+    <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido</div><div class="sc-val">${R$(tRec)}</div><div class="sc-hint">${pagos.length} pagos</div></div>
+    <div class="sc" style="--sc-c:var(--red)"><div class="sc-lbl">Custos materiais</div><div class="sc-val" style="color:var(--red)">${R$(tCusto)}</div><div class="sc-hint">dos serviços</div></div>
+    <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Despesas</div><div class="sc-val" style="color:var(--org)">${R$(tDesp)}</div><div class="sc-hint">operacionais</div></div>
+    <div class="sc" style="--sc-c:var(--pur)"><div class="sc-lbl">Lucro real</div><div class="sc-val" style="color:${lucro>=0?'var(--grn)':'var(--red)'}">${R$(lucro)}</div><div class="sc-hint">receita − tudo</div></div>
+    <div class="sc" style="--sc-c:var(--blu)"><div class="sc-lbl">Serviços</div><div class="sc-val">${srvMes.length}</div><div class="sc-hint">${reais.length} realizados</div></div>
+    <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Ticket médio</div><div class="sc-val">${R$(ticket)}</div><div class="sc-hint">por serviço pago</div></div>
+  `;
+}
+
+function preencherTabelasRel(){
+  const mes     = document.getElementById('rel-mes')?.value; if(!mes) return;
+  const body    = document.getElementById('rel-detalhado-body'); if(!body) return;
+  const srvMes  = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais   = srvMes.filter(s=>s.sts_srv==='Realizado').sort((a,b)=>(a.dt||'').localeCompare(b.dt||''));
+  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes)).sort((a,b)=>a.dt.localeCompare(b.dt));
+  const tDesp   = despMes.reduce((a,b)=>a+(+b.val),0);
+  const tMat    = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
+  const tRec    = reais.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
+  const lucroReal = tRec - tMat - tDesp;
+
+  // Bloco por serviço
+  const blocoServicos = reais.length ? reais.map(s=>{
+    const mats  = s.materiais||[];
+    const tMat  = mats.reduce((a,b)=>a+(+b.val),0);
+    const lucro = (+s.val) - tMat;
+    return `
+      <div style="background:var(--sur);border:1.5px solid var(--bor);border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${mats.length?'10px':'0'}">
+          <div>
+            <div style="font-size:.72rem;color:var(--mut);font-weight:600">${fd(s.dt)} · ${s.tipo||'—'}</div>
+            <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700">${s.cli||'—'}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--grn)">${R$(s.val)}</div>
+            <div style="font-size:.72rem;color:var(--mut)">${s.pag||'—'} · ${s.sts_pag||'—'}</div>
+          </div>
+        </div>
+        ${mats.length ? `
+          <div style="border-top:1px dashed var(--bor);padding-top:8px">
+            ${mats.map(m=>`
+              <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;color:var(--mut)">
+                <span>📦 ${m.desc}</span>
+                <span style="color:var(--red);font-weight:600">−${R$(m.val)}</span>
+              </div>`).join('')}
+            <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;padding-top:6px;border-top:1px solid var(--bor);margin-top:4px">
+              <span style="color:var(--mut)">Lucro do serviço</span>
+              <span style="color:${lucro>=0?'var(--grn)':'var(--red)'}">${R$(lucro)}</span>
+            </div>
+          </div>` : ''}
+      </div>`;
+  }).join('') : '<div class="empty">Nenhum serviço realizado no período</div>';
+
+  // Bloco despesas
+  const blocoDesp = despMes.length ? `
+    <div class="tw" style="margin-bottom:12px">
+      <div class="th"><div class="pt">💸 Despesas operacionais</div></div>
+      <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead>
+      <tbody>
+        ${despMes.map(d=>`<tr>
+          <td>${fd(d.dt)}</td>
+          <td><strong>${d.nm}</strong>${d.parcela?` <span style="font-size:.7rem;color:var(--mut)">${d.parcela}/${d.totalParcelas}</span>`:''}</td>
+          <td><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></td>
+          <td style="color:var(--red);font-weight:700">${R$(d.val)}</td>
+        </tr>`).join('')}
+        <tr style="background:var(--sur2)">
+          <td colspan="3" style="text-align:right;font-size:.8rem;color:var(--mut);font-weight:700">Total despesas</td>
+          <td style="color:var(--red);font-weight:700">${R$(tDesp)}</td>
+        </tr>
+      </tbody></table>
+    </div>` : '<div class="empty" style="margin-bottom:12px">Nenhuma despesa no período</div>';
+
+  // Lucro real final
+  const blocoLucro = `
+    <div style="background:${lucroReal>=0?'linear-gradient(135deg,var(--grn-bg),#c8eed9)':'linear-gradient(135deg,var(--red-bg),#fdd)'};border:1.5px solid ${lucroReal>=0?'rgba(26,107,60,.2)':'rgba(184,50,50,.2)'};border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'};text-transform:uppercase;letter-spacing:.5px">📈 Lucro real do mês</div>
+        <div style="font-size:.8rem;color:var(--mut);margin-top:2px">Recebido − Materiais − Despesas</div>
+      </div>
+      <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'}">${R$(lucroReal)}</div>
+    </div>`;
+
+  body.innerHTML = `
+    <div class="tw" style="margin-bottom:12px">
+      <div class="th"><div class="pt">🔧 Serviços realizados</div></div>
+      <div style="padding:12px">${blocoServicos}</div>
+    </div>
+    ${blocoDesp}
+    ${blocoLucro}
+  `;
+}
+
+function gerarPDFRel(){
+  const mes = document.getElementById('rel-mes').value;
+  const detalhado = !document.getElementById('rel-tw-rec')?.classList.contains('rel-oculto');
+  if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
+  const {jsPDF} = window.jspdf;
+  const doc  = new jsPDF({unit:'mm',format:'a4'});
+  const pw   = doc.internal.pageSize.getWidth();
+  const nome = D.perfil.nome || 'AutônomoPro';
+
+  doc.setFillColor(30,15,0); doc.rect(0,0,pw,30,'F');
+  doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text(nome,14,14);
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(D.perfil.tipo||'Prestador de Serviços',14,22);
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text(`Relatório — ${nomeMes(mes)}`,pw-14,14,{align:'right'});
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
+  doc.text(`Gerado: ${new Date().toLocaleDateString('pt-BR')}`,pw-14,22,{align:'right'});
+
+  let y = 38;
+  const srvMes = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais  = srvMes.filter(s=>s.sts_srv==='Realizado');
+  const tRec   = reais.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
+  const tCusto = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
+  const lucro  = tRec-tCusto;
+  const tPend  = reais.filter(s=>s.sts_pag==='Pendente').reduce((a,b)=>a+(+b.val),0);
+
+  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes));
+  const tDesp  = despMes.reduce((a,b)=>a+(+b.val),0);
+  const lucroReal = tRec - tCusto - tDesp;
+
+  const cards = [
+    {l:'Recebido',  v:R$(tRec),     c:[26,107,60]},
+    {l:'Materiais', v:R$(tCusto),   c:[184,50,50]},
+    {l:'Despesas',  v:R$(tDesp),    c:[224,123,42]},
+    {l:'Lucro real',v:R$(lucroReal),c:lucroReal>=0?[26,107,60]:[184,50,50]},
+  ];
+  const cw = (pw-28-9)/4;
+  cards.forEach((c,k)=>{
+    const x=14+k*(cw+3);
+    doc.setFillColor(...c.c); doc.roundedRect(x,y,cw,16,2,2,'F');
+    doc.setFontSize(6);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text(c.l.toUpperCase(),x+3,y+6);
+    doc.setFontSize(11); doc.text(c.v,x+3,y+13);
+  });
+  y+=22;
+
+  // SERVIÇOS - cada um com seus materiais discriminados
+  if(reais.length){
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+    doc.text('Servicos Realizados',14,y); y+=6;
+
+    reais.sort((a,b)=>(a.dt||'').localeCompare(b.dt||'')).forEach(s=>{
+      if(y>255){ doc.addPage(); y=20; }
+      const mats  = s.materiais||[];
+      const custo = mats.reduce((a,b)=>a+(+b.val),0);
+      const lucroS = (+s.val) - custo;
+      const altBloco = 16 + (mats.length * 6) + (mats.length ? 8 : 0);
+
+      // Caixa do serviço
+      doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,altBloco,3,3,'F');
+
+      // Cabeçalho serviço
+      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+      doc.text(`${fd(s.dt)} · ${s.tipo||'—'}`,18,y+6);
+      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text((s.cli||'—').slice(0,30),18,y+13);
+      doc.setFontSize(11);doc.setFont('helvetica','bold');
+      doc.setTextColor(...(s.sts_pag==='Pago'?[26,107,60]:[224,123,42]));
+      doc.text(R$(s.val),pw-18,y+13,{align:'right'});
+      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+      doc.text(`${s.pag||'—'} · ${s.sts_pag||'—'}`,pw-18,y+19,{align:'right'});
+      y+=16;
+
+      // Materiais do serviço
+      if(mats.length){
+        doc.setDrawColor(220,210,200); doc.line(18,y,pw-18,y); y+=2;
+        mats.forEach(m=>{
+          doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
+          doc.text(`+ ${m.desc}`,20,y+4);
+          doc.setTextColor(184,50,50);
+          doc.text(`-${R$(m.val)}`,pw-18,y+4,{align:'right'});
+          y+=6;
+        });
+        // Lucro do serviço
+        doc.setDrawColor(200,190,180); doc.line(18,y,pw-18,y);
+        doc.setFillColor(235,245,238); doc.rect(14,y,pw-28,8,'F');
+        doc.setFontSize(8);doc.setFont('helvetica','bold');
+        doc.setTextColor(80,60,40); doc.text('Lucro do servico',18,y+5.5);
+        doc.setTextColor(lucroS>=0?26:184, lucroS>=0?107:50, lucroS>=0?60:50);
+        doc.setFontSize(9);
+        doc.text(R$(lucroS),pw-18,y+5.5,{align:'right'});
+        y+=8;
+      } else {
+        y+=2;
+      }
+      y+=4;
+    });
+  }
+
+  // DESPESAS OPERACIONAIS
+  if(despMes.length){
+    if(y>240){ doc.addPage(); y=20; }
+    y+=4;
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+    doc.text('Despesas Operacionais',14,y); y+=6;
+    doc.setFillColor(224,123,42); doc.rect(14,y,pw-28,7,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(7.5);
+    doc.text('Data',16,y+4.8);
+    doc.text('Descricao',36,y+4.8);
+    doc.text('Categoria',110,y+4.8);
+    doc.text('Valor',pw-18,y+4.8,{align:'right'});
+    y+=7;
+    despMes.sort((a,b)=>a.dt.localeCompare(b.dt)).forEach((d,di)=>{
+      if(y>270){ doc.addPage(); y=20; }
+      if(di%2===0){ doc.setFillColor(255,244,235); doc.rect(14,y,pw-28,7,'F'); }
+      doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8);
+      doc.text(fd(d.dt),16,y+4.8);
+      doc.text(d.nm.slice(0,30),36,y+4.8);
+      doc.text(d.cat,110,y+4.8);
+      doc.setTextColor(184,50,50);doc.setFont('helvetica','bold');
+      doc.text(R$(d.val),pw-18,y+4.8,{align:'right'});
+      y+=7;
+    });
+    // Total despesas
+    doc.setFillColor(30,15,0); doc.rect(14,y,pw-28,8,'F');
+    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('TOTAL DESPESAS',16,y+5.5);
+    doc.text(R$(tDesp),pw-16,y+5.5,{align:'right'});
+    y+=14;
+  }
+
+  // LUCRO REAL FINAL
+  if(y>270){ doc.addPage(); y=20; }
+  doc.setFillColor(lucroReal>=0?26:184, lucroReal>=0?107:50, lucroReal>=0?60:50);
+  doc.rect(14,y,pw-28,12,'F');
+  doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+  doc.text('LUCRO REAL DO MES',16,y+8);
+  doc.setFontSize(13);
+  doc.text(R$(lucroReal),pw-16,y+8,{align:'right'});
+  y+=18;
+
+  for(let k=1;k<=doc.internal.getNumberOfPages();k++){
+    doc.setPage(k);
+    doc.setFontSize(7);doc.setTextColor(160,140,120);
+    doc.text(`${nome} · ${detalhado?'Relatório Detalhado':'Relatório Resumido'} · Página ${k}`,pw/2,290,{align:'center'});
+  }
+  doc.save(`relatorio-${mes}${detalhado?'-detalhado':''}.pdf`);
+  toast('📄 PDF gerado!');
+}
+
+// ══════════════════════════════════════════
+// NOTIFICAÇÕES
+// ══════════════════════════════════════════
+async function ativarNotifs(){
+  if(!('Notification' in window)){ toast('❌ Não suportado neste navegador'); return; }
+  const p = await Notification.requestPermission();
+  if(p==='granted'){
+    document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
+    document.getElementById('btn-ativar').className='btn btn-ok';
+    toast('🔔 Notificações ativadas!');
+    addNotif('sistema','✅ Notificações ativadas','Você receberá alertas automáticos.');
+  } else {
+    toast('❌ Permissão negada');
+  }
+}
+
+function iniciarNotificacoes(){
+  setInterval(verificarNotifs, 60000);
+  verificarNotifs();
+  if(Notification.permission==='granted'){
+    document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
+    document.getElementById('btn-ativar').className='btn btn-ok';
+  }
+}
+
+function verificarNotifs(){
+  const agora = new Date();
+  const h  = String(agora.getHours()).padStart(2,'0');
+  const m  = String(agora.getMinutes()).padStart(2,'0');
+  const hoje = hj();
+
+  if(D.cfg.togRes && h==='08' && m==='00'){
+    const agHj = D.servicos.filter(s=>s.dt===hoje&&s.sts_srv==='Agendado');
+    if(agHj.length){
+      const prim = [...agHj].sort((a,b)=>(a.hr||'').localeCompare(b.hr||''))[0];
+      const msg  = `${agHj.length} serviço(s) agendado(s) hoje. Primeiro às ${prim.hr||'?'}.`;
+      envNotif('🌅 Bom dia! Resumo do dia',msg,'resumo-'+hoje);
+      addNotif('resumo','🌅 Resumo do dia',msg);
+    }
+  }
+
+  if(D.cfg.togAg){
+    const em1h = new Date(agora.getTime()+3600000);
+    const hr1  = `${String(em1h.getHours()).padStart(2,'0')}:${String(em1h.getMinutes()).padStart(2,'0')}`;
+    D.servicos.filter(s=>s.dt===hoje&&s.hr===hr1&&s.sts_srv==='Agendado').forEach(s=>{
+      const msg = `Serviço com ${s.cli} às ${s.hr} - ${s.tipo}`;
+      envNotif('⏰ Serviço em 1 hora!',msg,'ag-'+s.dt+s.hr);
+      addNotif('agenda','⏰ Serviço em 1 hora!',msg);
+    });
+  }
+
+  if(D.cfg.togCob && h==='09' && m==='00'){
+    const pends = D.servicos.filter(s=>s.sts_srv==='Realizado'&&s.sts_pag==='Pendente');
+    if(pends.length){
+      const msg = `${pends.length} pagamento(s) em aberto - ${R$(pends.reduce((a,b)=>a+(+b.val),0))}`;
+      envNotif('💰 Cobranças pendentes',msg,'cob-'+hoje);
+      addNotif('cobranca','💰 Cobranças pendentes',msg);
+    }
+  }
+}
+
+function envNotif(title,body,tag){
+  if(Notification.permission!=='granted') return;
+  navigator.serviceWorker?.ready.then(sw=>{
+    sw.active?.postMessage({type:'NOTIFY',title,body,tag});
+  });
+}
+
+function testarNotif(){
+  const msg = `Teste às ${new Date().toLocaleTimeString('pt-BR')}. Tudo funcionando! ✅`;
+  if(Notification.permission==='granted'){
+    envNotif('🧪 Teste AutônomoPro',msg,'teste-'+Date.now());
+    addNotif('sistema','🧪 Teste',msg);
+    toast('🔔 Notificação enviada!');
+  } else {
+    toast('⚠️ Ative as notificações primeiro');
+    ativarNotifs();
+  }
+}
+
+function addNotif(tipo,title,msg){
+  D.notifs.unshift({
+    id: gerarId(), tipo, title, msg,
+    hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    lida: false
+  });
+  if(D.notifs.length>50) D.notifs=D.notifs.slice(0,50);
+  save(); atualizarBadge(); renderNotifs();
+}
+
+function renderNotifs(){
+  const el     = document.getElementById('notif-list');
+  const icoMap = {resumo:'🌅',agenda:'⏰',cobranca:'💰',sistema:'⚙️'};
+  const corMap = {resumo:'#dbeafe',agenda:'#d8f3dc',cobranca:'#fff4eb',sistema:'#f5f0e8'};
+  el.innerHTML = D.notifs.length
+    ? D.notifs.map((n,i)=>`
+        <div class="notif-item ${n.lida?'':'unread'}" onclick="lerNotif(${i})">
+          <div class="notif-ico" style="background:${corMap[n.tipo]||'#f5f0e8'}">${icoMap[n.tipo]||'🔔'}</div>
+          <div style="flex:1">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-msg">${n.msg}</div>
+          </div>
+          <div class="notif-time">${n.hora}</div>
+        </div>`).join('')
+    : '<div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div>';
+}
+
+function lerNotif(i){ D.notifs[i].lida=true; save(); atualizarBadge(); renderNotifs(); }
+function limparNotifs(){ D.notifs=[]; save(); atualizarBadge(); renderNotifs(); toast('🗑 Notificações limpas'); }
+
+function atualizarBadge(){
+  const n   = D.notifs.filter(x=>!x.lida).length;
+  const b   = document.getElementById('badge-count');
+  const dot = document.getElementById('mob-dot');
+  if(n>0){ b.textContent=n; b.style.display='inline-block'; dot?.classList.add('show'); }
+  else    { b.style.display='none'; dot?.classList.remove('show'); }
+}
+
+function salvarCfg(){
+  D.cfg = {
+    togAg:  document.getElementById('tog-ag').checked,
+    togRes: document.getElementById('tog-res').checked,
+    togCob: document.getElementById('tog-cob').checked
+  };
+  localStorage.setItem('sp4_cfg',JSON.stringify(D.cfg));
+  toast('✅ Configuração salva!');
+}
+
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+function limparTudo(){
+  if(!confirm('⚠️ Isso vai apagar TODOS os dados. Tem certeza?')) return;
+  D.servicos=[]; D.clientes=[]; D.orcamentos=[]; D.notifs=[];
+  save(); render(); toast('🗑 Todos os dados apagados');
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+let tT;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent=msg; el.style.display='block';
+  clearTimeout(tT);
+  tT = setTimeout(()=>el.style.display='none', 3200);
+}
+</script>
+</body>
+</html>
