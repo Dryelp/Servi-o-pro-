@@ -13,6 +13,7 @@
 <title>AutônomoPro</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#faf7f3;--sur:#fff;--sur2:#f5f0e8;--bor:#e8dfd2;
@@ -254,6 +255,35 @@ input:checked+.slider:before{transform:translateX(19px)}
   <button onclick="atualizarApp()" style="background:#fff;color:var(--grn);border:none;border-radius:7px;padding:7px 14px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
     Atualizar agora
   </button>
+</div>
+
+<!-- LOGIN -->
+<div class="welcome-overlay" id="tela-login" style="display:none">
+  <div class="welcome-box" style="max-width:420px">
+    <div class="welcome-ico" id="login-ico">🛠️</div>
+    <div class="welcome-title">AutônomoPro</div>
+    <div class="welcome-sub" id="login-sub">Entre na sua conta para continuar</div>
+
+    <div id="login-form">
+      <div class="fg" style="text-align:left"><label class="fl">E-mail</label><input class="fi" id="login-email" type="email" placeholder="seu@email.com"></div>
+      <div class="fg" style="text-align:left"><label class="fl">Senha</label><input class="fi" id="login-senha" type="password" placeholder="Sua senha"></div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerLogin()">Entrar</button>
+      <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarCadastro()">Criar conta grátis</button>
+    </div>
+
+    <div id="cadastro-form" style="display:none">
+      <div class="fg" style="text-align:left"><label class="fl">Nome completo</label><input class="fi" id="cad-nome" placeholder="Seu nome"></div>
+      <div class="fg" style="text-align:left"><label class="fl">E-mail</label><input class="fi" id="cad-email" type="email" placeholder="seu@email.com"></div>
+      <div class="fg" style="text-align:left"><label class="fl">Senha</label><input class="fi" id="cad-senha" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="fg" style="text-align:left"><label class="fl">O que você faz?</label><input class="fi" id="cad-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerCadastro()">Criar conta grátis 🚀</button>
+      <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Já tenho conta</button>
+    </div>
+
+    <div id="login-loading" style="display:none;text-align:center;padding:20px;color:var(--mut);font-size:.9rem">
+      ⏳ Aguarde...
+    </div>
+  </div>
 </div>
 
 <!-- WELCOME -->
@@ -498,6 +528,8 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
       <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
+      <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px">🚪 Sair da conta</button>
+      <button class="btn btn-del" style="margin-top:10px" onclick="fazerLogout()">🚪 Sair da conta</button>
     </div>
     <div class="cfg-sec">
       <div class="cfg-t">🛠️ Meus serviços</div>
@@ -525,6 +557,12 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- CONFIG -->
   <div class="page" id="pg-config">
     <div class="topbar"><div><div class="pg-title">Configurações</div></div></div>
+    <div class="cfg-sec" id="migracao-box" style="display:none">
+      <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados para a nuvem</div>
+      <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Detectamos dados salvos localmente no seu dispositivo. Deseja migrar para a nuvem agora?</p>
+      <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
+      <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
+    </div>
     <div class="cfg-sec">
       <div class="cfg-t" style="color:var(--red)">⚠️ Zona de perigo</div>
       <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Apaga todos os dados do app localmente. Esta ação <strong>não pode ser desfeita</strong>.</p>
@@ -854,6 +892,12 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').cat
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════════
+const SUPA = supabase.createClient('https://dwuhhdxhxveucajhejrk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dWhoZHhoeHZldWNhamhlanJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjU1NzgsImV4cCI6MjA4OTUwMTU3OH0.aCa2l7V9ScB5LuqGD1B3za0WIKqj7PmtJtIWk7AcyYQ');
+let USER_ID = null;
+
 const D = {
   servicos:   [],
   clientes:   [],
@@ -1097,8 +1141,7 @@ function atualizarApp(){
   }
 }
 
-window.onload = () => {
-  load();
+window.onload = async () => {
   document.getElementById('data-hoje').textContent =
     new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('s-dt').value = hj();
@@ -1106,21 +1149,267 @@ window.onload = () => {
   const v = new Date(); v.setDate(v.getDate()+7);
   document.getElementById('o-valid').value = v.toISOString().split('T')[0];
   relMesAtual();
+
+  // Verificar sessao Supabase
+  const { data: { session } } = await SUPA.auth.getSession();
+  if(session){
+    USER_ID = session.user.id;
+    await carregarDadosSupabase();
+    iniciarApp();
+  } else {
+    mostrarTelaLogin();
+  }
+
+  SUPA.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_IN' && session){
+      USER_ID = session.user.id;
+      await carregarDadosSupabase();
+      iniciarApp();
+    } else if(event === 'SIGNED_OUT'){
+      USER_ID = null;
+      mostrarTelaLogin();
+    }
+  });
+};
+
+function mostrarTelaLogin(){
+  document.getElementById('tela-login').style.display = 'flex';
+  const sb = document.querySelector('.sidebar'); if(sb) sb.style.display = 'none';
+  const mn = document.querySelector('.main');    if(mn) mn.style.display = 'none';
+  const mb = document.querySelector('.mob-bar'); if(mb) mb.style.display = 'none';
+}
+
+function esconderTelaLogin(){
+  document.getElementById('tela-login').style.display = 'none';
+  const sb = document.querySelector('.sidebar'); if(sb) sb.style.display = '';
+  const mn = document.querySelector('.main');    if(mn) mn.style.display = '';
+  const mb = document.querySelector('.mob-bar'); if(mb) mb.style.display = '';
+}
+
+function mostrarLogin(){
+  document.getElementById('login-sub').textContent = 'Entre na sua conta para continuar';
+  document.getElementById('login-form').style.display = '';
+  document.getElementById('cadastro-form').style.display = 'none';
+  document.getElementById('login-loading').style.display = 'none';
+}
+
+function mostrarCadastro(){
+  document.getElementById('login-sub').textContent = 'Crie sua conta gratis agora';
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('cadastro-form').style.display = '';
+  document.getElementById('login-loading').style.display = 'none';
+}
+
+function mostrarLoading(msg){
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('cadastro-form').style.display = 'none';
+  document.getElementById('login-loading').style.display = '';
+  document.getElementById('login-loading').innerHTML = msg || 'Aguarde...';
+}
+
+async function fazerLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  if(!email || !senha) return toast('Preencha email e senha');
+  mostrarLoading('Entrando...');
+  const { error } = await SUPA.auth.signInWithPassword({ email, password: senha });
+  if(error){
+    mostrarLogin();
+    toast('Email ou senha incorretos');
+  }
+}
+
+async function fazerCadastro(){
+  const nome  = document.getElementById('cad-nome').value.trim();
+  const email = document.getElementById('cad-email').value.trim();
+  const senha = document.getElementById('cad-senha').value;
+  const tipo  = document.getElementById('cad-tipo').value.trim();
+  if(!nome || !email || !senha) return toast('Preencha todos os campos');
+  if(senha.length < 6) return toast('Senha deve ter minimo 6 caracteres');
+  mostrarLoading('Criando sua conta...');
+  const { data, error } = await SUPA.auth.signUp({ email, password: senha });
+  if(error){ mostrarCadastro(); toast(error.message); return; }
+  if(data.user){
+    await SUPA.from('profiles').upsert({
+      id: data.user.id, nome, tipo,
+      segmento: detectarSegmento(tipo)
+    });
+  }
+}
+
+async function fazerLogout(){
+  await SUPA.auth.signOut();
+  D.servicos=[]; D.clientes=[]; D.orcamentos=[];
+  D.notifs=[]; D.despesas=[];
+  D.perfil={nome:'',tipo:'',wpp:'',meta:0};
+  toast('Ate logo!');
+}
+
+function iniciarApp(){
+  esconderTelaLogin();
   render();
   renderRel();
   iniciarNotificacoes();
   atualizarBadge();
   uiPerfil();
   if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
-  // Aplicar segmento DEPOIS de tudo — garante que DOM está pronto
+  verificarMigracao();
   setTimeout(function(){
     if(typeof SEGMENTOS !== 'undefined'){
       const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
       aplicarSegmento(SEGMENTOS[segSalvo] || SEGMENTOS.geral);
     }
-
   }, 0);
-};
+}
+
+// ══════════════════════════════════════════
+// SUPABASE CRUD
+// ══════════════════════════════════════════
+async function carregarDadosSupabase(){
+  try {
+    // Perfil
+    const { data: perf } = await SUPA.from('profiles').select('*').eq('id', USER_ID).single();
+    if(perf){
+      D.perfil = {
+        nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
+        meta: perf.meta||0, segmento: perf.segmento||'geral',
+        meusSrvs: perf.meus_srvs||[]
+      };
+      D.cfg = {togAg:true,togRes:true,togCob:true};
+    }
+
+    // Servicos
+    const { data: srvs } = await SUPA.from('servicos').select('*').eq('user_id', USER_ID).order('dt', {ascending:false});
+    D.servicos = (srvs||[]).map(s=>({
+      id: s.id, dt: s.dt, hr: s.hr, cli: s.cli, tipo: s.tipo,
+      end: s.end_, val: s.val, prazo: s.prazo, qtd: s.qtd,
+      entrada: s.entrada, saldo: s.saldo,
+      sts_srv: s.sts_srv, sts_pag: s.sts_pag, pag: s.pag,
+      materiais: s.materiais||[], desc_feito: s.desc_feito||'',
+      inicio: s.inicio, fim: s.fim, _dbid: s.id
+    }));
+
+    // Clientes
+    const { data: clis } = await SUPA.from('clientes').select('*').eq('user_id', USER_ID);
+    D.clientes = (clis||[]).map(c=>({
+      nm: c.nm, wpp: c.wpp||'', srv: c.srv||'', end: c.end_||'', _dbid: c.id
+    }));
+
+    // Orcamentos
+    const { data: orcs } = await SUPA.from('orcamentos').select('*').eq('user_id', USER_ID).order('dt', {ascending:false});
+    D.orcamentos = (orcs||[]).map(o=>({
+      dt: o.dt, cli: o.cli, desc: o.descricao||'', valid: o.valid,
+      obs: o.obs||'', itens: o.itens||[], sts: o.sts, _dbid: o.id
+    }));
+
+    // Despesas
+    const { data: desps } = await SUPA.from('despesas').select('*').eq('user_id', USER_ID).order('dt', {ascending:false});
+    D.despesas = (desps||[]).map(d=>({
+      id: d.id, nm: d.nm, cat: d.cat, val: d.val, dt: d.dt,
+      pag: d.pag||'', parcela: d.parcela, totalParcelas: d.total_parcelas,
+      grupo: d.grupo, _dbid: d.id
+    }));
+
+  } catch(e) {
+    console.error('Erro ao carregar dados:', e);
+    toast('Erro ao carregar dados. Tente novamente.');
+  }
+}
+
+async function sbSalvarPerfil(){
+  if(!USER_ID) return;
+  try {
+    await SUPA.from('profiles').upsert({
+      id: USER_ID,
+      nome: D.perfil.nome,
+      tipo: D.perfil.tipo,
+      wpp: D.perfil.wpp,
+      meta: D.perfil.meta||0,
+      segmento: D.perfil.segmento||'geral',
+      meus_srvs: D.perfil.meusSrvs||[]
+    });
+  } catch(e){ console.error('Erro ao salvar perfil:', e); }
+}
+
+async function sbSalvarServico(srv){
+  if(!USER_ID) return null;
+  const { data, error } = await SUPA.from('servicos').upsert({
+    id: srv._dbid || undefined,
+    user_id: USER_ID,
+    dt: srv.dt, hr: srv.hr||null, cli: srv.cli, tipo: srv.tipo,
+    end_: srv.end||null, val: srv.val||0, prazo: srv.prazo||null,
+    qtd: srv.qtd||null, entrada: srv.entrada||null, saldo: srv.saldo||null,
+    sts_srv: srv.sts_srv, sts_pag: srv.sts_pag||null, pag: srv.pag||null,
+    materiais: srv.materiais||[], desc_feito: srv.desc_feito||null,
+    inicio: srv.inicio||null, fim: srv.fim||null
+  }).select().single();
+  if(error){ console.error('Erro servico:', error); return null; }
+  return data;
+}
+
+async function sbDeletarServico(dbid){
+  if(!USER_ID || !dbid) return;
+  await SUPA.from('servicos').delete().eq('id', dbid).eq('user_id', USER_ID);
+}
+
+async function sbSalvarCliente(cli){
+  if(!USER_ID) return null;
+  const payload = {
+    user_id: USER_ID, nm: cli.nm, wpp: cli.wpp||null,
+    srv: cli.srv||null, end_: cli.end||null
+  };
+  if(cli._dbid) payload.id = cli._dbid;
+  const { data, error } = await SUPA.from('clientes').upsert(payload).select().single();
+  if(error){ console.error('Erro cliente:', error); return null; }
+  return data;
+}
+
+async function sbDeletarCliente(dbid){
+  if(!USER_ID || !dbid) return;
+  await SUPA.from('clientes').delete().eq('id', dbid).eq('user_id', USER_ID);
+}
+
+async function sbSalvarOrcamento(orc){
+  if(!USER_ID) return null;
+  const payload = {
+    user_id: USER_ID, dt: orc.dt, cli: orc.cli,
+    descricao: orc.desc||null, valid: orc.valid||null,
+    obs: orc.obs||null, itens: orc.itens||[], sts: orc.sts
+  };
+  if(orc._dbid) payload.id = orc._dbid;
+  const { data, error } = await SUPA.from('orcamentos').upsert(payload).select().single();
+  if(error){ console.error('Erro orcamento:', error); return null; }
+  return data;
+}
+
+async function sbDeletarOrcamento(dbid){
+  if(!USER_ID || !dbid) return;
+  await SUPA.from('orcamentos').delete().eq('id', dbid).eq('user_id', USER_ID);
+}
+
+async function sbSalvarDespesa(desp){
+  if(!USER_ID) return null;
+  const payload = {
+    user_id: USER_ID, nm: desp.nm, cat: desp.cat,
+    val: desp.val||0, dt: desp.dt, pag: desp.pag||null,
+    parcela: desp.parcela||null, total_parcelas: desp.totalParcelas||null,
+    grupo: desp.grupo||null
+  };
+  if(desp._dbid) payload.id = desp._dbid;
+  const { data, error } = await SUPA.from('despesas').upsert(payload).select().single();
+  if(error){ console.error('Erro despesa:', error); return null; }
+  return data;
+}
+
+async function sbDeletarDespesa(dbid){
+  if(!USER_ID || !dbid) return;
+  await SUPA.from('despesas').delete().eq('id', dbid).eq('user_id', USER_ID);
+}
+
+async function sbDeletarDespesasGrupo(grupo){
+  if(!USER_ID || !grupo) return;
+  await SUPA.from('despesas').delete().eq('grupo', grupo).eq('user_id', USER_ID);
+}
 
 // Gerador de ID sequencial seguro (evita colisão do Date.now)
 function gerarId(){
@@ -1141,57 +1430,39 @@ function hj(){
 // STORAGE
 // ══════════════════════════════════════════
 function load(){
+  // Substituido pelo carregarDadosSupabase()
   try{
-    D.servicos   = JSON.parse(localStorage.getItem('sp4_srv')   || '[]');
-    D.clientes   = JSON.parse(localStorage.getItem('sp4_cli')   || '[]');
-    D.orcamentos = JSON.parse(localStorage.getItem('sp4_orc')   || '[]');
-    D.notifs     = JSON.parse(localStorage.getItem('sp4_nf')    || '[]');
-    D.despesas   = JSON.parse(localStorage.getItem('sp4_desp')  || '[]');
-    D.perfil     = JSON.parse(localStorage.getItem('sp4_perf')  || '{"nome":"","tipo":"","wpp":""}');
-    D.cfg        = JSON.parse(localStorage.getItem('sp4_cfg')   || '{"togAg":true,"togRes":true,"togCob":true}');
     document.getElementById('tog-ag').checked  = D.cfg.togAg;
     document.getElementById('tog-res').checked = D.cfg.togRes;
     document.getElementById('tog-cob').checked = D.cfg.togCob;
-  }catch(e){ console.warn('Load error',e); }
+  }catch(e){}
 }
 function save(){
-  try{
-    localStorage.setItem('sp4_srv',  JSON.stringify(D.servicos));
-    localStorage.setItem('sp4_cli',  JSON.stringify(D.clientes));
-    localStorage.setItem('sp4_orc',  JSON.stringify(D.orcamentos));
-    localStorage.setItem('sp4_nf',   JSON.stringify(D.notifs));
-    localStorage.setItem('sp4_desp', JSON.stringify(D.despesas));
-    localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
-    localStorage.setItem('sp4_cfg',  JSON.stringify(D.cfg));
-    // Aviso se localStorage acima de 80% (~4MB)
-    const uso = JSON.stringify(localStorage).length;
-    if(uso > 4000000) toast('⚠️ Armazenamento quase cheio. Considere limpar dados antigos.');
-  }catch(e){
-    toast('⚠️ Erro ao salvar dados. Armazenamento pode estar cheio.');
-    console.error('Save error', e);
-  }
+  // Com Supabase cada operacao salva individualmente
+  // save() mantido por compatibilidade
 }
 
 // ══════════════════════════════════════════
 // PERFIL
 // ══════════════════════════════════════════
-function salvarPerfil(){
+async function salvarPerfil(){
   const nm = document.getElementById('p-nome').value.trim();
   if(!nm) return toast('⚠️ Digite seu nome');
   D.perfil.nome = nm;
   D.perfil.tipo = document.getElementById('p-tipo').value.trim();
-  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  D.perfil.segmento = detectarSegmento(D.perfil.tipo);
+  await sbSalvarPerfil();
   document.getElementById('welcome').classList.remove('open');
   uiPerfil(); render();
-  const segKey = detectarSegmento(D.perfil.tipo);
-  toast('Bem-vindo, ' + nm + '! ' + SEGMENTOS[segKey].icone);
+  toast('Bem-vindo, ' + nm + '! ' + SEGMENTOS[D.perfil.segmento].icone);
 }
 
-function atualizarPerfil(){
+async function atualizarPerfil(){
   D.perfil.nome = document.getElementById('edit-nome').value.trim();
   D.perfil.tipo = document.getElementById('edit-tipo').value.trim();
   D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
-  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  D.perfil.segmento = detectarSegmento(D.perfil.tipo);
+  await sbSalvarPerfil();
   uiPerfil();
   toast('✅ Perfil atualizado!');
 }
@@ -1231,11 +1502,11 @@ function atualizarPreviewMeta(){
   }
 }
 
-function salvarMeta(){
+async function salvarMeta(){
   const meta = parseFloat(document.getElementById('edit-meta').value) || 0;
   if(!meta) return toast('⚠️ Digite um valor de meta');
   D.perfil.meta = meta;
-  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  await sbSalvarPerfil();
   atualizarPreviewMeta();
   rDash();
   toast('🎯 Meta de ' + R$(meta) + ' definida!');
@@ -1579,7 +1850,7 @@ function abrirEditCli(i){
   abre('m-edit-cli');
 }
 
-function salvarEditCli(){
+async function salvarEditCli(){
   const i  = +document.getElementById('edit-cli-idx').value;
   const nm = document.getElementById('edit-cli-nm').value.trim();
   if(!nm){ toast('Informe o nome do cliente'); return; }
@@ -1593,7 +1864,8 @@ function salvarEditCli(){
     D.servicos.forEach(s=>{ if(s.cli===nomeAntigo) s.cli=nm; });
     D.orcamentos.forEach(o=>{ if(o.cli===nomeAntigo) o.cli=nm; });
   }
-  save(); fecha('m-edit-cli'); render();
+  await sbSalvarCliente(D.clientes[i]);
+  fecha('m-edit-cli'); render();
   toast('✅ Cliente atualizado!');
 }
 
@@ -1671,23 +1943,23 @@ function atualizarDatalistTipo(){
   if(dl) dl.innerHTML = todos.map(s=>`<option value="${s}">`).join('');
 }
 
-function adicionarMeuSrv(){
+async function adicionarMeuSrv(){
   const inp = document.getElementById('novo-srv-tipo');
   const val = inp?.value.trim();
   if(!val) return toast('Digite o tipo de servico');
   if(!D.perfil.meusSrvs) D.perfil.meusSrvs = [];
   if(D.perfil.meusSrvs.includes(val)) return toast('Ja cadastrado!');
   D.perfil.meusSrvs.push(val);
-  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  await sbSalvarPerfil();
   inp.value = '';
   renderMeusSrvs();
   atualizarDatalistTipo();
   toast('Servico adicionado!');
 }
 
-function removerMeuSrv(i){
+async function removerMeuSrv(i){
   D.perfil.meusSrvs.splice(i,1);
-  localStorage.setItem('sp4_perf', JSON.stringify(D.perfil));
+  await sbSalvarPerfil();
   renderMeusSrvs();
   atualizarDatalistTipo();
 }
@@ -1740,7 +2012,7 @@ function calcSaldo(){
   if(el) el.value = saldo > 0 ? 'R$ ' + saldo.toFixed(2).replace('.',',') : 'R$ 0,00';
 }
 
-function salvarSrv(){
+async function salvarSrv(){
   const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
   const val     = parseFloat(document.getElementById('s-val').value) || 0;
   const o = {
@@ -1839,7 +2111,7 @@ function remMat(j){ finMats.splice(j,1); renderFinMats(); }
 
 document.getElementById('fin-mat-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addMat(); });
 
-function finalizarSrv(){
+async function finalizarSrv(){
   const i       = +document.getElementById('fin-idx').value;
   const desc    = document.getElementById('fin-desc').value.trim();
   const pag     = document.getElementById('fin-pag').value;
@@ -1854,32 +2126,37 @@ function finalizarSrv(){
   D.servicos[i].desc_feito= desc;
   D.servicos[i].fim       = new Date().toISOString();
 
-  save(); fecha('m-fin-srv'); render();
-  toast('✅ Serviço finalizado!');
-  addNotif('sistema','✅ Serviço concluído',
-    `${D.servicos[i].cli} — ${D.servicos[i].tipo}. ${sts_pag==='Pago'?'Pagamento confirmado! 💰':'Pagamento pendente ⏳'}`
-  );
+  await sbSalvarServico(D.servicos[i]);
+  fecha('m-fin-srv'); render();
+  toast('✅ Servico finalizado!');
+  addNotif('sistema','✅ Servico concluido',D.servicos[i].cli + ' - ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado! 💰':'Pagamento pendente ⏳'));
 }
 
-function marcarPago(i){
+async function marcarPago(i){
   D.servicos[i].sts_pag = 'Pago';
-  save(); render();
+  await sbSalvarServico(D.servicos[i]);
+  render();
   toast('✅ Marcado como pago!');
 }
-function marcarPendente(i){
+async function marcarPendente(i){
   D.servicos[i].sts_pag = 'Pendente';
-  save(); render();
+  await sbSalvarServico(D.servicos[i]);
+  render();
   toast('⏳ Marcado como pendente');
 }
-function cancelarPag(i){
+async function cancelarPag(i){
   if(!confirm('Cancelar este pagamento?')) return;
   D.servicos[i].sts_pag = 'Cancelado';
-  save(); render();
+  await sbSalvarServico(D.servicos[i]);
+  render();
   toast('❌ Pagamento cancelado');
 }
-function delSrv(i){
-  if(!confirm('Remover este serviço?')) return;
-  D.servicos.splice(i,1); save(); render(); toast('🗑 Removido');
+async function delSrv(i){
+  if(!confirm('Remover este servico?')) return;
+  const dbid = D.servicos[i]._dbid;
+  D.servicos.splice(i,1);
+  await sbDeletarServico(dbid);
+  render(); toast('🗑 Removido');
 }
 
 // ══════════════════════════════════════════
@@ -2084,7 +2361,7 @@ function wppRelSrv(){
 // ══════════════════════════════════════════
 // CLIENTES
 // ══════════════════════════════════════════
-function salvarCli(){
+async function salvarCli(){
   const o = {
     nm:  document.getElementById('c-nm').value.trim(),
     wpp: document.getElementById('c-wpp').value.trim(),
@@ -2093,13 +2370,18 @@ function salvarCli(){
   };
   if(!o.nm) return toast('⚠️ Digite o nome do cliente');
   if(D.clientes.find(c=>c.nm.toLowerCase()===o.nm.toLowerCase())) return toast('⚠️ Cliente já cadastrado');
-  D.clientes.push(o); save(); fecha('m-cli'); render();
+  const sc = await sbSalvarCliente(o);
+  if(sc) o._dbid = sc.id;
+  D.clientes.push(o); fecha('m-cli'); render();
   toast('✅ Cliente cadastrado!');
   clr('c-nm','c-wpp','c-srv','c-end');
 }
-function delCli(i){
+async function delCli(i){
   if(!confirm('Remover cliente?')) return;
-  D.clientes.splice(i,1); save(); render(); toast('🗑 Removido');
+  const dbid = D.clientes[i]._dbid;
+  D.clientes.splice(i,1);
+  await sbDeletarCliente(dbid);
+  render(); toast('🗑 Removido');
 }
 
 function editarWppCli(i){
@@ -2149,7 +2431,7 @@ function abreDesp(){
   abre('m-desp');
 }
 
-function salvarDesp(){
+async function salvarDesp(){
   const nm   = document.getElementById('desp-nm').value.trim();
   const cat  = document.getElementById('desp-cat').value;
   const val  = parseFloat(document.getElementById('desp-val').value) || 0;
@@ -2166,7 +2448,6 @@ function salvarDesp(){
   const nomeCompleto = (cat === 'Mão de obra' && ajud) ? nm + ' - ' + ajud : nm;
 
   if(parc && npar > 1){
-    // Gerar uma entrada por parcela
     const valParc = val / npar;
     const [y,m,d] = dt.split('-').map(Number);
     const grupoId = gerarId();
@@ -2175,53 +2456,44 @@ function salvarDesp(){
       const offset  = dataPar.getTimezoneOffset();
       const local   = new Date(dataPar.getTime() - offset * 60000);
       const dtStr   = local.toISOString().split('T')[0];
-      D.despesas.push({
-        id: gerarId(),
-        nm: nomeCompleto,
-        cat,
-        val: valParc,
-        dt: dtStr,
-        pag,
-        parcela: p + 1,
-        totalParcelas: npar,
-        grupo: grupoId
-      });
+      const nd = { nm:nomeCompleto, cat, val:valParc, dt:dtStr, pag,
+                   parcela:p+1, totalParcelas:npar, grupo:grupoId };
+      const sd = await sbSalvarDespesa(nd);
+      if(sd) nd._dbid = sd.id;
+      D.despesas.unshift(nd);
     }
-    toast(`✅ Despesa em ${npar}x salva!`);
+    toast('✅ Despesa em ' + npar + 'x salva!');
   } else {
-    D.despesas.push({
-      id: gerarId(),
-      nm: nomeCompleto,
-      cat,
-      val,
-      dt,
-      pag,
-      parcela: null,
-      totalParcelas: null
-    });
+    const nd = { nm:nomeCompleto, cat, val, dt, pag, parcela:null, totalParcelas:null };
+    const sd = await sbSalvarDespesa(nd);
+    if(sd) nd._dbid = sd.id;
+    D.despesas.unshift(nd);
     toast('✅ Despesa salva!');
   }
 
-  save(); fecha('m-desp'); rDespesas();
+  fecha('m-desp'); rDespesas();
   clr('desp-nm','desp-val','desp-ajudante','desp-nparc','desp-vparc');
 }
 
-function delDesp(id){
-  const d = D.despesas.find(x=>x.id===id);
+async function delDesp(id){
+  const d = D.despesas.find(x=>x._dbid===id||x.id===id);
   if(!d) return;
-  // Se for parcelada, pergunta se remove todas
   if(d.grupo && d.totalParcelas > 1){
-    const todas = confirm(`Remover todas as ${d.totalParcelas} parcelas desta despesa?`);
+    const todas = confirm('Remover todas as ' + d.totalParcelas + ' parcelas desta despesa?');
     if(todas){
+      const dbids = D.despesas.filter(x=>x.grupo===d.grupo).map(x=>x._dbid).filter(Boolean);
       D.despesas = D.despesas.filter(x=>x.grupo !== d.grupo);
+      await sbDeletarDespesasGrupo(d.grupo);
     } else {
-      D.despesas = D.despesas.filter(x=>x.id !== id);
+      D.despesas = D.despesas.filter(x=>(x._dbid||x.id) !== id);
+      await sbDeletarDespesa(d._dbid);
     }
   } else {
     if(!confirm('Remover esta despesa?')) return;
-    D.despesas = D.despesas.filter(x=>x.id !== id);
+    D.despesas = D.despesas.filter(x=>(x._dbid||x.id) !== id);
+    await sbDeletarDespesa(d._dbid);
   }
-  save(); rDespesas(); toast('🗑 Removida');
+  rDespesas(); toast('🗑 Removida');
 }
 
 function rDespesas(){
@@ -2311,7 +2583,7 @@ function remOrcItem(j){ orcItens.splice(j,1); renderOrcItens(); }
 
 document.getElementById('oi-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addOrcItem(); });
 
-function salvarOrc(){
+async function salvarOrc(){
   if(!orcItens.length) return toast('⚠️ Adicione pelo menos 1 item');
   const o = {
     dt:    document.getElementById('o-dt').value,
@@ -2323,11 +2595,13 @@ function salvarOrc(){
     sts:   'Pendente'
   };
   if(!o.cli) return toast('⚠️ Informe o cliente');
-  D.orcamentos.push(o); save(); fecha('m-orc'); render();
-  toast('✅ Orçamento salvo!');
+  const so = await sbSalvarOrcamento(o);
+  if(so) o._dbid = so.id;
+  D.orcamentos.unshift(o); fecha('m-orc'); render();
+  toast('✅ Orcamento salvo!');
   clr('o-cli','o-desc','o-obs');
 }
-function mudarStsOrc(i,sts){ D.orcamentos[i].sts=sts; save(); rOrcamentos(); }
+async function mudarStsOrc(i,sts){ D.orcamentos[i].sts=sts; await sbSalvarOrcamento(D.orcamentos[i]); rOrcamentos(); }
 
 function abrirConverterOrc(i){
   const o = D.orcamentos[i];
@@ -2343,44 +2617,39 @@ function abrirConverterOrc(i){
   document.getElementById('m-conv-orc').classList.add('open');
 }
 
-function converterOrcSrv(){
+async function converterOrcSrv(){
   const i  = +document.getElementById('conv-orc-idx').value;
   const o  = D.orcamentos[i];
   const dt = document.getElementById('conv-dt').value;
   const hr = document.getElementById('conv-hr').value;
   if(!dt) return toast('⚠️ Selecione a data');
-
   const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
   const desc  = (o.itens||[]).map(it=>it.desc).join(', ');
-
-  // Criar serviço
-  D.servicos.push({
-    id: gerarId(),
-    dt, hr,
-    cli:  o.cli,
-    tipo: o.desc || desc,
-    end:  '',
-    val:  total,
-    sts_srv: 'Agendado', sts_pag: null, pag: null,
-    materiais: [], desc_feito: '', inicio: null, fim: null,
-    orcamento_origem: i
-  });
-
-  // Marca orçamento como aprovado
+  const ns = { dt, hr, cli:o.cli, tipo:o.desc||desc, end:'', val:total,
+    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], desc_feito:'', inicio:null, fim:null };
+  const ss = await sbSalvarServico(ns);
+  if(ss) ns._dbid = ss.id;
+  D.servicos.unshift(ns);
   D.orcamentos[i].sts = 'Aprovado';
-
-  // Cadastra cliente se não existir
+  await sbSalvarOrcamento(D.orcamentos[i]);
   const jaExiste = D.clientes.find(c=>c.nm.toLowerCase()===o.cli.toLowerCase());
-  if(!jaExiste) D.clientes.push({nm:o.cli, wpp:'', srv:o.desc||'', end:''});
-
-  save(); fecha('m-conv-orc'); render();
-  toast('✅ Serviço criado! Orçamento aprovado 🎉');
-  addNotif('sistema','✅ Orçamento convertido',`${o.cli} — serviço agendado para ${fd(dt)}`);
+  if(!jaExiste){
+    const nc = {nm:o.cli, wpp:'', srv:o.desc||'', end:''};
+    const sc = await sbSalvarCliente(nc);
+    if(sc) nc._dbid = sc.id;
+    D.clientes.push(nc);
+  }
+  fecha('m-conv-orc'); render();
+  toast('✅ Servico criado! Orcamento aprovado 🎉');
+  addNotif('sistema','✅ Orcamento convertido', o.cli + ' - servico agendado para ' + fd(dt));
   ir('servicos');
 }
-function delOrc(i){
-  if(!confirm('Remover orçamento?')) return;
-  D.orcamentos.splice(i,1); save(); rOrcamentos(); toast('🗑 Removido');
+async function delOrc(i){
+  if(!confirm('Remover orcamento?')) return;
+  const dbid = D.orcamentos[i]._dbid;
+  D.orcamentos.splice(i,1);
+  await sbDeletarOrcamento(dbid);
+  rOrcamentos(); toast('🗑 Removido');
 }
 
 function pdfOrc(i){
@@ -2754,6 +3023,68 @@ function gerarPDFRel(){
 }
 
 // ══════════════════════════════════════════
+// MIGRAÇÃO DE DADOS
+// ══════════════════════════════════════════
+async function verificarMigracao(){
+  const localSrvs = localStorage.getItem('sp4_srv');
+  if(localSrvs && D.servicos.length === 0){
+    const box = document.getElementById('migracao-box');
+    if(box) box.style.display = '';
+  }
+}
+
+async function migrarDadosLocais(){
+  toast('Migrando dados...');
+  try{
+    const srvs  = JSON.parse(localStorage.getItem('sp4_srv')  || '[]');
+    const clis  = JSON.parse(localStorage.getItem('sp4_cli')  || '[]');
+    const orcs  = JSON.parse(localStorage.getItem('sp4_orc')  || '[]');
+    const desps = JSON.parse(localStorage.getItem('sp4_desp') || '[]');
+    const perf  = JSON.parse(localStorage.getItem('sp4_perf') || '{}');
+
+    // Migrar perfil
+    if(perf.nome){
+      D.perfil = {...D.perfil, ...perf};
+      await sbSalvarPerfil();
+    }
+
+    // Migrar clientes
+    for(const c of clis){
+      const sc = await sbSalvarCliente({nm:c.nm,wpp:c.wpp||'',srv:c.srv||'',end:c.end||''});
+      if(sc) D.clientes.push({...c, _dbid:sc.id});
+    }
+
+    // Migrar servicos
+    for(const s of srvs){
+      const ss = await sbSalvarServico(s);
+      if(ss) D.servicos.push({...s, _dbid:ss.id});
+    }
+
+    // Migrar orcamentos
+    for(const o of orcs){
+      const so = await sbSalvarOrcamento(o);
+      if(so) D.orcamentos.push({...o, _dbid:so.id});
+    }
+
+    // Migrar despesas
+    for(const d of desps){
+      const sd = await sbSalvarDespesa(d);
+      if(sd) D.despesas.push({...d, _dbid:sd.id});
+    }
+
+    // Limpar localStorage
+    ['sp4_srv','sp4_cli','sp4_orc','sp4_nf','sp4_desp','sp4_perf','sp4_cfg'].forEach(k=>localStorage.removeItem(k));
+
+    document.getElementById('migracao-box').style.display = 'none';
+    render(); uiPerfil();
+    toast('✅ Dados migrados com sucesso!');
+  }catch(e){
+    console.error('Erro na migração:', e);
+    toast('Erro ao migrar. Tente novamente.');
+  }
+}
+
+// ══════════════════════════════════════════
 // NOTIFICAÇÕES
 // ══════════════════════════════════════════
 async function ativarNotifs(){
@@ -2871,13 +3202,13 @@ function atualizarBadge(){
   else    { b.style.display='none'; dot?.classList.remove('show'); }
 }
 
-function salvarCfg(){
+async function salvarCfg(){
   D.cfg = {
     togAg:  document.getElementById('tog-ag').checked,
     togRes: document.getElementById('tog-res').checked,
     togCob: document.getElementById('tog-cob').checked
   };
-  localStorage.setItem('sp4_cfg',JSON.stringify(D.cfg));
+  await sbSalvarPerfil(); // cfg salvo junto com perfil
   toast('✅ Configuração salva!');
 }
 
