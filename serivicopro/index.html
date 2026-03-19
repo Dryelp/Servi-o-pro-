@@ -266,8 +266,18 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <div id="login-form">
       <div class="fg" style="text-align:left"><label class="fl">E-mail</label><input class="fi" id="login-email" type="email" placeholder="seu@email.com"></div>
-      <div class="fg" style="text-align:left"><label class="fl">Senha</label><input class="fi" id="login-senha" type="password" placeholder="Sua senha"></div>
-      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerLogin()">Entrar</button>
+      <div class="fg" style="text-align:left">
+        <label class="fl">Senha</label>
+        <div style="position:relative">
+          <input class="fi" id="login-senha" type="password" placeholder="Sua senha" style="padding-right:40px">
+          <button onclick="toggleSenha('login-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--mut);margin-bottom:4px;cursor:pointer">
+        <input type="checkbox" id="lembrar-login" style="width:16px;height:16px;accent-color:var(--org)">
+        Permanecer logado
+      </label>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="fazerLogin()">Entrar</button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarCadastro()">Criar conta grátis</button>
       <button onclick="mostrarEsqueciSenha()" style="background:none;border:none;color:var(--mut);font-size:.82rem;margin-top:10px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
     </div>
@@ -275,7 +285,13 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="cadastro-form" style="display:none">
       <div class="fg" style="text-align:left"><label class="fl">Nome completo</label><input class="fi" id="cad-nome" placeholder="Seu nome"></div>
       <div class="fg" style="text-align:left"><label class="fl">E-mail</label><input class="fi" id="cad-email" type="email" placeholder="seu@email.com"></div>
-      <div class="fg" style="text-align:left"><label class="fl">Senha</label><input class="fi" id="cad-senha" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="fg" style="text-align:left">
+        <label class="fl">Senha</label>
+        <div style="position:relative">
+          <input class="fi" id="cad-senha" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
+          <button onclick="toggleSenha('cad-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+        </div>
+      </div>
       <div class="fg" style="text-align:left"><label class="fl">O que você faz?</label><input class="fi" id="cad-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerCadastro()">Criar conta grátis 🚀</button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Já tenho conta</button>
@@ -995,7 +1011,7 @@ const SEGMENTOS = {
                'video','vídeo','filmagem','drone','retratos'],
     icone: '📷',
     paleta: {org:'#4a5568',org2:'#6b7280',orgBg:'#f3f4f6',brn:'#0a0c10',brn2:'#1a1c22',bg:'#f9fafb',sur2:'#e8eaef',bor:'#c8ccd8',mut:'#6a7080'},
-    labels: {servico:'Sessao',servicos:'Sessoes',cliente:'Cliente',
+    labels: {servico:'Sessão',servicos:'Sessões',cliente:'Cliente',
              clientes:'Clientes',materiais:'Equipamentos',
              status:['Agendado','Em andamento','Editando','Entregue']}
   },
@@ -1003,7 +1019,7 @@ const SEGMENTOS = {
     keywords: [],
     icone: '🛠️',
     paleta: {org:'#e07b2a',org2:'#f59642',orgBg:'#fff4eb',brn:'#1e0f00',brn2:'#3d2008',bg:'#faf7f3',sur2:'#f5f0e8',bor:'#e8dfd2',mut:'#8a7060'},
-    labels: {servico:'Servico',servicos:'Servicos',cliente:'Cliente',
+    labels: {servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Agendado','Em andamento','Realizado','Cancelado']}
   }
@@ -1028,7 +1044,7 @@ const PLACEHOLDERS_SEG = {
   embalagens: 'Ex: Caixas personalizadas, baloes...',
   beleza:     'Ex: Corte de cabelo, manicure, maquiagem...',
   fotografia: 'Ex: Ensaio fotografico, casamento...',
-  geral:      'Ex: Tipo de servico prestado...'
+  geral:      'Ex: Tipo de serviço prestado...'
 };
 
 const ICONES_CLI_SEG = {
@@ -1098,7 +1114,7 @@ function aplicarSegmento(seg){
       if(b.textContent.includes('Novo')||b.textContent.includes('Cadastrar'))
         b.textContent = b.textContent.includes('primeiro')
           ? '+ Cadastrar primeiro ' + L.servico.toLowerCase()
-          : '+ Novo ' + L.servico;
+          : '+ Novo' + (L.servico ? ' ' + L.servico : ' Serviço');
     });
   }
 }
@@ -1213,6 +1229,18 @@ function mostrarLoading(msg){
   document.getElementById('login-loading').innerHTML = msg || 'Aguarde...';
 }
 
+function toggleSenha(id, btn){
+  const inp = document.getElementById(id);
+  if(!inp) return;
+  if(inp.type === 'password'){
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
 function mostrarEsqueciSenha(){
   document.getElementById('login-sub').textContent = 'Redefinir senha';
   document.getElementById('login-form').style.display = 'none';
@@ -1238,14 +1266,23 @@ async function enviarResetSenha(){
 }
 
 async function fazerLogin(){
-  const email = document.getElementById('login-email').value.trim();
-  const senha = document.getElementById('login-senha').value;
+  const email   = document.getElementById('login-email').value.trim();
+  const senha   = document.getElementById('login-senha').value;
+  const lembrar = document.getElementById('lembrar-login')?.checked;
   if(!email || !senha) return toast('Preencha email e senha');
   mostrarLoading('Entrando...');
   const { error } = await SUPA.auth.signInWithPassword({ email, password: senha });
   if(error){
     mostrarLogin();
     toast('Email ou senha incorretos');
+    return;
+  }
+  // Salvar preferência de "lembrar"
+  if(!lembrar){
+    // Sessão expira ao fechar o navegador
+    localStorage.setItem('ap_session_type', 'session');
+  } else {
+    localStorage.removeItem('ap_session_type');
   }
 }
 
@@ -1255,7 +1292,7 @@ async function fazerCadastro(){
   const senha = document.getElementById('cad-senha').value;
   const tipo  = document.getElementById('cad-tipo').value.trim();
   if(!nome || !email || !senha) return toast('Preencha todos os campos');
-  if(senha.length < 6) return toast('Senha deve ter minimo 6 caracteres');
+  if(senha.length < 6) return toast('Senha deve ter mínimo 6 caracteres');
   mostrarLoading('Criando sua conta...');
   const { data, error } = await SUPA.auth.signUp({ email, password: senha });
   if(error){ mostrarCadastro(); toast(error.message); return; }
@@ -1272,7 +1309,7 @@ async function fazerLogout(){
   D.servicos=[]; D.clientes=[]; D.orcamentos=[];
   D.notifs=[]; D.despesas=[];
   D.perfil={nome:'',tipo:'',wpp:'',meta:0};
-  toast('Ate logo!');
+  toast('Até logo! 👋');
 }
 
 function iniciarApp(){
@@ -1504,8 +1541,8 @@ function uiPerfil(){
   const SEG = SEGMENTOS[key];
   const ico = SEG.icone;
   D.perfil.segmento = key;
-  document.getElementById('dash-ola').textContent = nm ? `Ola, ${nm.split(' ')[0]}! ${ico}` : `Ola! ${ico}`;
-  document.getElementById('sb-tipo').textContent  = tp || 'Gestao de Servicos';
+  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ${ico}` : `Olá! ${ico}`;
+  document.getElementById('sb-tipo').textContent  = tp || 'Gestão de Serviços';
   document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
   aplicarSegmento(SEG);
   const en = document.getElementById('edit-nome'); if(en) en.value = D.perfil.nome;
@@ -1961,7 +1998,7 @@ const SUGESTOES_SEG = {
   embalagens: ['Caixas personalizadas','Baloes decorados','Kit presente','Lembrancinha','Mimo','Outro'],
   beleza:     ['Corte de cabelo','Coloracao','Escova','Manicure','Pedicure','Maquiagem','Depilacao','Sobrancelha','Outro'],
   fotografia: ['Ensaio fotografico','Casamento','Aniversario','Formatura','Newborn','Produto','Video','Outro'],
-  geral:      ['Servico geral','Manutencao','Reparo','Consultoria','Outro']
+  geral:      ['Serviço geral','Manutenção','Reparo','Consultoria','Outro']
 };
 
 function atualizarDatalistTipo(){
@@ -1976,15 +2013,15 @@ function atualizarDatalistTipo(){
 async function adicionarMeuSrv(){
   const inp = document.getElementById('novo-srv-tipo');
   const val = inp?.value.trim();
-  if(!val) return toast('Digite o tipo de servico');
+  if(!val) return toast('Digite o tipo de serviço');
   if(!D.perfil.meusSrvs) D.perfil.meusSrvs = [];
-  if(D.perfil.meusSrvs.includes(val)) return toast('Ja cadastrado!');
+  if(D.perfil.meusSrvs.includes(val)) return toast('Já cadastrado!');
   D.perfil.meusSrvs.push(val);
   await sbSalvarPerfil();
   inp.value = '';
   renderMeusSrvs();
   atualizarDatalistTipo();
-  toast('Servico adicionado!');
+  toast('Serviço adicionado!');
 }
 
 async function removerMeuSrv(i){
