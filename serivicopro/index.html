@@ -269,6 +269,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg" style="text-align:left"><label class="fl">Senha</label><input class="fi" id="login-senha" type="password" placeholder="Sua senha"></div>
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerLogin()">Entrar</button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarCadastro()">Criar conta grátis</button>
+      <button onclick="mostrarEsqueciSenha()" style="background:none;border:none;color:var(--mut);font-size:.82rem;margin-top:10px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
     </div>
 
     <div id="cadastro-form" style="display:none">
@@ -280,6 +281,12 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Já tenho conta</button>
     </div>
 
+    <div id="esqueci-form" style="display:none">
+      <p style="font-size:.85rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Digite seu email e enviaremos um link para redefinir sua senha.</p>
+      <div class="fg" style="text-align:left"><label class="fl">E-mail</label><input class="fi" id="esqueci-email" type="email" placeholder="seu@email.com"></div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="enviarResetSenha()">Enviar link de redefinição</button>
+      <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Voltar ao login</button>
+    </div>
     <div id="login-loading" style="display:none;text-align:center;padding:20px;color:var(--mut);font-size:.9rem">
       ⏳ Aguarde...
     </div>
@@ -528,8 +535,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
       <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
-      <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px">🚪 Sair da conta</button>
-      <button class="btn btn-del" style="margin-top:10px" onclick="fazerLogout()">🚪 Sair da conta</button>
+      <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%">🚪 Sair da conta</button>
     </div>
     <div class="cfg-sec">
       <div class="cfg-t">🛠️ Meus serviços</div>
@@ -1205,6 +1211,30 @@ function mostrarLoading(msg){
   document.getElementById('cadastro-form').style.display = 'none';
   document.getElementById('login-loading').style.display = '';
   document.getElementById('login-loading').innerHTML = msg || 'Aguarde...';
+}
+
+function mostrarEsqueciSenha(){
+  document.getElementById('login-sub').textContent = 'Redefinir senha';
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('cadastro-form').style.display = 'none';
+  document.getElementById('esqueci-form').style.display = '';
+  document.getElementById('login-loading').style.display = 'none';
+}
+
+async function enviarResetSenha(){
+  const email = document.getElementById('esqueci-email').value.trim();
+  if(!email) return toast('Digite seu email');
+  mostrarLoading('Enviando link...');
+  const { error } = await SUPA.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if(error){
+    mostrarLogin();
+    toast('Erro: ' + error.message);
+  } else {
+    document.getElementById('login-loading').innerHTML = '✅ Link enviado! Verifique seu email.';
+    setTimeout(mostrarLogin, 3000);
+  }
 }
 
 async function fazerLogin(){
@@ -3026,10 +3056,15 @@ function gerarPDFRel(){
 // MIGRAÇÃO DE DADOS
 // ══════════════════════════════════════════
 async function verificarMigracao(){
-  const localSrvs = localStorage.getItem('sp4_srv');
-  if(localSrvs && D.servicos.length === 0){
-    const box = document.getElementById('migracao-box');
-    if(box) box.style.display = '';
+  const temDados = localStorage.getItem('sp4_srv') ||
+                   localStorage.getItem('sp4_cli') ||
+                   localStorage.getItem('sp4_desp');
+  if(temDados){
+    const srvs = JSON.parse(localStorage.getItem('sp4_srv')||'[]');
+    if(srvs.length > 0){
+      const box = document.getElementById('migracao-box');
+      if(box) box.style.display = '';
+    }
   }
 }
 
