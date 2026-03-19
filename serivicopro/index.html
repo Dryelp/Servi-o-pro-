@@ -303,6 +303,17 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="enviarResetSenha()">Enviar link de redefinição</button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Voltar ao login</button>
     </div>
+    <div id="nova-senha-form" style="display:none">
+      <p style="font-size:.85rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Digite sua nova senha abaixo.</p>
+      <div class="fg" style="text-align:left">
+        <label class="fl">Nova senha</label>
+        <div style="position:relative">
+          <input class="fi" id="nova-senha-inp" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
+          <button onclick="toggleSenha('nova-senha-inp',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+        </div>
+      </div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="salvarNovaSenha()">✅ Salvar nova senha</button>
+    </div>
     <div id="login-loading" style="display:none;text-align:center;padding:20px;color:var(--mut);font-size:.9rem">
       ⏳ Aguarde...
     </div>
@@ -1172,6 +1183,14 @@ window.onload = async () => {
   document.getElementById('o-valid').value = v.toISOString().split('T')[0];
   relMesAtual();
 
+  // Verificar se veio de link de reset de senha
+  const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+  const tipo = hashParams.get('type');
+  if(tipo === 'recovery'){
+    mostrarTelaRedefinirSenha();
+    return;
+  }
+
   // Verificar sessao Supabase
   const { data: { session } } = await SUPA.auth.getSession();
   if(session){
@@ -1213,6 +1232,8 @@ function mostrarLogin(){
   document.getElementById('login-form').style.display = '';
   document.getElementById('cadastro-form').style.display = 'none';
   document.getElementById('login-loading').style.display = 'none';
+  const ef = document.getElementById('esqueci-form');
+  if(ef) ef.style.display = 'none';
 }
 
 function mostrarCadastro(){
@@ -1241,6 +1262,44 @@ function toggleSenha(id, btn){
   }
 }
 
+function mostrarTelaRedefinirSenha(){
+  document.getElementById('tela-login').style.display = 'flex';
+  const sb = document.querySelector('.sidebar'); if(sb) sb.style.display = 'none';
+  const mn = document.querySelector('.main');    if(mn) mn.style.display = 'none';
+  const mb = document.querySelector('.mob-bar'); if(mb) mb.style.display = 'none';
+  document.getElementById('login-sub').textContent = 'Criar nova senha';
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('cadastro-form').style.display = 'none';
+  document.getElementById('esqueci-form').style.display = 'none';
+  document.getElementById('login-loading').style.display = 'none';
+  document.getElementById('nova-senha-form').style.display = '';
+}
+
+async function salvarNovaSenha(){
+  const senha = document.getElementById('nova-senha-inp').value;
+  if(!senha || senha.length < 6) return toast('Senha deve ter mínimo 6 caracteres');
+  mostrarLoading('Salvando nova senha...');
+  const { error } = await SUPA.auth.updateUser({ password: senha });
+  if(error){
+    mostrarTelaRedefinirSenha();
+    toast('Erro: ' + error.message);
+  } else {
+    document.getElementById('login-loading').innerHTML = '✅ Senha atualizada! Entrando...';
+    // Limpar hash da URL
+    history.replaceState(null, '', window.location.pathname);
+    setTimeout(async () => {
+      const { data: { session } } = await SUPA.auth.getSession();
+      if(session){
+        USER_ID = session.user.id;
+        await carregarDadosSupabase();
+        iniciarApp();
+      } else {
+        mostrarLogin();
+      }
+    }, 1500);
+  }
+}
+
 function mostrarEsqueciSenha(){
   document.getElementById('login-sub').textContent = 'Redefinir senha';
   document.getElementById('login-form').style.display = 'none';
@@ -1254,7 +1313,7 @@ async function enviarResetSenha(){
   if(!email) return toast('Digite seu email');
   mostrarLoading('Enviando link...');
   const { error } = await SUPA.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname
+    redirectTo: 'https://autonomopro.vercel.app/'
   });
   if(error){
     mostrarLogin();
