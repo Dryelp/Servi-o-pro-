@@ -1428,7 +1428,8 @@ async function carregarDadosSupabase(){
       D.perfil = {
         nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
-        meusSrvs: perf.meus_srvs||[]
+        meusSrvs: perf.meus_srvs||[],
+        modulos: perf.modulos||{}
       };
       D.cfg = {togAg:true,togRes:true,togCob:true};
     }
@@ -1481,7 +1482,8 @@ async function sbSalvarPerfil(){
       wpp: D.perfil.wpp,
       meta: D.perfil.meta||0,
       segmento: D.perfil.segmento||'geral',
-      meus_srvs: D.perfil.meusSrvs||[]
+      meus_srvs: D.perfil.meusSrvs||[],
+      modulos: D.perfil.modulos||{}
     });
   } catch(e){ console.error('Erro ao salvar perfil:', e); }
 }
