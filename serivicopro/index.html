@@ -261,7 +261,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- LOGIN -->
 <div class="welcome-overlay" id="tela-login" style="display:none">
   <div class="welcome-box" style="max-width:420px">
-    <div class="welcome-ico" id="login-ico">🛠️</div>
+    <div class="welcome-ico" id="login-ico">⚡</div>
     <div class="welcome-title">AutônomoPro</div>
     <div class="welcome-sub" id="login-sub">Entre na sua conta para continuar</div>
 
@@ -324,7 +324,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- WELCOME -->
 <div class="welcome-overlay" id="welcome">
   <div class="welcome-box">
-    <div class="welcome-ico" id="welcome-ico">🛠️</div>
+    <div class="welcome-ico" id="welcome-ico">⚡</div>
     <div class="welcome-title" id="welcome-title">Bem-vindo ao AutônomoPro!</div>
     <div class="welcome-sub">Gestão completa para autônomos de qualquer segmento.<br>Antes de começar, nos diga quem é você!</div>
     <div class="fg" style="text-align:left"><label class="fl">Seu nome</label><input class="fi" id="p-nome" placeholder="Ex: João Silva"></div>
@@ -338,7 +338,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-ico">🛠️</div>
+    <div class="logo-ico">⚡</div>
     <div><div class="logo-name" id="logo-nome">AutônomoPro</div><div class="logo-sub" id="sb-tipo">Gestão de Serviços</div></div>
   </div>
   <nav class="nav">
@@ -368,7 +368,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <div class="page active" id="pg-dashboard">
     <div class="topbar">
       <div>
-        <div class="pg-title" id="dash-ola">Olá! 🛠️</div>
+        <div class="pg-title" id="dash-ola">Olá! ⚡</div>
         <div class="pg-sub" id="data-hoje"></div>
       </div>
       <div class="tb-right">
@@ -1062,11 +1062,11 @@ function aplicarSegmento(seg){
   if(!seg) seg = SEGMENTOS.geral;
   const key = Object.keys(SEGMENTOS).find(k=>SEGMENTOS[k]===seg) || 'geral';
 
-  // Ícone principal
+  // Ícone universal no logo
   const logoIco = document.querySelector('.logo-ico');
-  if(logoIco) logoIco.textContent = seg.icone;
+  if(logoIco) logoIco.textContent = '⚡';
   const welcomeIco = document.getElementById('welcome-ico');
-  if(welcomeIco) welcomeIco.textContent = seg.icone;
+  if(welcomeIco) welcomeIco.textContent = '⚡';
 
   // Ícone de cliente
   const icoC = ICONES_CLI_SEG[key] || '👤';
@@ -1077,7 +1077,7 @@ function aplicarSegmento(seg){
 
   // Ícone tela vazia de serviços
   const emptySrv = document.getElementById('empty-srv-ico');
-  if(emptySrv) emptySrv.textContent = seg.icone;
+  if(emptySrv) emptySrv.textContent = '⚡';
 
   // Placeholder tipo de serviço
   const tipoInp = document.getElementById('s-tipo');
@@ -1546,7 +1546,7 @@ async function salvarPerfil(){
   await sbSalvarPerfil();
   document.getElementById('welcome').classList.remove('open');
   uiPerfil(); render();
-  toast('Bem-vindo, ' + nm + '! ' + SEGMENTOS[D.perfil.segmento].icone);
+  toast('Bem-vindo, ' + nm + '! ⚡');
 }
 
 async function atualizarPerfil(){
@@ -1566,7 +1566,7 @@ function uiPerfil(){
   const SEG = SEGMENTOS[key];
   const ico = SEG.icone;
   D.perfil.segmento = key;
-  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ${ico}` : `Olá! ${ico}`;
+  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ⚡` : `Olá! ⚡`;
   document.getElementById('sb-tipo').textContent  = tp || 'Gestão de Serviços';
   document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
   aplicarSegmento(SEG);
@@ -1805,7 +1805,7 @@ function rServicos(){
   if(!lista.length){
     if(!D.servicos.length){
     el.innerHTML=`<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">🛠️</div>
+      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">⚡</div>
       <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum serviço ainda</div>
       <div style="margin-bottom:18px">Cadastre seu primeiro serviço e comece a faturar!</div>
       <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
@@ -2430,7 +2430,7 @@ function wppRelSrv(){
   const s = D.servicos[i];
   const nome = D.perfil.nome || 'Prestador';
   let msg = `📋 *Relatório de Serviço*\n\n`;
-  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  const _ico = '⚡';
   msg += `${_ico} *${nome}*\n`;
   msg += `👤 Cliente: ${s.cli||'—'}\n`;
   msg += `📅 Data: ${fd(s.dt)}\n`;
@@ -2812,7 +2812,7 @@ function wppOrc(i){
   const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
   const nome  = D.perfil.nome || 'Prestador';
   let msg = `📋 *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
-  const _ico = (typeof SEGMENTOS !== 'undefined' && D.perfil.segmento) ? SEGMENTOS[D.perfil.segmento]?.icone || '🛠️' : '🛠️';
+  const _ico = '⚡';
   msg += `${_ico} *${nome}*\n`;
   msg += `👤 Cliente: ${o.cli||'—'}\n`;
   msg += `📅 Data: ${fd(o.dt)}\n`;
