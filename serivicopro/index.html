@@ -1836,7 +1836,11 @@ function paginaAtiva(){ return document.querySelector('.page.active')?.id.replac
 function abre(id){
   document.getElementById(id).classList.add('open');
   updDL();
-  if(id === 'm-orc'){ orcItens = []; renderOrcItens(); }
+  if(id === 'm-orc'){
+    const editIdx = parseInt(document.getElementById('orc-edit-idx')?.value ?? '-1');
+    if(editIdx < 0){ orcItens = []; renderOrcItens(); }
+    else { renderOrcItens(); }
+  }
 }
 function fecha(id){ document.getElementById(id).classList.remove('open'); }
 
