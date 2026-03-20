@@ -350,6 +350,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" onclick="ir('despesas',this)"><span class="ni">💸</span>Despesas</button>
     <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
     <button class="nb" id="nav-produtos" style="display:none" onclick="ir('produtos',this)"><span class="ni">🛍️</span>Produtos</button>
+    <button class="nb" id="nav-materiais" style="display:none" onclick="ir('materiais',this)"><span class="ni">📦</span>Materiais</button>
     <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni">👷</span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
@@ -589,6 +590,15 @@ input:checked+.slider:before{transform:translateX(19px)}
         <label class="switch"><input type="checkbox" id="mod-produtos" onchange="salvarModulo('produtos',this.checked)"><span class="slider"></span></label>
       </div>
 
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Estoque</div>
+      <div class="toggle-row" style="margin-bottom:14px">
+        <div>
+          <div class="tl">📦 Estoque de materiais</div>
+          <div class="ts">Controle materiais e desconte ao finalizar serviço</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="mod-materiais" onchange="salvarModulo('materiais',this.checked)"><span class="slider"></span></label>
+      </div>
+
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipe</div>
       <div class="toggle-row" style="margin-bottom:14px">
         <div>
@@ -648,6 +658,15 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
   </div>
 
+  <!-- MATERIAIS -->
+  <div class="page" id="pg-materiais">
+    <div class="topbar">
+      <div><div class="pg-title">📦 Materiais</div><div class="pg-sub">Controle seu estoque de materiais</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoMaterial()">+ Novo material</button></div>
+    </div>
+    <div id="materiais-lista"></div>
+  </div>
+
   <!-- PRODUTOS -->
   <div class="page" id="pg-produtos">
     <div class="topbar">
@@ -657,7 +676,34 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="produtos-lista"></div>
   </div>
 
-  <!-- Modal Novo Produto -->
+  <!-- Modal Novo Material -->
+<div class="overlay" id="m-material">
+  <div class="modal">
+    <div class="mt" id="m-material-titulo">📦 Novo Material <button class="xbtn" onclick="fecha('m-material')">✕</button></div>
+    <input type="hidden" id="mat-edit-idx" value="-1">
+    <div class="fg"><label class="fl">Nome do material</label><input class="fi" id="mat-nome" placeholder="Ex: Tinta 18L, parafuso, cimento..."></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Unidade</label>
+        <select class="fs" id="mat-unidade">
+          <option>un</option><option>kg</option><option>g</option>
+          <option>L</option><option>ml</option><option>m</option>
+          <option>m²</option><option>cx</option><option>pct</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Quantidade</label><input class="fi" type="number" id="mat-qtd" placeholder="0" min="0" step="0.1"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Custo unitário (R$)</label><input class="fi" type="number" id="mat-custo" placeholder="0,00" min="0" step="0.01"></div>
+      <div class="fg"><label class="fl">Estoque mínimo</label><input class="fi" type="number" id="mat-minimo" placeholder="1" min="0" step="0.1"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarMaterial()">✅ Salvar</button>
+      <button class="btn btn-gho" onclick="fecha('m-material')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Produto -->
 <div class="overlay" id="m-produto">
   <div class="modal">
     <div class="mt">🛍️ Novo Produto <button class="xbtn" onclick="fecha('m-produto')">✕</button></div>
@@ -747,6 +793,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <div class="mob-more-menu" id="mob-more">
   <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
   <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir('produtos');fecharMais()"><span class="mi">🛍️</span>Produtos</button>
+  <button class="mob-more-btn" id="mob-materiais" style="display:none" onclick="ir('materiais');fecharMais()"><span class="mi">📦</span>Materiais</button>
   <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir('ajudantes');fecharMais()"><span class="mi">👷</span>Ajudantes</button>
   <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
@@ -924,6 +971,13 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="lucro-row"><span>Lucro líquido</span><span id="fin-lucro-show" style="font-family:'Fraunces',serif;font-size:1.15rem;color:var(--grn)">R$ 0,00</span></div>
     </div>
 
+    <!-- Desconto de estoque — aparece só se módulo ativo -->
+    <div id="fin-estoque-box" style="display:none;margin-bottom:14px">
+      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📦 Descontar do estoque</div>
+      <div id="fin-estoque-lista" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div style="font-size:.75rem;color:var(--mut);margin-top:6px;font-style:italic">Marque os materiais usados neste serviço</div>
+    </div>
+
     <div class="frow">
       <div class="fg"><label class="fl">Forma de pagamento</label>
         <select class="fs" id="fin-pag">
@@ -1060,6 +1114,7 @@ const D = {
   clientes:   [],
   avaliacoes: [],
   produtos:   [],
+  materiais:  [],
   orcamentos: [],
   notifs:     [],
   despesas:   [],
@@ -1473,6 +1528,7 @@ function iniciarApp(){
   verificarMigracao();
   carregarAvaliacoes();
   carregarProdutos();
+  carregarMateriais();
   setTimeout(function(){
     if(typeof SEGMENTOS !== 'undefined'){
       const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
@@ -2133,6 +2189,7 @@ function rOrcamentos(){
       ${o.obs?`<div style="font-size:.78rem;color:var(--mut);background:var(--bg);padding:7px 9px;border-radius:7px;margin-top:8px;border:1px solid var(--bor)">📌 ${o.obs}</div>`:''}
       <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
         <button class="btn btn-pdf btn-sm" onclick="pdfOrc(${i})">📄 PDF</button>
+        <button class="btn btn-gho btn-sm" onclick="editarOrc(${i})">✏️ Editar</button>
         <button class="btn btn-wpp btn-sm" onclick="wppOrc(${i})">📱 WhatsApp</button>
         <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">✅ Converter</button>
         <button class="btn btn-del btn-sm" onclick="delOrc(${i})" style="margin-left:auto">🗑</button>
@@ -2286,7 +2343,6 @@ function cancelarSrv(i){
 }
 
 function abrirFinalizar(i){
-  // Atualizar label de materiais conforme segmento
   const seg = D.perfil.segmento || 'geral';
   const SEG = SEGMENTOS[seg];
   const lbl = document.getElementById('fin-mat-label');
@@ -2297,7 +2353,29 @@ function abrirFinalizar(i){
   document.getElementById('fin-val-edit').value = D.servicos[i].val || '';
   document.getElementById('fin-val-original').textContent = D.servicos[i].val ? `Valor combinado: ${R$(D.servicos[i].val)}` : '';
   renderFinMats(i);
+
+  // Mostrar seção de estoque se módulo ativo
+  const estoqueBox = document.getElementById('fin-estoque-box');
+  if(estoqueBox){
+    const temMateriais = D.perfil.modulos?.materiais && D.materiais?.length > 0;
+    estoqueBox.style.display = temMateriais ? '' : 'none';
+    if(temMateriais) renderEstoqueFinalizar();
+  }
+
   document.getElementById('m-fin-srv').classList.add('open');
+}
+
+function renderEstoqueFinalizar(){
+  const el = document.getElementById('fin-estoque-lista');
+  if(!el) return;
+  el.innerHTML = (D.materiais||[]).map((m,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--bor)">
+      <input type="checkbox" id="est-chk-${i}" style="width:16px;height:16px;accent-color:var(--org)">
+      <label for="est-chk-${i}" style="flex:1;font-size:.84rem;cursor:pointer">${m.nome} <span style="color:var(--mut)">(${m.quantidade} ${m.unidade})</span></label>
+      <input type="number" id="est-qtd-${i}" placeholder="Qtd" min="0.1" step="0.1"
+        style="width:65px;padding:4px 7px;border:1.5px solid var(--bor);border-radius:6px;font-size:.82rem;background:var(--sur)">
+    </div>
+  `).join('');
 }
 
 function renderFinMats(idx){
@@ -2349,11 +2427,23 @@ async function finalizarSrv(){
   D.servicos[i].desc_feito= desc;
   D.servicos[i].fim       = new Date().toISOString();
 
-  // Fecha modal imediatamente — não espera Supabase
+  // Descontar materiais do estoque
+  if(D.perfil.modulos?.materiais && D.materiais?.length > 0){
+    D.materiais.forEach((m,idx)=>{
+      const chk = document.getElementById('est-chk-'+idx);
+      const qtd = parseFloat(document.getElementById('est-qtd-'+idx)?.value)||0;
+      if(chk?.checked && qtd > 0){
+        D.materiais[idx].quantidade = Math.max(0, m.quantidade - qtd);
+        SUPA.from('materiais_estoque').update({quantidade: D.materiais[idx].quantidade})
+          .eq('id', m._dbid).eq('user_id', USER_ID);
+      }
+    });
+    rMateriais();
+  }
+
   fecha('m-fin-srv'); render();
   toast('✅ Serviço finalizado!');
   addNotif('sistema','✅ Serviço concluído',D.servicos[i].cli + ' - ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado! 💰':'Pagamento pendente ⏳'));
-  // Salva no Supabase em background
   sbSalvarServico(D.servicos[i]);
 }
 
@@ -2884,6 +2974,21 @@ async function converterOrcSrv(){
   addNotif('sistema','✅ Orcamento convertido', o.cli + ' - servico agendado para ' + fd(dt));
   ir('servicos');
 }
+function editarOrc(i){
+  const o = D.orcamentos[i];
+  orcItens = [...(o.itens||[])];
+  document.getElementById('o-cli').value   = o.cli||'';
+  document.getElementById('o-dt').value    = o.dt||hj();
+  document.getElementById('o-desc').value  = o.desc||'';
+  document.getElementById('o-valid').value = o.valid||'';
+  document.getElementById('o-obs').value   = o.obs||'';
+  renderOrcItens();
+  // Marcar como edição
+  document.getElementById('m-orc').dataset.editIdx = i;
+  document.querySelector('#m-orc .mt').childNodes[0].textContent = '✏️ Editar Orçamento ';
+  abre('m-orc');
+}
+
 async function delOrc(i){
   if(!confirm('Remover orcamento?')) return;
   const dbid = D.orcamentos[i]._dbid;
@@ -3282,10 +3387,14 @@ function aplicarModulos(){
   const mobProdutos  = document.getElementById('mob-produtos');
   const mobAjudantes = document.getElementById('mob-ajudantes');
 
-  if(abaProdutos)  abaProdutos.style.display  = m.produtos   ? '' : 'none';
-  if(abaAjudantes) abaAjudantes.style.display = m.ajudantes  ? '' : 'none';
-  if(mobProdutos)  mobProdutos.style.display  = m.produtos   ? '' : 'none';
-  if(mobAjudantes) mobAjudantes.style.display = m.ajudantes  ? '' : 'none';
+  const abaMateriais = document.getElementById('nav-materiais');
+  const mobMateriais = document.getElementById('mob-materiais');
+  if(abaProdutos)  abaProdutos.style.display  = m.produtos  ? '' : 'none';
+  if(abaAjudantes) abaAjudantes.style.display = m.ajudantes ? '' : 'none';
+  if(abaMateriais) abaMateriais.style.display = m.materiais ? '' : 'none';
+  if(mobProdutos)  mobProdutos.style.display  = m.produtos  ? '' : 'none';
+  if(mobAjudantes) mobAjudantes.style.display = m.ajudantes ? '' : 'none';
+  if(mobMateriais) mobMateriais.style.display = m.materiais ? '' : 'none';
 
   // Categoria mão de obra nas despesas
   const maoDeObra = document.getElementById('opt-mao-obra');
@@ -3298,12 +3407,141 @@ function aplicarModulos(){
 
 function renderModulos(){
   const m = D.perfil.modulos || {};
-  const ids = ['produtos','ajudantes','contrato','avaliacoes'];
+  const ids = ['produtos','ajudantes','materiais','contrato','avaliacoes'];
   ids.forEach(id => {
     const el = document.getElementById('mod-' + id);
     if(el) el.checked = !!m[id];
   });
   aplicarModulos();
+}
+
+// ══════════════════════════════════════════
+// MATERIAIS
+// ══════════════════════════════════════════
+function abrirNovoMaterial(){
+  document.getElementById('mat-edit-idx').value = -1;
+  document.getElementById('m-material-titulo').childNodes[0].textContent = '📦 Novo Material ';
+  clr('mat-nome','mat-qtd','mat-custo','mat-minimo');
+  document.getElementById('mat-unidade').value = 'un';
+  abre('m-material');
+}
+
+function editarMaterial(i){
+  const m = D.materiais[i];
+  document.getElementById('mat-edit-idx').value = i;
+  document.getElementById('m-material-titulo').childNodes[0].textContent = '✏️ Editar Material ';
+  document.getElementById('mat-nome').value    = m.nome;
+  document.getElementById('mat-unidade').value = m.unidade||'un';
+  document.getElementById('mat-qtd').value     = m.quantidade;
+  document.getElementById('mat-custo').value   = m.custo_unitario;
+  document.getElementById('mat-minimo').value  = m.estoque_minimo||1;
+  abre('m-material');
+}
+
+async function salvarMaterial(){
+  const nome    = document.getElementById('mat-nome').value.trim();
+  const unidade = document.getElementById('mat-unidade').value;
+  const qtd     = parseFloat(document.getElementById('mat-qtd').value)||0;
+  const custo   = parseFloat(document.getElementById('mat-custo').value)||0;
+  const minimo  = parseFloat(document.getElementById('mat-minimo').value)||1;
+  if(!nome) return toast('Digite o nome do material');
+
+  const idx = parseInt(document.getElementById('mat-edit-idx').value);
+  const mat = { nome, unidade, quantidade: qtd, custo_unitario: custo, estoque_minimo: minimo };
+
+  if(idx >= 0){
+    mat._dbid = D.materiais[idx]._dbid;
+    D.materiais[idx] = mat;
+  } else {
+    D.materiais.push(mat);
+  }
+
+  const { data } = await SUPA.from('materiais_estoque').upsert({
+    id: mat._dbid||undefined,
+    user_id: USER_ID, nome, unidade,
+    quantidade: qtd, custo_unitario: custo, estoque_minimo: minimo
+  }).select().single();
+  if(data && idx < 0) D.materiais[D.materiais.length-1]._dbid = data.id;
+
+  fecha('m-material');
+  rMateriais();
+  toast('✅ Material salvo!');
+}
+
+async function deletarMaterial(i){
+  if(!confirm('Remover este material?')) return;
+  const dbid = D.materiais[i]._dbid;
+  D.materiais.splice(i,1);
+  if(dbid) await SUPA.from('materiais_estoque').delete().eq('id', dbid).eq('user_id', USER_ID);
+  rMateriais();
+  toast('🗑 Removido');
+}
+
+async function carregarMateriais(){
+  if(!USER_ID) return;
+  try{
+    const { data } = await SUPA.from('materiais_estoque').select('*').eq('user_id', USER_ID).order('nome');
+    D.materiais = (data||[]).map(m=>({
+      nome: m.nome, unidade: m.unidade||'un',
+      quantidade: m.quantidade||0,
+      custo_unitario: m.custo_unitario||0,
+      estoque_minimo: m.estoque_minimo||1,
+      _dbid: m.id
+    }));
+    rMateriais();
+    atualizarDatalistMateriais();
+  }catch(e){ console.error('Erro materiais:', e); }
+}
+
+function atualizarDatalistMateriais(){
+  const dl = document.getElementById('dl-materiais-fin');
+  if(!dl) return;
+  dl.innerHTML = (D.materiais||[]).map(m=>`<option value="${m.nome} (${m.unidade})">`).join('');
+}
+
+function rMateriais(){
+  const el = document.getElementById('materiais-lista');
+  if(!el) return;
+  const lista = D.materiais||[];
+
+  if(!lista.length){
+    el.innerHTML = `<div class="empty" style="padding:48px 20px">
+      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px">📦</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum material ainda</div>
+      <div style="margin-bottom:18px">Cadastre seus materiais e controle o estoque</div>
+      <button class="btn btn-org" onclick="abrirNovoMaterial()">+ Cadastrar primeiro material</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = lista.map((m,i)=>{
+    const baixo   = m.quantidade <= m.estoque_minimo;
+    const zerado  = m.quantidade === 0;
+    const cor     = zerado ? 'var(--red)' : baixo ? 'var(--org)' : 'var(--grn)';
+    const badge   = zerado ? '<span class="badge b-r">Sem estoque</span>'
+                  : baixo  ? '<span class="badge b-o">Estoque baixo</span>' : '';
+    return `
+    <div class="srv-card ${zerado?'sts-cancelado':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <div>
+          <div class="srv-cli">${m.nome}</div>
+          <div class="srv-tipo">Custo unitário: ${R$(m.custo_unitario)} / ${m.unidade}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:${cor}">${m.quantidade}</div>
+          <div style="font-size:.72rem;color:var(--mut)">${m.unidade}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        ${badge}
+        <span style="font-size:.76rem;color:var(--mut)">Mínimo: ${m.estoque_minimo} ${m.unidade}</span>
+      </div>
+      <div class="srv-card-actions">
+        <button class="btn btn-gho btn-sm" onclick="editarMaterial(${i})">✏️ Editar</button>
+        <button class="btn btn-del btn-sm" onclick="deletarMaterial(${i})" style="margin-left:auto">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════
