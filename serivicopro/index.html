@@ -1926,7 +1926,7 @@ function rServicos(){
         ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Marcar pendente</button>`:''}
         ${isReal?`<button class="btn btn-pdf btn-sm" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
         <button class="btn btn-wpp btn-sm" onclick="abrirWpp(${i})">📱 WhatsApp</button>
-        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? `<button class="btn btn-ok btn-sm" onclick="pedirAvaliacao(${i})">⭐ Pedir avaliação</button>` : ''}
+        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm\" onclick=\"pedirAvaliacao('+i+')\">⭐ Pedir avaliação</button>' : ''}
         <button class="btn btn-del btn-sm" onclick="delSrv(${i})" style="margin-left:auto">🗑</button>
       </div>
     </div>`;
@@ -2294,30 +2294,19 @@ async function finalizarSrv(){
 }
 
 function pedirAvaliacao(i){
-  const s = D.servicos[i];
-  const cli = D.clientes.find(c=>c.nm===s.cli);
-  const tel = cli?.wpp?.replace(/\D/g,'')||'';
+  const s    = D.servicos[i];
+  const cli  = D.clientes.find(c=>c.nm===s.cli);
+  const tel  = (cli?.wpp||'').replace(/[^0-9]/g,'');
   const link = window.location.origin + '/avaliar.html?uid=' + USER_ID + '&srv=' + (s._dbid||s.id);
-  const nome = D.perfil.nome || 'AutônomoPro';
-  const msg = 'Olá ' + s.cli + '! 😊
-
-' +
-    'Foi um prazer atender você!
-
-' +
-    'Pode deixar sua avaliação do serviço em 1 clique aqui:
-' +
-    link + '
-
-' +
-    'Obrigado! ⭐
-_' + nome + '_';
-  const url = tel
-    ? 'https://wa.me/55' + tel + '?text=' + encodeURIComponent(msg)
-    : 'https://wa.me/?text=' + encodeURIComponent(msg);
+  const nome = D.perfil.nome || 'AutonomoPro';
+  const msg  = `Ola ${s.cli}! Obrigado pelo atendimento! Pode avaliar em 1 clique: ${link} Obrigado! ${nome}`;
+  const url  = tel
+    ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
-  toast('📱 Abrindo WhatsApp com link de avaliação...');
+  toast('Abrindo WhatsApp...');
 }
+
 
 async function marcarPago(i){
   D.servicos[i].sts_pag = 'Pago';
