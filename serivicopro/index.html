@@ -12,6 +12,16 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>AutônomoPro</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+// Anti-flash — aplica cor do segmento antes do CSS renderizar
+try{
+  var _s=JSON.parse(localStorage.getItem('sp4_perf')||'{}').segmento||'geral';
+  var _c={'construcao':'#e07b2a','frete':'#1d6fa4','confeitaria':'#e879a0',
+          'cerimonial':'#c9a84c','artesanato':'#4a9b6f','embalagens':'#9b6fd4',
+          'beleza':'#b06fd4','fotografia':'#4a5568','geral':'#e07b2a'};
+  document.documentElement.style.setProperty('--org',_c[_s]||'#e07b2a');
+}catch(e){}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
