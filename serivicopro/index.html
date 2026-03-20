@@ -657,7 +657,50 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="produtos-lista"></div>
   </div>
 
-  <!-- AJUDANTES -->
+  <!-- Modal Novo Produto -->
+<div class="overlay" id="m-produto">
+  <div class="modal">
+    <div class="mt">🛍️ Novo Produto <button class="xbtn" onclick="fecha('m-produto')">✕</button></div>
+    <input type="hidden" id="prod-edit-idx" value="-1">
+    <div class="fg"><label class="fl">Nome do produto</label><input class="fi" id="prod-nome" placeholder="Ex: Livro personalizado, caderno..."></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Custo (R$)</label><input class="fi" type="number" id="prod-custo" placeholder="0,00" min="0" step="0.01" oninput="calcLucroProd()"></div>
+      <div class="fg"><label class="fl">Preço de venda (R$)</label><input class="fi" type="number" id="prod-preco" placeholder="0,00" min="0" step="0.01" oninput="calcLucroProd()"></div>
+    </div>
+    <div class="fg"><label class="fl">Quantidade em estoque</label><input class="fi" type="number" id="prod-estoque" placeholder="0" min="0"></div>
+    <div id="prod-lucro-box" style="display:none;background:var(--grn-bg);border-radius:10px;padding:12px 14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:.85rem">
+        <span style="color:var(--mut)">Lucro por unidade</span>
+        <span id="prod-lucro-val" style="font-weight:700;color:var(--grn);font-family:'Fraunces',serif"></span>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarProduto()">✅ Salvar produto</button>
+      <button class="btn btn-gho" onclick="fecha('m-produto')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Vender Produto -->
+<div class="overlay" id="m-vender">
+  <div class="modal">
+    <div class="mt">💰 Registrar venda <button class="xbtn" onclick="fecha('m-vender')">✕</button></div>
+    <input type="hidden" id="vender-idx">
+    <div id="vender-info" style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.88rem;color:var(--mut)"></div>
+    <div class="fg"><label class="fl">Quantidade vendida</label><input class="fi" type="number" id="vender-qtd" placeholder="1" min="1" value="1"></div>
+    <div class="fg"><label class="fl">Forma de pagamento</label>
+      <select class="fs" id="vender-pag">
+        <option>PIX</option><option>Dinheiro</option><option>Cartão Crédito</option><option>Cartão Débito</option>
+      </select>
+    </div>
+    <div class="mf">
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="confirmarVenda()">✅ Confirmar venda</button>
+      <button class="btn btn-gho" onclick="fecha('m-vender')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- AJUDANTES -->
   <div class="page" id="pg-ajudantes">
     <div class="topbar">
       <div><div class="pg-title">👷 Ajudantes</div><div class="pg-sub">Controle comissões e pagamentos</div></div>
@@ -1016,6 +1059,7 @@ const D = {
   servicos:   [],
   clientes:   [],
   avaliacoes: [],
+  produtos:   [],
   orcamentos: [],
   notifs:     [],
   despesas:   [],
@@ -1428,6 +1472,7 @@ function iniciarApp(){
   if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
   verificarMigracao();
   carregarAvaliacoes();
+  carregarProdutos();
   setTimeout(function(){
     if(typeof SEGMENTOS !== 'undefined'){
       const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
@@ -3259,6 +3304,195 @@ function renderModulos(){
     if(el) el.checked = !!m[id];
   });
   aplicarModulos();
+}
+
+// ══════════════════════════════════════════
+// PRODUTOS
+// ══════════════════════════════════════════
+function abrirNovoProduto(){
+  document.getElementById('prod-edit-idx').value = -1;
+  document.getElementById('prod-nome').value = '';
+  document.getElementById('prod-custo').value = '';
+  document.getElementById('prod-preco').value = '';
+  document.getElementById('prod-estoque').value = '';
+  document.getElementById('prod-lucro-box').style.display = 'none';
+  abre('m-produto');
+}
+
+function calcLucroProd(){
+  const custo = parseFloat(document.getElementById('prod-custo').value) || 0;
+  const preco = parseFloat(document.getElementById('prod-preco').value) || 0;
+  const box   = document.getElementById('prod-lucro-box');
+  const val   = document.getElementById('prod-lucro-val');
+  if(custo > 0 && preco > 0){
+    box.style.display = '';
+    const lucro = preco - custo;
+    val.textContent = R$(lucro);
+    val.style.color = lucro >= 0 ? 'var(--grn)' : 'var(--red)';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+async function salvarProduto(){
+  const nome    = document.getElementById('prod-nome').value.trim();
+  const custo   = parseFloat(document.getElementById('prod-custo').value) || 0;
+  const preco   = parseFloat(document.getElementById('prod-preco').value) || 0;
+  const estoque = parseInt(document.getElementById('prod-estoque').value) || 0;
+  if(!nome) return toast('Digite o nome do produto');
+
+  const idx = parseInt(document.getElementById('prod-edit-idx').value);
+  const prod = { nome, custo, preco, estoque, vendidos: 0, ativo: true };
+
+  if(idx >= 0){
+    prod.vendidos = D.produtos[idx].vendidos || 0;
+    prod._dbid    = D.produtos[idx]._dbid;
+    D.produtos[idx] = prod;
+  } else {
+    D.produtos.push(prod);
+  }
+
+  const { data } = await SUPA.from('produtos').upsert({
+    id: prod._dbid || undefined,
+    user_id: USER_ID, nome, custo, preco,
+    estoque, vendidos: prod.vendidos || 0, ativo: true
+  }).select().single();
+  if(data && !prod._dbid){
+    D.produtos[D.produtos.length-1]._dbid = data.id;
+  }
+
+  fecha('m-produto');
+  rProdutos();
+  toast('✅ Produto salvo!');
+}
+
+function editarProduto(i){
+  const p = D.produtos[i];
+  document.getElementById('prod-edit-idx').value = i;
+  document.getElementById('prod-nome').value    = p.nome;
+  document.getElementById('prod-custo').value   = p.custo;
+  document.getElementById('prod-preco').value   = p.preco;
+  document.getElementById('prod-estoque').value = p.estoque;
+  calcLucroProd();
+  abre('m-produto');
+}
+
+function abrirVender(i){
+  const p = D.produtos[i];
+  document.getElementById('vender-idx').value = i;
+  document.getElementById('vender-qtd').value = 1;
+  document.getElementById('vender-info').innerHTML =
+    `<strong>${p.nome}</strong><br>
+     Preço: <strong style="color:var(--grn)">${R$(p.preco)}</strong> · 
+     Estoque: <strong>${p.estoque}</strong> unid.`;
+  abre('m-vender');
+}
+
+async function confirmarVenda(){
+  const i   = parseInt(document.getElementById('vender-idx').value);
+  const qtd = parseInt(document.getElementById('vender-qtd').value) || 1;
+  const pag = document.getElementById('vender-pag').value;
+  const p   = D.produtos[i];
+
+  if(qtd > p.estoque) return toast('Estoque insuficiente! Disponível: ' + p.estoque);
+
+  D.produtos[i].estoque  -= qtd;
+  D.produtos[i].vendidos  = (p.vendidos||0) + qtd;
+
+  await SUPA.from('produtos').update({
+    estoque:  D.produtos[i].estoque,
+    vendidos: D.produtos[i].vendidos
+  }).eq('id', p._dbid).eq('user_id', USER_ID);
+
+  fecha('m-vender');
+  rProdutos();
+  toast(`✅ ${qtd}x ${p.nome} vendido! ${R$(p.preco * qtd)}`);
+}
+
+async function deletarProduto(i){
+  if(!confirm('Remover este produto?')) return;
+  const dbid = D.produtos[i]._dbid;
+  D.produtos.splice(i,1);
+  if(dbid) await SUPA.from('produtos').delete().eq('id', dbid).eq('user_id', USER_ID);
+  rProdutos();
+  toast('🗑 Produto removido');
+}
+
+async function carregarProdutos(){
+  if(!USER_ID) return;
+  try{
+    const { data } = await SUPA.from('produtos').select('*').eq('user_id', USER_ID).order('nome');
+    D.produtos = (data||[]).map(p=>({
+      nome: p.nome, custo: p.custo, preco: p.preco,
+      estoque: p.estoque, vendidos: p.vendidos||0,
+      ativo: p.ativo, _dbid: p.id
+    }));
+    rProdutos();
+  } catch(e){ console.error('Erro produtos:', e); }
+}
+
+function rProdutos(){
+  const el = document.getElementById('produtos-lista');
+  if(!el) return;
+  const lista = D.produtos || [];
+
+  if(!lista.length){
+    el.innerHTML = `<div class="empty" style="padding:48px 20px">
+      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px">🛍️</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum produto ainda</div>
+      <div style="margin-bottom:18px">Cadastre seus produtos e controle o estoque</div>
+      <button class="btn btn-org" onclick="abrirNovoProduto()">+ Cadastrar primeiro produto</button>
+    </div>`;
+    return;
+  }
+
+  // Resumo do topo
+  const totalVendas = lista.reduce((a,p)=>a+(p.preco*p.vendidos),0);
+  const totalEstoque = lista.reduce((a,p)=>a+p.estoque,0);
+
+  el.innerHTML = `
+  <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+    <div class="sc" style="--sc-c:var(--grn)">
+      <div class="sc-lbl">Vendas totais</div>
+      <div class="sc-val">${R$(totalVendas)}</div>
+    </div>
+    <div class="sc" style="--sc-c:var(--org)">
+      <div class="sc-lbl">Em estoque</div>
+      <div class="sc-val">${totalEstoque} unid.</div>
+    </div>
+    <div class="sc" style="--sc-c:var(--blu)">
+      <div class="sc-lbl">Produtos</div>
+      <div class="sc-val">${lista.length}</div>
+    </div>
+  </div>
+  ` + lista.map((p,i) => {
+    const lucro   = p.preco - p.custo;
+    const semEstoque = p.estoque === 0;
+    return `
+    <div class="srv-card ${semEstoque ? 'sts-cancelado' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div>
+          <div class="srv-cli">${p.nome}</div>
+          <div class="srv-tipo">Custo: ${R$(p.custo)} · Lucro/un: <span style="color:var(--grn);font-weight:700">${R$(lucro)}</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--grn)">${R$(p.preco)}</div>
+          <div style="font-size:.73rem;color:var(--mut)">${p.vendidos||0} vendidos</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:.78rem;color:${semEstoque?'var(--red)':'var(--mut)'}">
+          📦 Estoque: <strong>${p.estoque}</strong>
+        </span>
+        ${semEstoque ? '<span class="badge b-r">Sem estoque</span>' : ''}
+      </div>
+      <div class="srv-card-actions">
+        ${!semEstoque ? `<button class="btn btn-grn btn-sm" onclick="abrirVender(${i})">💰 Vender</button>` : ''}
+        <button class="btn btn-gho btn-sm" onclick="editarProduto(${i})">✏️ Editar</button>
+        <button class="btn btn-del btn-sm" onclick="deletarProduto(${i})" style="margin-left:auto">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════
