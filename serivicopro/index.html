@@ -349,6 +349,8 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" onclick="ir('recebimentos',this)"><span class="ni">💵</span>Recebimentos</button>
     <button class="nb" onclick="ir('despesas',this)"><span class="ni">💸</span>Despesas</button>
     <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
+    <button class="nb" id="nav-produtos" style="display:none" onclick="ir('produtos',this)"><span class="ni">🛍️</span>Produtos</button>
+    <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni">👷</span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
     <div class="nav-sec">Análise</div>
@@ -575,6 +577,47 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="cfg-sec">
+      <div class="cfg-t">⚙️ Módulos</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:16px;line-height:1.6">Ative apenas o que você usa. O app se adapta ao seu negócio.</p>
+
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Vendas e Estoque</div>
+      <div class="toggle-row" style="margin-bottom:14px">
+        <div>
+          <div class="tl">🛍️ Produtos e estoque</div>
+          <div class="ts">Controle estoque, custo e vendas de produtos</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="mod-produtos" onchange="salvarModulo('produtos',this.checked)"><span class="slider"></span></label>
+      </div>
+
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipe</div>
+      <div class="toggle-row" style="margin-bottom:14px">
+        <div>
+          <div class="tl">👷 Comissão de ajudantes</div>
+          <div class="ts">Controle dias trabalhados e valores a pagar</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="mod-ajudantes" onchange="salvarModulo('ajudantes',this.checked)"><span class="slider"></span></label>
+      </div>
+
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Documentos</div>
+      <div class="toggle-row" style="margin-bottom:14px">
+        <div>
+          <div class="tl">🧾 Contrato digital</div>
+          <div class="ts">Gera contrato em PDF com dados do serviço</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="mod-contrato" onchange="salvarModulo('contrato',this.checked)"><span class="slider"></span></label>
+      </div>
+
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Relacionamento</div>
+      <div class="toggle-row" style="margin-bottom:6px">
+        <div>
+          <div class="tl">⭐ Avaliações de clientes</div>
+          <div class="ts">Receba avaliações via link pelo WhatsApp</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="mod-avaliacoes" onchange="salvarModulo('avaliacoes',this.checked)"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <div class="cfg-sec">
       <div class="cfg-t">🎯 Meta mensal</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Defina quanto quer faturar por mês. Vamos te mostrar o progresso em tempo real no dashboard.</p>
       <div class="fg"><label class="fl">Meta de faturamento (R$)</label>
@@ -586,6 +629,24 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
       <button class="btn btn-org" onclick="salvarMeta()">🎯 Definir meta</button>
     </div>
+  </div>
+
+  <!-- PRODUTOS -->
+  <div class="page" id="pg-produtos">
+    <div class="topbar">
+      <div><div class="pg-title">🛍️ Produtos</div><div class="pg-sub">Controle seu estoque e vendas</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoProduto()">+ Novo produto</button></div>
+    </div>
+    <div id="produtos-lista"></div>
+  </div>
+
+  <!-- AJUDANTES -->
+  <div class="page" id="pg-ajudantes">
+    <div class="topbar">
+      <div><div class="pg-title">👷 Ajudantes</div><div class="pg-sub">Controle comissões e pagamentos</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoAjudante()">+ Novo ajudante</button></div>
+    </div>
+    <div id="ajudantes-lista"></div>
   </div>
 
   <!-- CONFIG -->
@@ -625,6 +686,8 @@ input:checked+.slider:before{transform:translateX(19px)}
 </div>
 <div class="mob-more-menu" id="mob-more">
   <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
+  <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir('produtos');fecharMais()"><span class="mi">🛍️</span>Produtos</button>
+  <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir('ajudantes');fecharMais()"><span class="mi">👷</span>Ajudantes</button>
   <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
   <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
@@ -667,7 +730,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="fg">
       <label class="fl">Categoria</label>
       <select class="fs" id="desp-cat" onchange="toggleAjudante()">
-        <option value="Mão de obra">👷 Mão de obra (ajudante)</option>
+        <option value="Mão de obra" id="opt-mao-obra">👷 Mão de obra (ajudante)</option>
         <option value="Combustível">⛽ Combustível</option>
         <option value="Ferramenta">🔨 Ferramenta / Equipamento</option>
         <option value="Outro">📦 Outro</option>
@@ -1577,6 +1640,7 @@ function uiPerfil(){
   atualizarPreviewMeta();
   renderMeusSrvs();
   atualizarDatalistTipo();
+  renderModulos();
 }
 
 function atualizarPreviewMeta(){
@@ -3112,6 +3176,49 @@ function gerarPDFRel(){
   }
   doc.save(`relatorio-${mes}${detalhado?'-detalhado':''}.pdf`);
   toast('📄 PDF gerado!');
+}
+
+// ══════════════════════════════════════════
+// MÓDULOS
+// ══════════════════════════════════════════
+async function salvarModulo(nome, ativo){
+  if(!D.perfil.modulos) D.perfil.modulos = {};
+  D.perfil.modulos[nome] = ativo;
+  await sbSalvarPerfil();
+  aplicarModulos();
+  toast(ativo ? '✅ ' + nome + ' ativado!' : nome + ' desativado');
+}
+
+function aplicarModulos(){
+  const m = D.perfil.modulos || {};
+
+  // Sidebar — mostrar/ocultar abas
+  const abaProdutos  = document.getElementById('nav-produtos');
+  const abaAjudantes = document.getElementById('nav-ajudantes');
+  const mobProdutos  = document.getElementById('mob-produtos');
+  const mobAjudantes = document.getElementById('mob-ajudantes');
+
+  if(abaProdutos)  abaProdutos.style.display  = m.produtos   ? '' : 'none';
+  if(abaAjudantes) abaAjudantes.style.display = m.ajudantes  ? '' : 'none';
+  if(mobProdutos)  mobProdutos.style.display  = m.produtos   ? '' : 'none';
+  if(mobAjudantes) mobAjudantes.style.display = m.ajudantes  ? '' : 'none';
+
+  // Categoria mão de obra nas despesas
+  const maoDeObra = document.getElementById('opt-mao-obra');
+  if(maoDeObra) maoDeObra.style.display = m.ajudantes ? 'none' : '';
+
+  // Botão contrato nos serviços (re-renderiza)
+  rServicos();
+}
+
+function renderModulos(){
+  const m = D.perfil.modulos || {};
+  const ids = ['produtos','ajudantes','contrato','avaliacoes'];
+  ids.forEach(id => {
+    const el = document.getElementById('mod-' + id);
+    if(el) el.checked = !!m[id];
+  });
+  aplicarModulos();
 }
 
 // ══════════════════════════════════════════
