@@ -617,6 +617,23 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
 
+    <div class="cfg-sec" id="sec-avaliacoes" style="display:none">
+      <div class="cfg-t">⭐ Minhas avaliações</div>
+      <div id="avaliacoes-resumo" style="background:var(--org-bg);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:.72rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Média geral</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--org)" id="aval-media">—</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.72rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--brn)" id="aval-total">0</div>
+        </div>
+      </div>
+      <div id="avaliacoes-lista">
+        <div style="text-align:center;color:var(--mut);font-size:.85rem;padding:20px 0">Nenhuma avaliação ainda</div>
+      </div>
+    </div>
+
     <div class="cfg-sec">
       <div class="cfg-t">🎯 Meta mensal</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Defina quanto quer faturar por mês. Vamos te mostrar o progresso em tempo real no dashboard.</p>
@@ -998,6 +1015,7 @@ let USER_ID = null;
 const D = {
   servicos:   [],
   clientes:   [],
+  avaliacoes: [],
   orcamentos: [],
   notifs:     [],
   despesas:   [],
@@ -1409,6 +1427,7 @@ function iniciarApp(){
   uiPerfil();
   if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
   verificarMigracao();
+  carregarAvaliacoes();
   setTimeout(function(){
     if(typeof SEGMENTOS !== 'undefined'){
       const segSalvo = D.perfil.segmento || detectarSegmento(D.perfil.tipo);
@@ -2299,7 +2318,7 @@ function pedirAvaliacao(i){
   const tel  = (cli?.wpp||'').replace(/[^0-9]/g,'');
   const link = window.location.origin + '/avaliar.html?uid=' + USER_ID + '&srv=' + (s._dbid||s.id);
   const nome = D.perfil.nome || 'AutonomoPro';
-  const msg  = `Ola ${s.cli}! Obrigado pelo atendimento! Pode avaliar em 1 clique: ${link} Obrigado! ${nome}`;
+  const msg  = `Olá, ${s.cli}! Obrigado pelo atendimento! Que tal deixar uma avaliação rápida? Leva menos de 10 segundos: ${link}`;
   const url  = tel
     ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`
     : `https://wa.me/?text=${encodeURIComponent(msg)}`;
@@ -3227,6 +3246,9 @@ function aplicarModulos(){
   const maoDeObra = document.getElementById('opt-mao-obra');
   if(maoDeObra) maoDeObra.style.display = m.ajudantes ? 'none' : '';
 
+  // Seção avaliações no perfil
+  renderAvaliacoes();
+
 }
 
 function renderModulos(){
@@ -3237,6 +3259,62 @@ function renderModulos(){
     if(el) el.checked = !!m[id];
   });
   aplicarModulos();
+}
+
+// ══════════════════════════════════════════
+// AVALIAÇÕES
+// ══════════════════════════════════════════
+async function carregarAvaliacoes(){
+  if(!USER_ID) return;
+  if(!D.perfil.modulos?.avaliacoes) return;
+  try{
+    const { data } = await SUPA
+      .from('avaliacoes')
+      .select('*')
+      .eq('user_id', USER_ID)
+      .order('created_at', {ascending: false});
+    D.avaliacoes = data || [];
+    renderAvaliacoes();
+  } catch(e){ console.error('Erro avaliacoes:', e); }
+}
+
+function renderAvaliacoes(){
+  const m = D.perfil.modulos || {};
+  const sec = document.getElementById('sec-avaliacoes');
+  if(sec) sec.style.display = m.avaliacoes ? '' : 'none';
+  if(!m.avaliacoes) return;
+
+  const lista = D.avaliacoes || [];
+  const total = lista.length;
+  const media = total > 0
+    ? (lista.reduce((a,b)=>a+b.estrelas,0) / total).toFixed(1)
+    : '—';
+
+  const elMedia = document.getElementById('aval-media');
+  const elTotal = document.getElementById('aval-total');
+  if(elMedia) elMedia.textContent = total > 0 ? '⭐ ' + media : '—';
+  if(elTotal) elTotal.textContent = total;
+
+  const el = document.getElementById('avaliacoes-lista');
+  if(!el) return;
+  if(!lista.length){
+    el.innerHTML = '<div style="text-align:center;color:var(--mut);font-size:.85rem;padding:20px 0">Nenhuma avaliação ainda.<br>Envie o link para seus clientes!</div>';
+    return;
+  }
+
+  el.innerHTML = lista.map(a => {
+    const estrelas = '⭐'.repeat(a.estrelas);
+    const data     = a.created_at ? new Date(a.created_at).toLocaleDateString('pt-BR') : '';
+    return `
+    <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px;border:1.5px solid var(--bor)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-weight:700;font-size:.9rem">${a.cliente||'Cliente'}</div>
+        <div style="font-size:.75rem;color:var(--mut)">${data}</div>
+      </div>
+      <div style="font-size:1rem;margin-bottom:${a.comentario?'6px':'0'}">${estrelas}</div>
+      ${a.comentario ? `<div style="font-size:.84rem;color:var(--mut);font-style:italic">"${a.comentario}"</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════
