@@ -2917,6 +2917,7 @@ document.getElementById('oi-val')?.addEventListener('keydown', e=>{ if(e.key==='
 
 async function salvarOrc(){
   if(!orcItens.length) return toast('⚠️ Adicione pelo menos 1 item');
+  const editIdx = parseInt(document.getElementById('orc-edit-idx')?.value ?? '-1');
   const o = {
     dt:    document.getElementById('o-dt').value,
     cli:   document.getElementById('o-cli').value.trim(),
@@ -2924,14 +2925,32 @@ async function salvarOrc(){
     valid: document.getElementById('o-valid').value,
     obs:   document.getElementById('o-obs').value.trim(),
     itens: [...orcItens],
-    sts:   'Pendente'
+    sts:   editIdx >= 0 ? D.orcamentos[editIdx].sts : 'Pendente'
   };
   if(!o.cli) return toast('⚠️ Informe o cliente');
-  const so = await sbSalvarOrcamento(o);
-  if(so) o._dbid = so.id;
-  D.orcamentos.unshift(o); fecha('m-orc'); render();
-  toast('✅ Orcamento salvo!');
+
+  if(editIdx >= 0){
+    // EDITAR — preservar _dbid e atualizar no array
+    o._dbid = D.orcamentos[editIdx]._dbid;
+    D.orcamentos[editIdx] = o;
+    await sbSalvarOrcamento(o);
+    toast('✅ Orçamento atualizado!');
+  } else {
+    // NOVO — inserir no início
+    const so = await sbSalvarOrcamento(o);
+    if(so) o._dbid = so.id;
+    D.orcamentos.unshift(o);
+    toast('✅ Orçamento salvo!');
+  }
+
+  // Resetar modo edição
+  document.getElementById('orc-edit-idx').value = '-1';
+  const titulo = document.getElementById('m-orc-titulo');
+  if(titulo) titulo.childNodes[0].textContent = '📋 Novo Orçamento ';
+
+  fecha('m-orc'); render();
   clr('o-cli','o-desc','o-obs');
+  orcItens = [];
 }
 async function mudarStsOrc(i,sts){ D.orcamentos[i].sts=sts; await sbSalvarOrcamento(D.orcamentos[i]); rOrcamentos(); }
 
