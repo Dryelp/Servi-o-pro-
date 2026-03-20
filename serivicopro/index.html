@@ -505,7 +505,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <div class="page" id="pg-orcamentos">
     <div class="topbar">
       <div><div class="pg-title">Orçamentos</div><div class="pg-sub">Orçamentos para visitas prévias — independente dos serviços</div></div>
-      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-orc')">+ Novo orçamento</button></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoOrc()">+ Novo orçamento</button></div>
     </div>
     <div class="search-bar">
       <input class="search-inp" id="orc-search" placeholder="🔍 Buscar por cliente, descrição..." oninput="rOrcamentos()">
@@ -1065,7 +1065,8 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Orçamento -->
 <div class="overlay" id="m-orc">
   <div class="modal modal-lg">
-    <div class="mt">📋 Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
+    <div class="mt" id="m-orc-titulo">📋 Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
+    <input type="hidden" id="orc-edit-idx" value="-1">
     <div class="frow">
       <div class="fg"><label class="fl">Cliente</label><input class="fi" id="o-cli" placeholder="Nome do cliente" list="dl-o"><datalist id="dl-o"></datalist></div>
       <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="o-dt"></div>
@@ -1115,6 +1116,7 @@ const D = {
   avaliacoes: [],
   produtos:   [],
   materiais:  [],
+  ajudantes:  [],
   orcamentos: [],
   notifs:     [],
   despesas:   [],
@@ -2974,18 +2976,28 @@ async function converterOrcSrv(){
   addNotif('sistema','✅ Orcamento convertido', o.cli + ' - servico agendado para ' + fd(dt));
   ir('servicos');
 }
+function abrirNovoOrc(){
+  orcItens = [];
+  document.getElementById('orc-edit-idx').value = '-1';
+  const titulo = document.getElementById('m-orc-titulo');
+  if(titulo) titulo.childNodes[0].textContent = '📋 Novo Orçamento ';
+  clr('o-cli','o-desc','o-obs');
+  renderOrcItens();
+  abre('m-orc');
+}
+
 function editarOrc(i){
   const o = D.orcamentos[i];
   orcItens = [...(o.itens||[])];
+  document.getElementById('orc-edit-idx').value = i;
   document.getElementById('o-cli').value   = o.cli||'';
   document.getElementById('o-dt').value    = o.dt||hj();
   document.getElementById('o-desc').value  = o.desc||'';
   document.getElementById('o-valid').value = o.valid||'';
   document.getElementById('o-obs').value   = o.obs||'';
   renderOrcItens();
-  // Marcar como edição
-  document.getElementById('m-orc').dataset.editIdx = i;
-  document.querySelector('#m-orc .mt').childNodes[0].textContent = '✏️ Editar Orçamento ';
+  const titulo = document.getElementById('m-orc-titulo');
+  if(titulo) titulo.childNodes[0].textContent = '✏️ Editar Orçamento ';
   abre('m-orc');
 }
 
@@ -3375,7 +3387,21 @@ async function salvarModulo(nome, ativo){
   D.perfil.modulos[nome] = ativo;
   await sbSalvarPerfil();
   aplicarModulos();
-  toast(ativo ? '✅ ' + nome + ' ativado!' : nome + ' desativado');
+
+  // Carregar dados do módulo ao ativar pela primeira vez
+  if(ativo){
+    if(nome === 'produtos'   && !D.produtos.length)   await carregarProdutos();
+    if(nome === 'materiais'  && !D.materiais.length)  await carregarMateriais();
+    if(nome === 'ajudantes'  && !D.ajudantes?.length) await carregarAjudantes();
+    if(nome === 'avaliacoes' && !D.avaliacoes.length) await carregarAvaliacoes();
+  }
+
+  const nomes = {
+    produtos:'Produtos',materiais:'Materiais',
+    ajudantes:'Ajudantes',contrato:'Contrato digital',
+    avaliacoes:'Avaliações'
+  };
+  toast(ativo ? '✅ ' + (nomes[nome]||nome) + ' ativado!' : (nomes[nome]||nome) + ' desativado');
 }
 
 function aplicarModulos(){
@@ -3731,6 +3757,24 @@ function rProdutos(){
       </div>
     </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+// AJUDANTES (stub — implementação completa em breve)
+// ══════════════════════════════════════════
+async function carregarAjudantes(){
+  if(!USER_ID) return;
+  if(!D.ajudantes) D.ajudantes = [];
+  try{
+    const { data } = await SUPA.from('ajudantes').select('*').eq('user_id', USER_ID).order('nome');
+    D.ajudantes = (data||[]).map(a=>({
+      nome: a.nome, valor_dia: a.valor_dia||0, ativo: a.ativo, _dbid: a.id
+    }));
+  }catch(e){ console.error('Erro ajudantes:', e); }
+}
+
+function abrirNovoAjudante(){
+  toast('Módulo Ajudantes em breve! 🔨');
 }
 
 // ══════════════════════════════════════════
