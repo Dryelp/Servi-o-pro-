@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ea580c">
-<title>Avalie o serviço — AutônomoPro</title>
+<title>Avaliação — AutônomoPro</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,48 +13,51 @@
   --org:#ea580c;--org2:#c2410c;--org-bg:#fff7ed;
   --grn:#16a34a;--grn-bg:#dcfce7;
   --bg:#fafafa;--sur:#fff;--brn:#1a0f0a;--mut:#78716c;
-  --bor:#e4e4e7;--rad:14px;
+  --bor:#e4e4e7;
 }
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--brn);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .card{background:var(--sur);border-radius:20px;padding:32px 24px;max-width:420px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
-.logo{font-size:2.5rem;margin-bottom:8px}
-.app-name{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--org);margin-bottom:24px}
-.titulo{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;margin-bottom:8px}
-.subtitulo{font-size:.9rem;color:var(--mut);margin-bottom:28px;line-height:1.6}
-.estrelas{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
-.estrela{font-size:2.8rem;cursor:pointer;transition:transform .15s;filter:grayscale(1);opacity:.4}
-.estrela.ativa{filter:grayscale(0);opacity:1;transform:scale(1.15)}
-.estrela:hover{transform:scale(1.2)}
-.comentario{width:100%;border:1.5px solid var(--bor);border-radius:10px;padding:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;color:var(--brn);resize:none;outline:none;background:var(--bg);margin-bottom:16px;transition:border-color .15s}
-.comentario:focus{border-color:var(--org)}
+.logo{font-size:2.5rem;margin-bottom:4px}
+.app-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--org);margin-bottom:28px}
+.prestador{font-size:.82rem;color:var(--mut);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.titulo{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;margin-bottom:8px;line-height:1.3}
+.subtitulo{font-size:.88rem;color:var(--mut);margin-bottom:28px;line-height:1.6}
+.estrelas{display:flex;justify-content:center;gap:10px;margin-bottom:28px}
+.estrela{font-size:2.8rem;cursor:pointer;transition:transform .15s;filter:grayscale(1);opacity:.35}
+.estrela.ativa{filter:grayscale(0);opacity:1;transform:scale(1.1)}
+.estrela:hover{opacity:.8;transform:scale(1.15)}
+.label-estrela{font-size:.82rem;color:var(--org);font-weight:600;height:20px;margin-bottom:16px}
+textarea{width:100%;border:1.5px solid var(--bor);border-radius:10px;padding:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;color:var(--brn);resize:none;outline:none;background:var(--bg);margin-bottom:16px;transition:border-color .15s}
+textarea:focus{border-color:var(--org)}
 .btn{width:100%;padding:14px;background:var(--org);color:#fff;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s}
 .btn:hover{background:var(--org2);transform:translateY(-1px)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.sucesso{display:none;text-align:center}
+.erro-msg{font-size:.82rem;color:#dc2626;margin-bottom:12px;display:none}
+.oculto{display:none}
+.loading{text-align:center;padding:40px 0}
+.loading-ico{font-size:2.5rem;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .sucesso-ico{font-size:4rem;margin-bottom:16px}
 .sucesso-titulo{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;margin-bottom:8px}
 .sucesso-sub{font-size:.9rem;color:var(--mut);line-height:1.6}
-.erro-msg{font-size:.82rem;color:#dc2626;margin-bottom:12px;display:none}
-.loading{display:none;text-align:center;padding:40px 0}
-.loading-ico{font-size:2rem;animation:spin 1s linear infinite;display:inline-block}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-
 <div class="card">
+
   <!-- Loading -->
-  <div class="loading" id="loading">
+  <div id="tela-loading" class="loading">
     <div class="loading-ico">⚡</div>
     <p style="margin-top:12px;color:var(--mut);font-size:.9rem">Carregando...</p>
   </div>
 
   <!-- Formulário -->
-  <div id="form-avaliar">
+  <div id="tela-form" class="oculto">
     <div class="logo">⚡</div>
     <div class="app-name">AutônomoPro</div>
-    <div class="titulo" id="titulo-srv">Como foi o serviço?</div>
-    <div class="subtitulo" id="subtitulo-srv">Sua avaliação ajuda muito! Leva menos de 10 segundos.</div>
+    <div class="prestador" id="txt-prestador"></div>
+    <div class="titulo" id="txt-titulo">Como foi o serviço?</div>
+    <div class="subtitulo" id="txt-sub">Sua opinião é muito importante!<br>Leva menos de 10 segundos. 😊</div>
 
     <div class="estrelas" id="estrelas">
       <span class="estrela" onclick="selecionarEstrela(1)">⭐</span>
@@ -63,76 +66,83 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <span class="estrela" onclick="selecionarEstrela(4)">⭐</span>
       <span class="estrela" onclick="selecionarEstrela(5)">⭐</span>
     </div>
+    <div class="label-estrela" id="label-estrela"></div>
 
-    <textarea class="comentario" id="comentario" rows="3" placeholder="Deixe um comentário (opcional)..."></textarea>
-    <div class="erro-msg" id="erro-msg">Selecione pelo menos 1 estrela</div>
+    <textarea id="comentario" rows="3" placeholder="Deixe um comentário (opcional)..."></textarea>
+    <div class="erro-msg" id="erro-msg">Selecione pelo menos 1 estrela ⭐</div>
     <button class="btn" id="btn-enviar" onclick="enviarAvaliacao()">Enviar avaliação</button>
   </div>
 
   <!-- Sucesso -->
-  <div class="sucesso" id="sucesso">
+  <div id="tela-sucesso" class="oculto">
     <div class="sucesso-ico">🎉</div>
     <div class="sucesso-titulo">Obrigado!</div>
-    <div class="sucesso-sub">Sua avaliação foi enviada com sucesso.<br>Isso ajuda muito o profissional a melhorar!</div>
+    <div class="sucesso-sub" id="txt-sucesso">Avaliação enviada com sucesso!</div>
   </div>
 
   <!-- Erro -->
-  <div class="sucesso" id="erro-geral">
+  <div id="tela-erro" class="oculto">
     <div class="sucesso-ico">😕</div>
     <div class="sucesso-titulo">Link inválido</div>
-    <div class="sucesso-sub">Este link de avaliação não é válido ou já foi utilizado.</div>
+    <div class="sucesso-sub">Este link não é válido ou já expirou.</div>
   </div>
+
 </div>
 
 <script>
-const SUPA_URL = 'https://dwuhhdxhxveucajhejrk.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dWhoZHhoeHZldWNhamhlanJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjU1NzgsImV4cCI6MjA4OTUwMTU3OH0.aCa2l7V9ScB5LuqGD1B3za0WIKqj7PmtJtIWk7AcyYQ';
-const SUPA = supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA = supabase.createClient(
+  'https://dwuhhdxhxveucajhejrk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dWhoZHhoeHZldWNhamhlanJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjU1NzgsImV4cCI6MjA4OTUwMTU3OH0.aCa2l7V9ScB5LuqGD1B3za0WIKqj7PmtJtIWk7AcyYQ'
+);
 
+const LABELS = ['','😞 Ruim','😐 Regular','🙂 Bom','😄 Muito bom','🤩 Excelente!'];
 let estrelasSelecionadas = 0;
 let dadosServico = null;
 
-// Pegar parâmetros da URL
-const params = new URLSearchParams(window.location.search);
-const uid    = params.get('uid');
-const srvId  = params.get('srv');
+const params  = new URLSearchParams(window.location.search);
+const uid     = params.get('uid');
+const srvId   = params.get('srv');
+
+function mostrar(id){
+  ['tela-loading','tela-form','tela-sucesso','tela-erro'].forEach(t=>{
+    document.getElementById(t).classList.toggle('oculto', t!==id);
+  });
+}
 
 window.onload = async () => {
-  if(!uid || !srvId){
-    mostrarErro(); return;
-  }
+  if(!uid || !srvId){ mostrar('tela-erro'); return; }
 
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('form-avaliar').style.display = 'none';
+  try{
+    // Buscar serviço e nome do PRESTADOR
+    const [{ data: srv }, { data: perfil }] = await Promise.all([
+      SUPA.from('servicos').select('cli, tipo').eq('id', srvId).eq('user_id', uid).single(),
+      SUPA.from('profiles').select('nome, tipo').eq('id', uid).single()
+    ]);
 
-  try {
-    // Buscar dados do serviço
-    const { data: srv } = await SUPA
-      .from('servicos')
-      .select('cli, tipo')
-      .eq('id', srvId)
-      .eq('user_id', uid)
-      .single();
+    if(!srv){ mostrar('tela-erro'); return; }
 
-    if(!srv){ mostrarErro(); return; }
+    dadosServico = { ...srv, prestador: perfil?.nome || 'o profissional' };
 
-    dadosServico = srv;
-    document.getElementById('titulo-srv').textContent = 'Como foi o serviço com ' + srv.cli + '?';
-    document.getElementById('subtitulo-srv').textContent = srv.tipo + ' · Avalie em segundos!';
+    // Preencher textos — cliente avalia o PRESTADOR
+    document.getElementById('txt-prestador').textContent = srv.tipo || 'Serviço realizado';
+    document.getElementById('txt-titulo').textContent    = 'Como foi o serviço de ' + dadosServico.prestador + '?';
+    document.getElementById('txt-sucesso').textContent   = 'Sua avaliação foi enviada para ' + dadosServico.prestador + '. Obrigado!';
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('form-avaliar').style.display = 'block';
+    // Subtitulo com tipo do serviço
+    document.getElementById('txt-sub').textContent = srv.tipo + ' · Sua opinião é muito importante!';
+    mostrar('tela-form');
 
   } catch(e){
-    mostrarErro();
+    mostrar('tela-erro');
   }
 };
 
 function selecionarEstrela(n){
   estrelasSelecionadas = n;
-  document.querySelectorAll('.estrela').forEach((el, i) => {
+  document.querySelectorAll('.estrela').forEach((el,i)=>{
     el.classList.toggle('ativa', i < n);
   });
+  document.getElementById('label-estrela').textContent = LABELS[n] || '';
   document.getElementById('erro-msg').style.display = 'none';
 }
 
@@ -141,37 +151,25 @@ async function enviarAvaliacao(){
     document.getElementById('erro-msg').style.display = 'block';
     return;
   }
-
   const btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
-  const comentario = document.getElementById('comentario').value.trim();
-
-  try {
+  try{
     await SUPA.from('avaliacoes').insert({
       user_id:    uid,
       servico_id: parseInt(srvId),
       cliente:    dadosServico?.cli || '',
       estrelas:   estrelasSelecionadas,
-      comentario: comentario || null
+      comentario: document.getElementById('comentario').value.trim() || null
     });
-
-    document.getElementById('form-avaliar').style.display = 'none';
-    document.getElementById('sucesso').style.display = 'block';
-
+    mostrar('tela-sucesso');
   } catch(e){
     btn.disabled = false;
     btn.textContent = 'Enviar avaliação';
     document.getElementById('erro-msg').textContent = 'Erro ao enviar. Tente novamente.';
     document.getElementById('erro-msg').style.display = 'block';
   }
-}
-
-function mostrarErro(){
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('form-avaliar').style.display = 'none';
-  document.getElementById('erro-geral').style.display = 'block';
 }
 </script>
 </body>
