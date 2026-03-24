@@ -1,26 +1,21 @@
 <!DOCTYPE html>
-<!-- saved from url=(0071)https://feedback-hub-238.preview.emergentagent.com/index_melhorado.html -->
-<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ea580c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AutônomoPro">
-<link rel="manifest" href="https://feedback-hub-238.preview.emergentagent.com/manifest.json">
-<link rel="apple-touch-icon" href="https://feedback-hub-238.preview.emergentagent.com/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>AutônomoPro</title>
-<link href="./AutônomoPro_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<script src="./AutônomoPro_files/jspdf.umd.min.js.transferir"></script>
-<script src="./AutônomoPro_files/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ═══════════════════════════════════════════════════════════════════════════
-   MELHORIAS DE CSS - Design/UI, Acessibilidade, Performance/UX
-   Versão: 5.1 Melhorada
-═══════════════════════════════════════════════════════════════════════════ */
-
 :root{
   --bg:#fafafa;--sur:#fff;--sur2:#f4f4f5;--bor:#e4e4e7;
   --brn:#1a0f0a;--brn2:#2d1810;
@@ -31,51 +26,21 @@
   --pur:#7c3aed;--pur-bg:#ede9fe;
   --txt:#1a0f0a;--mut:#78716c;
   --rad:14px;--shd:0 1px 12px rgba(0,0,0,.06);--shd2:0 4px 24px rgba(0,0,0,.12);
-  /* NOVAS variáveis para transições */
-  --tr-fast:150ms ease;
-  --tr-normal:250ms ease;
-  --tr-slow:350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
 html,body{overflow-x:hidden;max-width:100vw}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased}
-
-/* ═══ MELHORIA: Focus visível para acessibilidade ═══ */
-:focus-visible{outline:2px solid var(--org);outline-offset:2px;border-radius:4px}
-:focus:not(:focus-visible){outline:none}
-
-/* ═══ MELHORIA: Skip link para acessibilidade ═══ */
-.skip-link{position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--brn);color:#fff;padding:10px 20px;border-radius:8px;z-index:9999;font-weight:600;text-decoration:none;transition:top var(--tr-fast)}
-.skip-link:focus{top:10px}
-
-/* ═══ MELHORIA: Animações extras ═══ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes popIn{from{transform:scale(.94) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-.animate-shake{animation:shake .4s ease}
-.animate-pulse{animation:pulse 1.5s ease infinite}
-
-/* ═══ MELHORIA: Loading skeleton ═══ */
-.loading-skeleton{background:linear-gradient(90deg,var(--sur2) 25%,var(--sur) 50%,var(--sur2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px}
-.loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--bor);border-top-color:var(--org);border-radius:50%;animation:spin .8s linear infinite}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
 
 /* SIDEBAR */
-.sidebar{width:252px;background:var(--brn);position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;overflow:hidden;transition:transform var(--tr-slow)}
+.sidebar{width:252px;background:var(--brn);position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;overflow:hidden}
 .logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform var(--tr-fast)}
-.logo-ico:hover{transform:scale(1.05)}
+.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2)}
 .logo-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:#fff}
 .logo-sub{font-size:.65rem;color:rgba(255,255,255,.28);margin-top:1px}
 .nav{flex:1;padding:10px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
 .nav-sec{font-size:.61rem;font-weight:700;color:rgba(255,255,255,.18);text-transform:uppercase;letter-spacing:1.2px;padding:12px 12px 4px}
-.nb{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:500;color:rgba(255,255,255,.42);transition:all var(--tr-fast);border:none;background:none;width:100%;text-align:left}
-.nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.78);transform:translateX(3px)}
+.nb{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:500;color:rgba(255,255,255,.42);transition:all .14s;border:none;background:none;width:100%;text-align:left}
+.nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.78)}
 .nb.on{background:var(--org);color:#fff;font-weight:600}
 .nb .ni{font-size:.9rem;width:18px;text-align:center;flex-shrink:0}
 .notif-badge{background:#ef4444;color:#fff;font-size:.58rem;font-weight:700;padding:2px 5px;border-radius:10px;margin-left:auto;display:none}
@@ -90,59 +55,49 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .pg-sub{font-size:.8rem;color:var(--mut);margin-top:3px}
 .tb-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
-/* ═══ MELHORIA: Botões com microinterações ═══ */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all var(--tr-fast);border:none;white-space:nowrap;position:relative;overflow:hidden}
-.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.15),transparent);opacity:0;transition:opacity var(--tr-fast)}
-.btn:hover::before{opacity:1}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
 .btn-brn{background:var(--brn);color:#fff}.btn-brn:hover{background:var(--brn2)}
-.btn-org{background:var(--org);color:#fff}.btn-org:hover{background:var(--org2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(234,88,12,.35)}
+.btn-org{background:var(--org);color:#fff}.btn-org:hover{background:var(--org2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .btn-gho{background:var(--sur);color:var(--brn2);border:1.5px solid var(--bor)}.btn-gho:hover{border-color:var(--org);color:var(--org)}
-.btn-grn{background:var(--grn);color:#fff}.btn-grn:hover{background:#155c32;transform:translateY(-1px)}
+.btn-grn{background:var(--grn);color:#fff}.btn-grn:hover{background:#155c32}
 .btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#9b2a2a}
-.btn-wpp{background:#25d366;color:#fff}.btn-wpp:hover{background:#1da851;transform:translateY(-1px)}
+.btn-wpp{background:#25d366;color:#fff}.btn-wpp:hover{background:#1da851}
 .btn-pdf{background:var(--blu-bg);color:var(--blu);border:1px solid rgba(29,78,216,.15)}
 .btn-sm{padding:5px 10px;font-size:.76rem}
 .btn-ok{background:var(--grn-bg);color:var(--grn);border:1px solid rgba(26,107,60,.2)}
-.btn-del{background:var(--red-bg);color:var(--red);border:1px solid rgba(184,50,50,.15)}.btn-del:hover{background:var(--red);color:#fff}
-/* Estado de loading no botão */
-.btn.loading{color:transparent;pointer-events:none}
-.btn.loading::after{content:'';position:absolute;width:18px;height:18px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:spin .7s linear infinite}
-.btn-org.loading::after{border-top-color:#fff}
+.btn-del{background:var(--red-bg);color:var(--red);border:1px solid rgba(184,50,50,.15)}
 
-/* ═══ MELHORIA: Stats cards com animação ═══ */
+/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.sc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:16px 15px 13px;box-shadow:var(--shd);position:relative;overflow:hidden;transition:transform var(--tr-fast),box-shadow var(--tr-fast);animation:fadeUp .4s ease backwards}
-.sc:nth-child(1){animation-delay:0ms}.sc:nth-child(2){animation-delay:80ms}.sc:nth-child(3){animation-delay:160ms}.sc:nth-child(4){animation-delay:240ms}
-.sc:hover{transform:translateY(-3px);box-shadow:var(--shd2)}
+.sc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:16px 15px 13px;box-shadow:var(--shd);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s}
+.sc:hover{transform:translateY(-2px);box-shadow:var(--shd2)}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc-c,var(--bor))}
 .sc-ico{font-size:1.3rem;margin-bottom:8px}
 .sc-lbl{font-size:.68rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.sc-val{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;line-height:1;margin-bottom:5px;transition:color var(--tr-fast)}
+.sc-val{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;line-height:1;margin-bottom:5px}
 .sc-hint{font-size:.73rem;color:var(--mut)}
 
 /* PANEL */
-.panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden;animation:fadeUp .4s ease backwards}
+.panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden}
 .ph{padding:13px 18px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bor);background:var(--sur2);flex-wrap:wrap;gap:8px}
 .pt{font-family:'Fraunces',serif;font-size:.93rem;font-weight:600;color:var(--brn)}
 .pb{padding:14px}
 
 /* TABLE */
-.tw{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden;margin-bottom:18px;animation:fadeUp .4s ease backwards}
+.tw{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden;margin-bottom:18px}
 .tw table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .th{padding:13px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bor);background:var(--sur2);flex-wrap:wrap;gap:8px}
 table{width:100%;border-collapse:collapse;font-size:.84rem}
 thead th{padding:8px 14px;text-align:left;font-size:.66rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;background:var(--sur2);border-bottom:1px solid var(--bor)}
-tbody tr{border-bottom:1px solid var(--bor);transition:background var(--tr-fast)}
+tbody tr{border-bottom:1px solid var(--bor);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--org-bg)}
+tbody tr:hover{background:var(--bg)}
 tbody td{padding:9px 14px;vertical-align:middle}
 
 /* BADGES */
-.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:.69rem;font-weight:600;transition:transform var(--tr-fast)}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:.69rem;font-weight:600}
 .badge::before{content:'●';font-size:.4rem}
-.badge:hover{transform:scale(1.05)}
 .b-g{background:var(--grn-bg);color:var(--grn)}
 .b-o{background:var(--org-bg);color:var(--org)}
 .b-r{background:var(--red-bg);color:var(--red)}
@@ -150,39 +105,29 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .b-p{background:var(--pur-bg);color:var(--pur)}
 
 /* PAGES */
-.page{display:none}.page.active{display:block;animation:fadeUp .25s ease}
+.page{display:none}.page.active{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 
 /* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(20,8,0,.52);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:12px;opacity:0;transition:opacity var(--tr-normal)}
-.overlay.open{display:flex;opacity:1}
-.modal{background:var(--sur);border-radius:16px;padding:26px;width:480px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(30,15,0,.22);animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(20,8,0,.52);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:12px}
+.overlay.open{display:flex}
+.modal{background:var(--sur);border-radius:16px;padding:26px;width:480px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(30,15,0,.22);animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
 .modal-lg{width:600px}
+@keyframes popIn{from{transform:scale(.94) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
 .mt{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--brn);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
-.xbtn{width:28px;height:28px;background:var(--sur2);border:none;border-radius:6px;cursor:pointer;color:var(--mut);font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all var(--tr-fast);flex-shrink:0}
-.xbtn:hover{background:var(--red-bg);color:var(--red)}
-
-/* ═══ MELHORIA: Inputs com validação visual ═══ */
+.xbtn{width:28px;height:28px;background:var(--sur2);border:none;border-radius:6px;cursor:pointer;color:var(--mut);font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .14s;flex-shrink:0}
+.xbtn:hover{background:var(--bor)}
 .fg{margin-bottom:11px}
 .fl{display:block;font-size:.73rem;font-weight:700;color:var(--brn2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.fl.required::after{content:' *';color:var(--red)}
-.fi,.fs{width:100%;background:var(--bg);border:1.5px solid var(--bor);border-radius:8px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color var(--tr-fast),box-shadow var(--tr-fast),background var(--tr-fast);appearance:none}
-.fi:hover,.fs:hover{border-color:var(--mut)}
-.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(234,88,12,.12)}
+.fi,.fs{width:100%;background:var(--bg);border:1.5px solid var(--bor);border-radius:8px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
+.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
 .fi::placeholder{color:var(--mut)}
-/* Estados de validação */
-.fi.valid{border-color:var(--grn);background:var(--grn-bg)}
-.fi.invalid{border-color:var(--red);background:var(--red-bg);animation:shake .4s ease}
-.fi.valid:focus{box-shadow:0 0 0 3px rgba(22,163,74,.12)}
-.fi.invalid:focus{box-shadow:0 0 0 3px rgba(220,38,38,.12)}
-/* Mensagem de erro */
-.fi-error{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--red);margin-top:4px;animation:fadeUp .2s ease}
-.fi-success{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--grn);margin-top:4px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mf{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 
 /* SERVIÇO CARD */
-.srv-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color var(--tr-fast),box-shadow var(--tr-fast),transform var(--tr-fast)}
-.srv-card:hover{border-color:var(--org);box-shadow:var(--shd2);transform:translateY(-2px)}
+.srv-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s,box-shadow .2s}
+.srv-card:hover{border-color:var(--org);opacity:.9;box-shadow:var(--shd2)}
 .srv-card.sts-andamento{border-left:4px solid var(--pur)}
 .srv-card.sts-realizado{border-left:4px solid var(--grn)}
 .srv-card.sts-cancelado{border-left:4px solid var(--red);opacity:.6}
@@ -195,8 +140,7 @@ tbody td{padding:9px 14px;vertical-align:middle}
 
 /* MATERIAIS */
 .mat-lista{border:1.5px solid var(--bor);border-radius:9px;overflow:hidden;margin-bottom:10px;min-height:38px}
-.mat-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bor);background:var(--bg);transition:background var(--tr-fast)}
-.mat-row:hover{background:var(--sur2)}
+.mat-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bor);background:var(--bg)}
 .mat-row:last-child{border-bottom:none}
 .mat-desc{font-size:.84rem;font-weight:500;flex:1}
 .mat-val-r{font-family:'Fraunces',serif;font-weight:700;font-size:.87rem;color:var(--red);white-space:nowrap}
@@ -204,18 +148,18 @@ tbody td{padding:9px 14px;vertical-align:middle}
 
 /* SEARCH */
 .search-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.search-inp{flex:1;min-width:180px;background:var(--sur);border:1.5px solid var(--bor);border-radius:9px;padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color var(--tr-fast),box-shadow var(--tr-fast)}
-.search-inp:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(234,88,12,.1)}
+.search-inp{flex:1;min-width:180px;background:var(--sur);border:1.5px solid var(--bor);border-radius:9px;padding:9px 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color .15s}
+.search-inp:focus{border-color:var(--org)}
 
 /* ORC CARD */
-.orc-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:all var(--tr-fast)}
-.orc-card:hover{border-color:var(--org);transform:translateY(-2px);box-shadow:var(--shd2)}
+.orc-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s}
+.orc-card:hover{border-color:var(--org)}
 .orc-item-row{display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0;border-bottom:1px dashed var(--bor)}
 .orc-item-row:last-child{border-bottom:none}
 
 /* AGENDA ROW */
-.ag-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--bor);transition:all var(--tr-fast);margin-bottom:7px;cursor:pointer}
-.ag-row:hover{border-color:var(--org);background:var(--org-bg);transform:translateX(4px)}
+.ag-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--bor);transition:all .14s;margin-bottom:7px;cursor:pointer}
+.ag-row:hover{border-color:var(--org);background:var(--org-bg)}
 .ag-time{font-family:'Fraunces',serif;font-size:.9rem;font-weight:700;color:var(--org);min-width:44px}
 .ag-name{font-weight:600;font-size:.85rem}
 .ag-srv{font-size:.73rem;color:var(--mut);margin-top:1px}
@@ -226,7 +170,6 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .cb{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:height .7s cubic-bezier(.34,1.56,.64,1)}
 .cb.now{background:linear-gradient(180deg,var(--org) 0%,var(--org2) 100%)}
 .cb:not(.now){background:var(--brn);opacity:.13}
-.cb:hover{opacity:1!important}
 
 /* LUCRO BOX */
 .lucro-box{background:linear-gradient(135deg,var(--grn-bg) 0%,#c8eed9 100%);border:1px solid rgba(26,107,60,.2);border-radius:10px;padding:13px;margin:12px 0}
@@ -247,16 +190,14 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .tl{font-size:.86rem;font-weight:600}.ts{font-size:.73rem;color:var(--mut);margin-top:2px}
 .switch{position:relative;width:42px;height:23px;flex-shrink:0}
 .switch input{opacity:0;width:0;height:0;position:absolute}
-.slider{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:23px;transition:var(--tr-normal)}
-.slider:before{content:'';position:absolute;width:17px;height:17px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:var(--tr-normal);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:23px;transition:.28s}
+.slider:before{content:'';position:absolute;width:17px;height:17px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.28s}
 input:checked+.slider{background:var(--org)}
 input:checked+.slider:before{transform:translateX(19px)}
-input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 
 /* NOTIF */
-.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 17px;border-bottom:1px solid var(--bor);cursor:pointer;transition:background var(--tr-fast)}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 17px;border-bottom:1px solid var(--bor);cursor:pointer;transition:background .1s}
 .notif-item:last-child{border-bottom:none}
-.notif-item:hover{background:var(--sur2)}
 .notif-item.unread{background:var(--org-bg)}
 .notif-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
 .notif-title{font-weight:600;font-size:.85rem;margin-bottom:2px}
@@ -264,33 +205,25 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 .notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap}
 
 /* CFG */
-.cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px;animation:fadeUp .3s ease backwards}
+.cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px}
 .cfg-t{font-family:'Fraunces',serif;font-size:.97rem;font-weight:600;color:var(--brn);margin-bottom:13px;display:flex;align-items:center;gap:6px}
 
 /* RELATÓRIO DETALHADO */
 .rel-oculto{display:none!important}
 
-/* ═══ MELHORIA: Toast com tipos ═══ */
-.toast{position:fixed;bottom:22px;right:22px;background:var(--brn);color:#fff;padding:12px 18px;border-radius:10px;font-size:.84rem;font-weight:500;z-index:9999;display:none;box-shadow:0 8px 28px rgba(30,15,0,.26);max-width:320px;animation:slideIn .25s ease;display:flex;align-items:center;gap:10px}
-.toast.show{display:flex}
-.toast.toast-success{background:var(--grn)}
-.toast.toast-error{background:var(--red)}
-.toast.toast-warning{background:var(--org)}
-.toast-icon{font-size:1.1rem}
-.toast-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:2px;font-size:1rem}
-.toast-close:hover{color:#fff}
-
-/* EMPTY */
+/* EMPTY / TOAST */
 .empty{text-align:center;padding:30px 14px;color:var(--mut);font-size:.84rem}
-.empty-ico{font-size:1.8rem;margin-bottom:7px;opacity:.6}
+.empty-ico{font-size:1.8rem;margin-bottom:7px}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--brn);color:#fff;padding:11px 17px;border-radius:10px;font-size:.84rem;font-weight:500;z-index:9999;display:none;box-shadow:0 8px 28px rgba(30,15,0,.26);max-width:300px;animation:slideIn .2s ease}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* MOBILE */
 .mob-bar{display:none}
-.mob-more-menu{display:none;position:fixed;bottom:62px;left:0;right:0;background:var(--brn);border-top:1px solid rgba(255,255,255,.08);z-index:299;padding:9px;gap:6px;animation:fadeUp .2s ease}
+.mob-more-menu{display:none;position:fixed;bottom:62px;left:0;right:0;background:var(--brn);border-top:1px solid rgba(255,255,255,.08);z-index:299;padding:9px;gap:6px}
 .mob-more-menu.open{display:flex;flex-wrap:wrap}
-.mob-more-btn{flex:1;min-width:calc(33.3% - 6px);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:9px;background:rgba(255,255,255,.06);border:none;cursor:pointer;font-size:.68rem;font-weight:600;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif;transition:all var(--tr-fast)}
+.mob-more-btn{flex:1;min-width:calc(33.3% - 6px);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:9px;background:rgba(255,255,255,.06);border:none;cursor:pointer;font-size:.68rem;font-weight:600;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif}
 .mob-more-btn .mi{font-size:1.1rem}
-.mob-more-btn:hover,.mob-more-btn.on{background:var(--org);color:#fff;transform:scale(1.02)}
+.mob-more-btn:hover,.mob-more-btn.on{background:var(--org);color:#fff}
 
 @media(max-width:900px){
   .sidebar{display:none}
@@ -300,46 +233,33 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
   .tb-right{width:100%}
   .tb-right .btn{flex:1;justify-content:center}
   .mob-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--brn);border-top:1px solid rgba(255,255,255,.08);z-index:300;padding:3px 0 env(safe-area-inset-bottom,3px)}
-  .mb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;cursor:pointer;font-size:.58rem;font-weight:600;color:rgba(255,255,255,.38);border:none;background:none;position:relative;font-family:'Plus Jakarta Sans',sans-serif;transition:color var(--tr-fast)}
-  .mb .mi{font-size:1.15rem}.mb.on{color:var(--org)}
+  .mb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;cursor:pointer;font-size:.58rem;font-weight:600;color:rgba(255,255,255,.38);border:none;background:none;position:relative;font-family:'Plus Jakarta Sans',sans-serif}
+  .mb .mi{font-size:1.15rem}.mb.on{color:var(--org2)}
   .mb .mn-dot{position:absolute;top:4px;right:calc(50% - 14px);width:6px;height:6px;background:#ef4444;border-radius:50%;border:1.5px solid var(--brn);display:none}
   .mb .mn-dot.show{display:block}
   .dash-grid{grid-template-columns:1fr!important}
+  /* Oculta colunas menos importantes no mobile */
   .hide-mob{display:none!important}
   table{font-size:.78rem}
   tbody td{padding:7px 10px}
   thead th{padding:7px 10px}
-  .toast{left:12px;right:12px;bottom:80px}
-}
-
-/* ═══ MELHORIA: Suporte a reduced motion ═══ */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-}
-
-/* ═══ MELHORIA: Print styles ═══ */
-@media print{
-  .sidebar,.mob-bar,.toast,.btn{display:none!important}
-  .main{margin:0;padding:20px}
 }
 </style>
 </head>
 <body>
-<!-- Skip link para acessibilidade -->
-<a href="https://feedback-hub-238.preview.emergentagent.com/index_melhorado.html#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
 <!-- BANNER ATUALIZAÇÃO -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--grn);color:#fff;padding:11px 18px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.2);flex-wrap:wrap">
   <div style="display:flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600">
     🔄 Nova versão disponível!
   </div>
-  <button onclick="atualizarApp()" style="background:#fff;color:var(--grn);border:none;border-radius:7px;padding:7px 14px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:&#39;Plus Jakarta Sans&#39;,sans-serif">
+  <button onclick="atualizarApp()" style="background:#fff;color:var(--grn);border:none;border-radius:7px;padding:7px 14px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
     Atualizar agora
   </button>
 </div>
 
 <!-- LOGIN -->
-<div class="welcome-overlay" id="tela-login" style="display: flex;">
+<div class="welcome-overlay" id="tela-login" style="display:none">
   <div class="welcome-box" style="max-width:420px">
     <div class="welcome-ico" id="login-ico">⚡</div>
     <div class="welcome-title">AutônomoPro</div>
@@ -351,7 +271,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
         <label class="fl">Senha</label>
         <div style="position:relative">
           <input class="fi" id="login-senha" type="password" placeholder="Sua senha" style="padding-right:40px">
-          <button onclick="toggleSenha(&#39;login-senha&#39;,this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('login-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--mut);margin-bottom:4px;cursor:pointer">
@@ -370,7 +290,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
         <label class="fl">Senha</label>
         <div style="position:relative">
           <input class="fi" id="cad-senha" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
-          <button onclick="toggleSenha(&#39;cad-senha&#39;,this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('cad-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
         </div>
       </div>
       <div class="fg" style="text-align:left"><label class="fl">O que você faz?</label><input class="fi" id="cad-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
@@ -390,7 +310,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
         <label class="fl">Nova senha</label>
         <div style="position:relative">
           <input class="fi" id="nova-senha-inp" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
-          <button onclick="toggleSenha(&#39;nova-senha-inp&#39;,this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('nova-senha-inp',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
         </div>
       </div>
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="salvarNovaSenha()">✅ Salvar nova senha</button>
@@ -416,47 +336,47 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <div style="display:flex;min-height:100vh">
 
 <!-- SIDEBAR -->
-<aside class="sidebar" style="display: none;">
+<aside class="sidebar">
   <div class="logo">
     <div class="logo-ico">⚡</div>
     <div><div class="logo-name" id="logo-nome">AutônomoPro</div><div class="logo-sub" id="sb-tipo">Gestão de Serviços</div></div>
   </div>
   <nav class="nav">
     <div class="nav-sec">Principal</div>
-    <button class="nb on" onclick="ir(&#39;dashboard&#39;,this)"><span class="ni">🏠</span>Início</button>
-    <button class="nb" onclick="ir(&#39;servicos&#39;,this)"><span class="ni">🔧</span>Serviços</button>
+    <button class="nb on" onclick="ir('dashboard',this)"><span class="ni">🏠</span>Início</button>
+    <button class="nb" onclick="ir('servicos',this)"><span class="ni">🔧</span>Serviços</button>
     <div class="nav-sec">Financeiro</div>
-    <button class="nb" onclick="ir(&#39;recebimentos&#39;,this)"><span class="ni">💵</span>Recebimentos</button>
-    <button class="nb" onclick="ir(&#39;despesas&#39;,this)"><span class="ni">💸</span>Despesas</button>
-    <button class="nb" onclick="ir(&#39;clientes&#39;,this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
-    <button class="nb" id="nav-produtos" style="display:none" onclick="ir(&#39;produtos&#39;,this)"><span class="ni">🛍️</span>Produtos</button>
-    <button class="nb" id="nav-materiais" style="display:none" onclick="ir(&#39;materiais&#39;,this)"><span class="ni">📦</span>Materiais</button>
-    <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir(&#39;ajudantes&#39;,this)"><span class="ni">👷</span>Ajudantes</button>
+    <button class="nb" onclick="ir('recebimentos',this)"><span class="ni">💵</span>Recebimentos</button>
+    <button class="nb" onclick="ir('despesas',this)"><span class="ni">💸</span>Despesas</button>
+    <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
+    <button class="nb" id="nav-produtos" style="display:none" onclick="ir('produtos',this)"><span class="ni">🛍️</span>Produtos</button>
+    <button class="nb" id="nav-materiais" style="display:none" onclick="ir('materiais',this)"><span class="ni">📦</span>Materiais</button>
+    <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni">👷</span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
-    <button class="nb" onclick="ir(&#39;orcamentos&#39;,this)"><span class="ni">📋</span>Orçamentos</button>
+    <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
     <div class="nav-sec">Análise</div>
-    <button class="nb" onclick="ir(&#39;relatorio&#39;,this)"><span class="ni">📊</span>Relatórios</button>
-    <button class="nb" onclick="ir(&#39;notificacoes&#39;,this)"><span class="ni">🔔</span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
+    <button class="nb" onclick="ir('relatorio',this)"><span class="ni">📊</span>Relatórios</button>
+    <button class="nb" onclick="ir('notificacoes',this)"><span class="ni">🔔</span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
     <div class="nav-sec">Conta</div>
-    <button class="nb" onclick="ir(&#39;perfil&#39;,this)"><span class="ni">👤</span>Meu Perfil</button>
-    <button class="nb" onclick="ir(&#39;config&#39;,this)"><span class="ni">⚙️</span>Configurações</button>
+    <button class="nb" onclick="ir('perfil',this)"><span class="ni">👤</span>Meu Perfil</button>
+    <button class="nb" onclick="ir('config',this)"><span class="ni">⚙️</span>Configurações</button>
   </nav>
   <div class="sfoot">AutônomoPro v5.0<br><span id="sb-nome" style="color:rgba(255,255,255,.35)">Dados locais</span></div>
 </aside>
 
 <!-- MAIN CONTENT -->
-<main class="main" style="display: none;">
+<main class="main">
 
   <!-- DASHBOARD -->
   <div class="page active" id="pg-dashboard">
     <div class="topbar">
       <div>
-        <div class="pg-title" id="dash-ola" tabindex="-1"><span id="main-content"></span></div>
-        <div class="pg-sub" id="data-hoje">terça-feira, 24 de março de 2026</div>
+        <div class="pg-title" id="dash-ola"></div>
+        <div class="pg-sub" id="data-hoje"></div>
       </div>
       <div class="tb-right">
         <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
-        <button class="btn btn-gho" onclick="ir(&#39;perfil&#39;)">👤 Perfil</button>
+        <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
         <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
       </div>
     </div>
@@ -486,7 +406,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 
     <div style="display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-bottom:18px" class="dash-grid">
       <div class="panel">
-        <div class="ph"><div class="pt">🗓 Serviços de Hoje</div><button class="btn btn-gho btn-sm" onclick="ir(&#39;servicos&#39;)">Ver todos</button></div>
+        <div class="ph"><div class="pt">🗓 Serviços de Hoje</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
         <div class="pb" id="dash-hoje"></div>
       </div>
       <div class="panel">
@@ -504,11 +424,11 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
         <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">📈 Progresso do mês</div>
         <div id="dash-meta-txt" style="font-size:.9rem;font-weight:600;color:var(--brn)"></div>
       </div>
-      <div id="dash-meta-pct" style="font-family:&#39;Fraunces&#39;,serif;font-size:1.4rem;font-weight:700;color:var(--grn)"></div>
+      <div id="dash-meta-pct" style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--grn)"></div>
     </div>
 
     <div class="tw">
-      <div class="th"><div class="pt">🔧 Últimos serviços</div><button class="btn btn-gho btn-sm" onclick="ir(&#39;servicos&#39;)">Ver todos</button></div>
+      <div class="th"><div class="pt">🔧 Últimos serviços</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
       <table><thead><tr><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Data</th><th>Valor</th><th>Status</th><th class="hide-mob">Pagamento</th></tr></thead>
       <tbody id="tb-dash"></tbody></table>
     </div>
@@ -555,7 +475,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
   <div class="page" id="pg-clientes">
     <div class="topbar">
       <div><div class="pg-title">Clientes</div><div class="pg-sub">Base de clientes cadastrados</div></div>
-      <div class="tb-right"><button class="btn btn-org" onclick="abre(&#39;m-cli&#39;)">+ Novo cliente</button></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-cli')">+ Novo cliente</button></div>
     </div>
     <div class="tw">
       <table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Serviço</th><th>Total gasto</th><th>Último atend.</th><th></th></tr></thead>
@@ -567,7 +487,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
   <div class="page" id="pg-despesas">
     <div class="topbar">
       <div><div class="pg-title">Despesas</div><div class="pg-sub">Controle seus gastos operacionais</div></div>
-      <div class="tb-right"><button class="btn btn-org" onclick="abre(&#39;m-desp&#39;)">+ Nova despesa</button></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="abre('m-desp')">+ Nova despesa</button></div>
     </div>
     <div class="stats" style="grid-template-columns:repeat(3,1fr)">
       <div class="sc" style="--sc-c:var(--red)"><div class="sc-lbl">Total do mês</div><div class="sc-val" id="desp-tot">R$ 0,00</div></div>
@@ -609,17 +529,10 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
       <button class="btn btn-gho btn-sm" onclick="relMesAtual()">Mês atual</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:18px">
-      <button id="btn-rel-resumido" class="btn btn-brn btn-sm" onclick="setModoRel(&#39;resumido&#39;)">📄 Resumido</button>
-      <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel(&#39;detalhado&#39;)">📋 Detalhado</button>
+      <button id="btn-rel-resumido" class="btn btn-brn btn-sm" onclick="setModoRel('resumido')">📄 Resumido</button>
+      <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel('detalhado')">📋 Detalhado</button>
     </div>
-    <div id="rel-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
-    <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido</div><div class="sc-val">R$ 0,00</div><div class="sc-hint">0 pagos</div></div>
-    <div class="sc" style="--sc-c:var(--red)"><div class="sc-lbl">Custos materiais</div><div class="sc-val" style="color:var(--red)">R$ 0,00</div><div class="sc-hint">dos serviços</div></div>
-    <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Despesas</div><div class="sc-val" style="color:var(--org)">R$ 0,00</div><div class="sc-hint">operacionais</div></div>
-    <div class="sc" style="--sc-c:var(--pur)"><div class="sc-lbl">Lucro real</div><div class="sc-val" style="color:var(--grn)">R$ 0,00</div><div class="sc-hint">receita − tudo</div></div>
-    <div class="sc" style="--sc-c:var(--blu)"><div class="sc-lbl">Serviços</div><div class="sc-val">0</div><div class="sc-hint">0 realizados</div></div>
-    <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Ticket médio</div><div class="sc-val">R$ 0,00</div><div class="sc-hint">por serviço pago</div></div>
-  </div>
+    <div id="rel-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>
     <div id="rel-detalhado-body" class="rel-oculto"></div>
   </div>
 
@@ -634,9 +547,9 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     </div>
     <div class="cfg-sec" style="margin-bottom:18px">
       <div class="cfg-t">⚙️ Configurar alertas</div>
-      <div class="toggle-row"><div><div class="tl">Lembrete de agendamento</div><div class="ts">1 hora antes do serviço</div></div><label class="switch"><input type="checkbox" id="tog-ag" checked="" onchange="salvarCfg()"><span class="slider"></span></label></div>
-      <div class="toggle-row"><div><div class="tl">Resumo diário</div><div class="ts">Todo dia às 8h</div></div><label class="switch"><input type="checkbox" id="tog-res" checked="" onchange="salvarCfg()"><span class="slider"></span></label></div>
-      <div class="toggle-row"><div><div class="tl">Cobrança pendente</div><div class="ts">Avisar sobre pagamentos em aberto às 9h</div></div><label class="switch"><input type="checkbox" id="tog-cob" checked="" onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div class="toggle-row"><div><div class="tl">Lembrete de agendamento</div><div class="ts">1 hora antes do serviço</div></div><label class="switch"><input type="checkbox" id="tog-ag" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div class="toggle-row"><div><div class="tl">Resumo diário</div><div class="ts">Todo dia às 8h</div></div><label class="switch"><input type="checkbox" id="tog-res" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
+      <div class="toggle-row"><div><div class="tl">Cobrança pendente</div><div class="ts">Avisar sobre pagamentos em aberto às 9h</div></div><label class="switch"><input type="checkbox" id="tog-cob" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bor)">
         <button class="btn btn-gho btn-sm" onclick="testarNotif()">🧪 Testar notificação</button>
       </div>
@@ -674,7 +587,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           <div class="tl">🛍️ Produtos e estoque</div>
           <div class="ts">Controle estoque, custo e vendas de produtos</div>
         </div>
-        <label class="switch"><input type="checkbox" id="mod-produtos" onchange="salvarModulo(&#39;produtos&#39;,this.checked)"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="mod-produtos" onchange="salvarModulo('produtos',this.checked)"><span class="slider"></span></label>
       </div>
 
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Estoque</div>
@@ -683,7 +596,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           <div class="tl">📦 Estoque de materiais</div>
           <div class="ts">Controle materiais e desconte ao finalizar serviço</div>
         </div>
-        <label class="switch"><input type="checkbox" id="mod-materiais" onchange="salvarModulo(&#39;materiais&#39;,this.checked)"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="mod-materiais" onchange="salvarModulo('materiais',this.checked)"><span class="slider"></span></label>
       </div>
 
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipe</div>
@@ -692,7 +605,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           <div class="tl">👷 Comissão de ajudantes</div>
           <div class="ts">Controle dias trabalhados e valores a pagar</div>
         </div>
-        <label class="switch"><input type="checkbox" id="mod-ajudantes" onchange="salvarModulo(&#39;ajudantes&#39;,this.checked)"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="mod-ajudantes" onchange="salvarModulo('ajudantes',this.checked)"><span class="slider"></span></label>
       </div>
 
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Documentos</div>
@@ -701,7 +614,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           <div class="tl">🧾 Contrato digital</div>
           <div class="ts">Gera contrato em PDF com dados do serviço</div>
         </div>
-        <label class="switch"><input type="checkbox" id="mod-contrato" onchange="salvarModulo(&#39;contrato&#39;,this.checked)"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="mod-contrato" onchange="salvarModulo('contrato',this.checked)"><span class="slider"></span></label>
       </div>
 
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Relacionamento</div>
@@ -710,7 +623,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           <div class="tl">⭐ Avaliações de clientes</div>
           <div class="ts">Receba avaliações via link pelo WhatsApp</div>
         </div>
-        <label class="switch"><input type="checkbox" id="mod-avaliacoes" onchange="salvarModulo(&#39;avaliacoes&#39;,this.checked)"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="mod-avaliacoes" onchange="salvarModulo('avaliacoes',this.checked)"><span class="slider"></span></label>
       </div>
     </div>
 
@@ -719,11 +632,11 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
       <div id="avaliacoes-resumo" style="background:var(--org-bg);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:.72rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Média geral</div>
-          <div style="font-family:&#39;Fraunces&#39;,serif;font-size:1.6rem;font-weight:700;color:var(--org)" id="aval-media">—</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--org)" id="aval-media">—</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:.72rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total</div>
-          <div style="font-family:&#39;Fraunces&#39;,serif;font-size:1.6rem;font-weight:700;color:var(--brn)" id="aval-total">0</div>
+          <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--brn)" id="aval-total">0</div>
         </div>
       </div>
       <div id="avaliacoes-lista">
@@ -766,7 +679,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
   <!-- Modal Novo Material -->
 <div class="overlay" id="m-material">
   <div class="modal">
-    <div class="mt" id="m-material-titulo">📦 Novo Material <button class="xbtn" onclick="fecha(&#39;m-material&#39;)">✕</button></div>
+    <div class="mt" id="m-material-titulo">📦 Novo Material <button class="xbtn" onclick="fecha('m-material')">✕</button></div>
     <input type="hidden" id="mat-edit-idx" value="-1">
     <div class="fg"><label class="fl">Nome do material</label><input class="fi" id="mat-nome" placeholder="Ex: Tinta 18L, parafuso, cimento..."></div>
     <div class="frow">
@@ -785,7 +698,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     </div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarMaterial()">✅ Salvar</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-material&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-material')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -793,7 +706,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Modal Novo Produto -->
 <div class="overlay" id="m-produto">
   <div class="modal">
-    <div class="mt">🛍️ Novo Produto <button class="xbtn" onclick="fecha(&#39;m-produto&#39;)">✕</button></div>
+    <div class="mt">🛍️ Novo Produto <button class="xbtn" onclick="fecha('m-produto')">✕</button></div>
     <input type="hidden" id="prod-edit-idx" value="-1">
     <div class="fg"><label class="fl">Nome do produto</label><input class="fi" id="prod-nome" placeholder="Ex: Livro personalizado, caderno..."></div>
     <div class="frow">
@@ -804,12 +717,12 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     <div id="prod-lucro-box" style="display:none;background:var(--grn-bg);border-radius:10px;padding:12px 14px;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;font-size:.85rem">
         <span style="color:var(--mut)">Lucro por unidade</span>
-        <span id="prod-lucro-val" style="font-weight:700;color:var(--grn);font-family:&#39;Fraunces&#39;,serif"></span>
+        <span id="prod-lucro-val" style="font-weight:700;color:var(--grn);font-family:'Fraunces',serif"></span>
       </div>
     </div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarProduto()">✅ Salvar produto</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-produto&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-produto')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -817,7 +730,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Modal Vender Produto -->
 <div class="overlay" id="m-vender">
   <div class="modal">
-    <div class="mt">💰 Registrar venda <button class="xbtn" onclick="fecha(&#39;m-vender&#39;)">✕</button></div>
+    <div class="mt">💰 Registrar venda <button class="xbtn" onclick="fecha('m-vender')">✕</button></div>
     <input type="hidden" id="vender-idx">
     <div id="vender-info" style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.88rem;color:var(--mut)"></div>
     <div class="fg"><label class="fl">Quantidade vendida</label><input class="fi" type="number" id="vender-qtd" placeholder="1" min="1" value="1"></div>
@@ -828,7 +741,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     </div>
     <div class="mf">
       <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="confirmarVenda()">✅ Confirmar venda</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-vender&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-vender')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -849,7 +762,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
       <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados para a nuvem</div>
       <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Detectamos dados salvos localmente no seu dispositivo. Deseja migrar para a nuvem agora?</p>
       <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
-      <button class="btn btn-gho" onclick="document.getElementById(&#39;migracao-box&#39;).style.display=&#39;none&#39;" style="margin-top:8px">Ignorar</button>
+      <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
     </div>
     <div class="cfg-sec">
       <div class="cfg-t" style="color:var(--red)">⚠️ Zona de perigo</div>
@@ -870,23 +783,23 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 </div>
 
 <!-- MOBILE BAR -->
-<div class="mob-bar" style="display: none;">
-  <button class="mb on" onclick="ir(&#39;dashboard&#39;,this)"><span class="mi">🏠</span>Início</button>
-  <button class="mb" onclick="ir(&#39;servicos&#39;,this)"><span class="mi">🔧</span>Serviços</button>
-  <button class="mb" onclick="ir(&#39;orcamentos&#39;,this)"><span class="mi">📋</span>Orçam.</button>
-  <button class="mb" onclick="ir(&#39;recebimentos&#39;,this)"><span class="mi">💵</span>Receb.</button>
+<div class="mob-bar">
+  <button class="mb on" onclick="ir('dashboard',this)"><span class="mi">🏠</span>Início</button>
+  <button class="mb" onclick="ir('servicos',this)"><span class="mi">🔧</span>Serviços</button>
+  <button class="mb" onclick="ir('orcamentos',this)"><span class="mi">📋</span>Orçam.</button>
+  <button class="mb" onclick="ir('recebimentos',this)"><span class="mi">💵</span>Receb.</button>
   <button class="mb" id="mb-mais" onclick="toggleMais()"><span class="mi">☰</span>Mais<span class="mn-dot" id="mob-dot"></span></button>
 </div>
 <div class="mob-more-menu" id="mob-more">
-  <button class="mob-more-btn" onclick="ir(&#39;clientes&#39;);fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
-  <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir(&#39;produtos&#39;);fecharMais()"><span class="mi">🛍️</span>Produtos</button>
-  <button class="mob-more-btn" id="mob-materiais" style="display:none" onclick="ir(&#39;materiais&#39;);fecharMais()"><span class="mi">📦</span>Materiais</button>
-  <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir(&#39;ajudantes&#39;);fecharMais()"><span class="mi">👷</span>Ajudantes</button>
-  <button class="mob-more-btn" onclick="ir(&#39;despesas&#39;);fecharMais()"><span class="mi">💸</span>Despesas</button>
-  <button class="mob-more-btn" onclick="ir(&#39;relatorio&#39;);fecharMais()"><span class="mi">📊</span>Relatórios</button>
-  <button class="mob-more-btn" onclick="ir(&#39;notificacoes&#39;);fecharMais()"><span class="mi">🔔</span>Notificações</button>
-  <button class="mob-more-btn" onclick="ir(&#39;perfil&#39;);fecharMais()"><span class="mi">👤</span>Perfil</button>
-  <button class="mob-more-btn" onclick="ir(&#39;config&#39;);fecharMais()"><span class="mi">⚙️</span>Config</button>
+  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
+  <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir('produtos');fecharMais()"><span class="mi">🛍️</span>Produtos</button>
+  <button class="mob-more-btn" id="mob-materiais" style="display:none" onclick="ir('materiais');fecharMais()"><span class="mi">📦</span>Materiais</button>
+  <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir('ajudantes');fecharMais()"><span class="mi">👷</span>Ajudantes</button>
+  <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
+  <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
+  <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
+  <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi">👤</span>Perfil</button>
+  <button class="mob-more-btn" onclick="ir('config');fecharMais()"><span class="mi">⚙️</span>Config</button>
 </div>
 
 <!-- ═══ MODAIS ═══ -->
@@ -894,7 +807,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Converter Orçamento em Serviço -->
 <div class="overlay" id="m-conv-orc">
   <div class="modal">
-    <div class="mt">✅ Converter em Serviço <button class="xbtn" onclick="fecha(&#39;m-conv-orc&#39;)">✕</button></div>
+    <div class="mt">✅ Converter em Serviço <button class="xbtn" onclick="fecha('m-conv-orc')">✕</button></div>
     <input type="hidden" id="conv-orc-idx">
     <div style="background:var(--grn-bg);border:1px solid rgba(26,107,60,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.84rem">
       <div id="conv-orc-preview" style="color:var(--brn)"></div>
@@ -905,7 +818,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     </div>
     <div class="mf">
       <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="converterOrcSrv()">✅ Criar serviço agendado</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-conv-orc&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-conv-orc')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -913,7 +826,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Nova Despesa -->
 <div class="overlay" id="m-desp">
   <div class="modal">
-    <div class="mt">💸 Nova Despesa <button class="xbtn" onclick="fecha(&#39;m-desp&#39;)">✕</button></div>
+    <div class="mt">💸 Nova Despesa <button class="xbtn" onclick="fecha('m-desp')">✕</button></div>
     <input type="hidden" id="desp-edit-idx" value="-1">
 
     <div class="fg">
@@ -967,7 +880,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
           </div>
           <div class="fg">
             <label class="fl">Valor por parcela</label>
-            <input class="fi" id="desp-vparc" placeholder="R$ 0,00" readonly="" style="color:var(--grn);font-weight:700">
+            <input class="fi" id="desp-vparc" placeholder="R$ 0,00" readonly style="color:var(--grn);font-weight:700">
           </div>
         </div>
       </div>
@@ -975,7 +888,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarDesp()">✅ Salvar despesa</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-desp&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-desp')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -983,7 +896,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Novo Serviço -->
 <div class="overlay" id="m-srv">
   <div class="modal">
-    <div class="mt">🔧 Novo Serviço <button class="xbtn" onclick="fecha(&#39;m-srv&#39;)">✕</button></div>
+    <div class="mt">🔧 Novo Serviço <button class="xbtn" onclick="fecha('m-srv')">✕</button></div>
     <div class="frow">
       <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="s-dt"></div>
       <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="s-hr"></div>
@@ -1010,13 +923,13 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
       <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">💰 Pagamento em etapas</div>
       <div class="frow">
         <div class="fg"><label class="fl">Entrada (R$)</label><input class="fi" type="number" id="s-entrada" placeholder="0,00" min="0" step="0.01" oninput="calcSaldo()"></div>
-        <div class="fg"><label class="fl">Saldo restante</label><input class="fi" id="s-saldo" readonly="" style="color:var(--org);font-weight:700"></div>
+        <div class="fg"><label class="fl">Saldo restante</label><input class="fi" id="s-saldo" readonly style="color:var(--org);font-weight:700"></div>
       </div>
     </div>
 
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()">✅ Agendar serviço</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-srv&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-srv')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1024,7 +937,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Finalizar Serviço -->
 <div class="overlay" id="m-fin-srv">
   <div class="modal modal-lg">
-    <div class="mt">⏹️ Finalizar Serviço <button class="xbtn" onclick="fecha(&#39;m-fin-srv&#39;)">✕</button></div>
+    <div class="mt">⏹️ Finalizar Serviço <button class="xbtn" onclick="fecha('m-fin-srv')">✕</button></div>
     <input type="hidden" id="fin-idx">
 
     <div class="fg">
@@ -1055,7 +968,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     <div class="lucro-box" id="fin-lucro-box">
       <div class="lucro-row"><span style="color:var(--mut)">Valor cobrado</span><span id="fin-val-show" style="color:var(--grn);font-weight:700">R$ 0,00</span></div>
       <div class="lucro-row"><span style="color:var(--mut)">(−) Custos materiais</span><span id="fin-custo-show" style="color:var(--red);font-weight:700">R$ 0,00</span></div>
-      <div class="lucro-row"><span>Lucro líquido</span><span id="fin-lucro-show" style="font-family:&#39;Fraunces&#39;,serif;font-size:1.15rem;color:var(--grn)">R$ 0,00</span></div>
+      <div class="lucro-row"><span>Lucro líquido</span><span id="fin-lucro-show" style="font-family:'Fraunces',serif;font-size:1.15rem;color:var(--grn)">R$ 0,00</span></div>
     </div>
 
     <!-- Desconto de estoque — aparece só se módulo ativo -->
@@ -1079,7 +992,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     </div>
     <div class="mf">
       <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="finalizarSrv()">✅ Finalizar serviço</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-fin-srv&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-fin-srv')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1087,15 +1000,15 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- WhatsApp mensagens -->
 <div class="overlay" id="m-wpp">
   <div class="modal">
-    <div class="mt">📱 Avisar Cliente <button class="xbtn" onclick="fecha(&#39;m-wpp&#39;)">✕</button></div>
+    <div class="mt">📱 Avisar Cliente <button class="xbtn" onclick="fecha('m-wpp')">✕</button></div>
     <input type="hidden" id="wpp-idx">
     <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px">Escolha a mensagem para enviar:</p>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp(&#39;deslocamento&#39;)">🚗 Estou a caminho!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp(&#39;chegada&#39;)">📍 Cheguei no local!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp(&#39;atraso&#39;)">⏰ Vou me atrasar</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp(&#39;concluido&#39;)">✅ Serviço concluído!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp(&#39;cobranca&#39;)">💰 Lembrete de pagamento</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('deslocamento')">🚗 Estou a caminho!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('chegada')">📍 Cheguei no local!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('atraso')">⏰ Vou me atrasar</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('concluido')">✅ Serviço concluído!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('cobranca')">💰 Lembrete de pagamento</button>
     </div>
   </div>
 </div>
@@ -1103,17 +1016,17 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Relatório do serviço -->
 <div class="overlay" id="m-rel-srv">
   <div class="modal modal-lg">
-    <div class="mt">📄 Relatório do Serviço <button class="xbtn" onclick="fecha(&#39;m-rel-srv&#39;)">✕</button></div>
+    <div class="mt">📄 Relatório do Serviço <button class="xbtn" onclick="fecha('m-rel-srv')">✕</button></div>
     <input type="hidden" id="rel-srv-idx">
     <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;background:var(--org-bg);border:1.5px solid var(--org-bg);border-radius:9px;padding:10px 14px;font-size:.86rem;font-weight:600;color:var(--brn2)">
-      <input type="checkbox" id="rel-srv-desp" onchange="abrirRelSrv(document.getElementById(&#39;rel-srv-idx&#39;).value)" style="accent-color:var(--org);width:16px;height:16px">
+      <input type="checkbox" id="rel-srv-desp" onchange="abrirRelSrv(document.getElementById('rel-srv-idx').value)" style="accent-color:var(--org);width:16px;height:16px">
       💸 Incluir despesas e custos no relatório
     </label>
     <div id="rel-srv-preview"></div>
     <div class="mf">
       <button class="btn btn-pdf" onclick="pdfRelSrv()">📄 Baixar PDF</button>
       <button class="btn btn-wpp" onclick="wppRelSrv()">📱 Enviar WhatsApp</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-rel-srv&#39;)">Fechar</button>
+      <button class="btn btn-gho" onclick="fecha('m-rel-srv')">Fechar</button>
     </div>
   </div>
 </div>
@@ -1121,14 +1034,14 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Cliente -->
 <div class="overlay" id="m-cli">
   <div class="modal">
-    <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha(&#39;m-cli&#39;)">✕</button></div>
+    <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="c-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="c-wpp" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Tipo de serviço..."></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="c-end" placeholder="Endereço principal"></div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarCli()">✅ Salvar</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-cli&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-cli')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1136,7 +1049,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Editar Cliente -->
 <div class="overlay" id="m-edit-cli">
   <div class="modal">
-    <div class="mt">✏️ Editar Cliente <button class="xbtn" onclick="fecha(&#39;m-edit-cli&#39;)">✕</button></div>
+    <div class="mt">✏️ Editar Cliente <button class="xbtn" onclick="fecha('m-edit-cli')">✕</button></div>
     <input type="hidden" id="edit-cli-idx">
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="edit-cli-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-cli-wpp" placeholder="(11) 99999-9999"></div>
@@ -1144,7 +1057,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="edit-cli-end" placeholder="Endereço principal"></div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarEditCli()">✅ Salvar alterações</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-edit-cli&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-edit-cli')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1152,7 +1065,7 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
 <!-- Orçamento -->
 <div class="overlay" id="m-orc">
   <div class="modal modal-lg">
-    <div class="mt" id="m-orc-titulo">📋 Novo Orçamento <button class="xbtn" onclick="fecha(&#39;m-orc&#39;)">✕</button></div>
+    <div class="mt" id="m-orc-titulo">📋 Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
     <input type="hidden" id="orc-edit-idx" value="-1">
     <div class="frow">
       <div class="fg"><label class="fl">Cliente</label><input class="fi" id="o-cli" placeholder="Nome do cliente" list="dl-o"><datalist id="dl-o"></datalist></div>
@@ -1172,13 +1085,13 @@ input:focus-visible+.slider{outline:2px solid var(--org);outline-offset:2px}
       </div>
       <div style="margin-top:10px;padding:11px 13px;background:var(--grn-bg);border-radius:9px;display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;font-size:.87rem">Total do orçamento:</span>
-        <span id="orc-total-prev" style="font-family:&#39;Fraunces&#39;,serif;font-weight:700;color:var(--grn);font-size:1.15rem">R$ 0,00</span>
+        <span id="orc-total-prev" style="font-family:'Fraunces',serif;font-weight:700;color:var(--grn);font-size:1.15rem">R$ 0,00</span>
       </div>
     </div>
     <div class="fg"><label class="fl">Observações</label><input class="fi" id="o-obs" placeholder="Prazo, condições, materiais inclusos..."></div>
     <div class="mf">
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
-      <button class="btn btn-gho" onclick="fecha(&#39;m-orc&#39;)">Cancelar</button>
+      <button class="btn btn-gho" onclick="fecha('m-orc')">Cancelar</button>
     </div>
   </div>
 </div>
@@ -4158,7 +4071,5 @@ function toast(msg){
   tT = setTimeout(()=>el.style.display='none', 3200);
 }
 </script>
-<script defer="" src="./AutônomoPro_files/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;7f7b0fd8732c4326aae4b9d58d5c514a&quot;,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
-
-
-</body></html>
+</body>
+</html>
