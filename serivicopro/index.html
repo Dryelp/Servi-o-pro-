@@ -1626,8 +1626,7 @@ async function sbSalvarPerfil(){
 
 async function sbSalvarServico(srv){
   if(!USER_ID) return null;
-  const { data, error } = await SUPA.from('servicos').upsert({
-    id: srv._dbid || undefined,
+  const payload = {
     user_id: USER_ID,
     dt: srv.dt, hr: srv.hr||null, cli: srv.cli, tipo: srv.tipo,
     end_: srv.end||null, val: srv.val||0, prazo: srv.prazo||null,
@@ -1635,7 +1634,14 @@ async function sbSalvarServico(srv){
     sts_srv: srv.sts_srv, sts_pag: srv.sts_pag||null, pag: srv.pag||null,
     materiais: srv.materiais||[], desc_feito: srv.desc_feito||null,
     inicio: srv.inicio||null, fim: srv.fim||null
-  }).select().single();
+  };
+  let q;
+  if(srv._dbid){
+    q = SUPA.from('servicos').update(payload).eq('id', srv._dbid).eq('user_id', USER_ID);
+  } else {
+    q = SUPA.from('servicos').insert(payload);
+  }
+  const { data, error } = await q.select().single();
   if(error){ console.error('Erro servico:', error); return null; }
   return data;
 }
@@ -1651,8 +1657,13 @@ async function sbSalvarCliente(cli){
     user_id: USER_ID, nm: cli.nm, wpp: cli.wpp||null,
     srv: cli.srv||null, end_: cli.end||null
   };
-  if(cli._dbid) payload.id = cli._dbid;
-  const { data, error } = await SUPA.from('clientes').upsert(payload).select().single();
+  let q;
+  if(cli._dbid){
+    q = SUPA.from('clientes').update(payload).eq('id', cli._dbid).eq('user_id', USER_ID);
+  } else {
+    q = SUPA.from('clientes').insert(payload);
+  }
+  const { data, error } = await q.select().single();
   if(error){ console.error('Erro cliente:', error); return null; }
   return data;
 }
@@ -1669,8 +1680,13 @@ async function sbSalvarOrcamento(orc){
     descricao: orc.desc||null, valid: orc.valid||null,
     obs: orc.obs||null, itens: orc.itens||[], sts: orc.sts
   };
-  if(orc._dbid) payload.id = orc._dbid;
-  const { data, error } = await SUPA.from('orcamentos').upsert(payload).select().single();
+  let q;
+  if(orc._dbid){
+    q = SUPA.from('orcamentos').update(payload).eq('id', orc._dbid).eq('user_id', USER_ID);
+  } else {
+    q = SUPA.from('orcamentos').insert(payload);
+  }
+  const { data, error } = await q.select().single();
   if(error){ console.error('Erro orcamento:', error); return null; }
   return data;
 }
@@ -1688,8 +1704,13 @@ async function sbSalvarDespesa(desp){
     parcela: desp.parcela||null, total_parcelas: desp.totalParcelas||null,
     grupo: desp.grupo||null
   };
-  if(desp._dbid) payload.id = desp._dbid;
-  const { data, error } = await SUPA.from('despesas').upsert(payload).select().single();
+  let q;
+  if(desp._dbid){
+    q = SUPA.from('despesas').update(payload).eq('id', desp._dbid).eq('user_id', USER_ID);
+  } else {
+    q = SUPA.from('despesas').insert(payload);
+  }
+  const { data, error } = await q.select().single();
   if(error){ console.error('Erro despesa:', error); return null; }
   return data;
 }
@@ -3551,11 +3572,11 @@ async function salvarMaterial(){
     D.materiais.push(mat);
   }
 
-  const { data } = await SUPA.from('materiais_estoque').upsert({
-    id: mat._dbid||undefined,
-    user_id: USER_ID, nome, unidade,
-    quantidade: qtd, custo_unitario: custo, estoque_minimo: minimo
-  }).select().single();
+  const payload_mat = { user_id: USER_ID, nome, unidade, quantidade: qtd, custo_unitario: custo, estoque_minimo: minimo };
+  let q_mat;
+  if(mat._dbid){ q_mat = SUPA.from('materiais_estoque').update(payload_mat).eq('id', mat._dbid).eq('user_id', USER_ID); }
+  else { q_mat = SUPA.from('materiais_estoque').insert(payload_mat); }
+  const { data } = await q_mat.select().single();
   if(data && idx < 0) D.materiais[D.materiais.length-1]._dbid = data.id;
 
   fecha('m-material');
@@ -3685,14 +3706,12 @@ async function salvarProduto(){
     D.produtos.push(prod);
   }
 
-  const { data } = await SUPA.from('produtos').upsert({
-    id: prod._dbid || undefined,
-    user_id: USER_ID, nome, custo, preco,
-    estoque, vendidos: prod.vendidos || 0, ativo: true
-  }).select().single();
-  if(data && !prod._dbid){
-    D.produtos[D.produtos.length-1]._dbid = data.id;
-  }
+  const payload_prod = { user_id: USER_ID, nome, custo, preco, estoque, vendidos: prod.vendidos||0, ativo: true };
+  let q_prod;
+  if(prod._dbid){ q_prod = SUPA.from('produtos').update(payload_prod).eq('id', prod._dbid).eq('user_id', USER_ID); }
+  else { q_prod = SUPA.from('produtos').insert(payload_prod); }
+  const { data } = await q_prod.select().single();
+  if(data && !prod._dbid){ D.produtos[D.produtos.length-1]._dbid = data.id; }
 
   fecha('m-produto');
   rProdutos();
