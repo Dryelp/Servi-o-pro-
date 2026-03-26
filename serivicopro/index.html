@@ -2007,6 +2007,7 @@ function rServicos(){
   const filtro = document.getElementById('srv-filtro')?.value || '';
   let lista = filtro ? D.servicos.filter(s=>s.sts_srv===filtro) : [...D.servicos];
   lista = [...lista].sort((a,b)=>(b.dt||'').localeCompare(a.dt||'')||(b.hr||'').localeCompare(a.hr||''));
+  lista = lista.filter(s=>s&&s.cli);
   const el = document.getElementById('srv-lista');
   if(!lista.length){
     if(!D.servicos.length){
@@ -2171,7 +2172,7 @@ async function salvarEditCli(){
 function rOrcamentos(){
   const q    = (document.getElementById('orc-search')?.value||'').toLowerCase();
   const fsts = document.getElementById('orc-filtro-sts')?.value||'';
-  let lista  = [...D.orcamentos].reverse();
+  let lista  = [...D.orcamentos].filter(o=>o&&o.cli).reverse();
   if(q)    lista = lista.filter(o=>(o.cli||'').toLowerCase().includes(q)||(o.desc||'').toLowerCase().includes(q)||(o.sts||'').toLowerCase().includes(q));
   if(fsts) lista = lista.filter(o=>o.sts===fsts);
 
@@ -2839,7 +2840,11 @@ async function salvarDesp(){
   }
 
   if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent='✅ Salvar despesa'; }
-  fecha('m-desp'); rDespesas();
+  fecha('m-desp');
+  // Forçar select pro mês da despesa salva
+  const selMes = document.getElementById('desp-mes');
+  if(selMes) selMes.value = dt.slice(0,7);
+  rDespesas();
   clr('desp-nm','desp-val','desp-ajudante','desp-nparc','desp-vparc');
 }
 
@@ -2866,7 +2871,7 @@ async function delDesp(id){
 
 function rDespesas(){
   // Popular select de meses
-  const meses = [...new Set(D.despesas.map(d=>d.dt.slice(0,7)))].sort().reverse();
+  const meses = [...new Set(D.despesas.filter(d=>d.dt).map(d=>d.dt.slice(0,7)))].sort().reverse();
   const sel   = document.getElementById('desp-mes');
   const mesAtual = hj().slice(0,7);
   const mesSel   = sel?.value || mesAtual;
@@ -2878,7 +2883,7 @@ function rDespesas(){
 
   const mes = sel?.value || mesAtual;
   const q   = (document.getElementById('desp-search')?.value||'').toLowerCase();
-  let lista = D.despesas.filter(d=>d.dt.startsWith(mes));
+  let lista = D.despesas.filter(d=>d.dt && d.dt.startsWith(mes));
   if(q) lista = lista.filter(d=>(d.nm||'').toLowerCase().includes(q)||(d.cat||'').toLowerCase().includes(q));
   lista = lista.sort((a,b)=>b.dt.localeCompare(a.dt));
 
@@ -2968,15 +2973,21 @@ async function salvarOrc(){
   if(!o.cli) return toast('⚠️ Informe o cliente');
 
   if(editIdx >= 0){
-    // EDITAR — preservar _dbid e atualizar no array
     o._dbid = D.orcamentos[editIdx]._dbid;
     D.orcamentos[editIdx] = o;
-    await sbSalvarOrcamento(o);
+    const so = await sbSalvarOrcamento(o);
+    if(!so){ 
+      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
+      return toast('⚠️ Erro ao salvar. Tente novamente.');
+    }
     toast('✅ Orçamento atualizado!');
   } else {
-    // NOVO — inserir no início
     const so = await sbSalvarOrcamento(o);
-    if(so) o._dbid = so.id;
+    if(!so){ 
+      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
+      return toast('⚠️ Erro ao salvar. Tente novamente.');
+    }
+    o._dbid = so.id;
     D.orcamentos.unshift(o);
     toast('✅ Orçamento salvo!');
   }
