@@ -56,7 +56,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .tb-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap;touch-action:manipulation}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
 .btn-brn{background:var(--brn);color:#fff}.btn-brn:hover{background:var(--brn2)}
 .btn-org{background:var(--org);color:#fff}.btn-org:hover{background:var(--org2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .btn-gho{background:var(--sur);color:var(--brn2);border:1.5px solid var(--bor)}.btn-gho:hover{border-color:var(--org);color:var(--org)}
@@ -107,7 +107,6 @@ tbody td{padding:9px 14px;vertical-align:middle}
 /* PAGES */
 .page{display:none}.page.active{display:block;animation:fadeUp .22s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(20,8,0,.52);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:12px}
@@ -121,13 +120,13 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .fg{margin-bottom:11px}
 .fl{display:block;font-size:.73rem;font-weight:700;color:var(--brn2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
 .fi,.fs{width:100%;background:var(--bg);border:1.5px solid var(--bor);border-radius:8px;padding:9px 11px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--txt);outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
-.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(234,88,12,.12);outline:none}
+.fi:focus,.fs:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
 .fi::placeholder{color:var(--mut)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .mf{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 
 /* SERVIÇO CARD */
-.srv-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:all .2s cubic-bezier(.4,0,.2,1)}
+.srv-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s,box-shadow .2s}
 .srv-card:hover{border-color:var(--org);opacity:.9;box-shadow:var(--shd2)}
 .srv-card.sts-andamento{border-left:4px solid var(--pur)}
 .srv-card.sts-realizado{border-left:4px solid var(--grn)}
@@ -215,10 +214,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:30px 14px;color:var(--mut);font-size:.84rem}
 .empty-ico{font-size:1.8rem;margin-bottom:7px}
-.toast{position:fixed;bottom:22px;right:22px;background:var(--brn);color:#fff;padding:12px 18px;border-radius:12px;font-size:.84rem;font-weight:600;z-index:9999;display:none;box-shadow:0 8px 28px rgba(0,0,0,.2);max-width:320px;animation:slideIn .25s cubic-bezier(.34,1.56,.64,1);line-height:1.4}
-.toast.t-ok{background:#16a34a}
-.toast.t-err{background:#dc2626}
-.toast.t-info{background:var(--org)}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--brn);color:#fff;padding:11px 17px;border-radius:10px;font-size:.84rem;font-weight:500;z-index:9999;display:none;box-shadow:0 8px 28px rgba(30,15,0,.26);max-width:300px;animation:slideIn .2s ease}
 @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
 
 /* MOBILE */
@@ -284,4 +280,9 @@ input:checked+.slider:before{transform:translateX(19px)}
       </label>
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="fazerLogin()">Entrar</button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarCadastro()">Criar conta grátis</button>
-      <button onclick="mostrarEsqueciSenha()" style="background:none;border:none;color:var(--mut);font-size:.82rem;margin-top:10px;cursor:pointer;text-decoration:underline">Esqueci minha senha</butt
+      <button onclick="mostrarEsqueciSenha()" style="background:none;border:none;color:var(--mut);font-size:.82rem;margin-top:10px;cursor:pointer;text-decoration:underline">Esqueci minha senha</button>
+    </div>
+
+    <div id="cadastro-form" style="display:none">
+      <div class="fg" style="text-align:left"><label class="fl">Nome completo</label><input class="fi" id="cad-nome" placeholder="Seu nome"></div>
+      <div class="fg" 
