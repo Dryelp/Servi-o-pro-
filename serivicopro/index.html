@@ -385,26 +385,45 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
 
+    <!-- Cards clicáveis status serviços -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="dash-status-cards">
+      <div onclick="irFiltrado('Agendado')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--org)'" onmouseout="this.style.borderColor='var(--bor)'">
+        <div style="font-size:1.5rem;margin-bottom:4px">📅</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--org)" id="v-agendados">0</div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px">Agendados</div>
+      </div>
+      <div onclick="irFiltrado('Em andamento')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--pur)'" onmouseout="this.style.borderColor='var(--bor)'">
+        <div style="font-size:1.5rem;margin-bottom:4px">▶️</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--pur)" id="v-andamento">0</div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px">Em andamento</div>
+      </div>
+      <div onclick="irFiltrado('Realizado')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--grn)'" onmouseout="this.style.borderColor='var(--bor)'">
+        <div style="font-size:1.5rem;margin-bottom:4px">✅</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--grn)" id="v-realizados">0</div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px">Realizados</div>
+      </div>
+    </div>
+
     <div class="stats">
-      <div class="sc" style="--sc-c:var(--grn)">
+      <div class="sc" style="--sc-c:var(--grn);cursor:pointer" onclick="irFiltrado('Pago')">
         <div class="sc-ico">💰</div><div class="sc-lbl">Recebido (mês)</div>
         <div class="sc-val" id="v-rec">R$ 0,00</div>
         <div class="sc-hint" id="v-rec-h">0 serviços pagos</div>
       </div>
-      <div class="sc" style="--sc-c:var(--org)">
+      <div class="sc" style="--sc-c:var(--org);cursor:pointer" onclick="irFiltrado('Pendente')">
         <div class="sc-ico">⏳</div><div class="sc-lbl">A receber</div>
         <div class="sc-val" id="v-pend">R$ 0,00</div>
         <div class="sc-hint" id="v-pend-h">0 pendentes</div>
       </div>
-      <div class="sc" style="--sc-c:var(--red)">
+      <div class="sc" style="--sc-c:var(--red);cursor:pointer" onclick="ir('despesas')">
         <div class="sc-ico">💸</div><div class="sc-lbl">Custos (mês)</div>
         <div class="sc-val" id="v-custo">R$ 0,00</div>
         <div class="sc-hint" id="v-custo-h">materiais + despesas</div>
       </div>
-      <div class="sc" style="--sc-c:var(--pur)">
+      <div class="sc" style="--sc-c:var(--pur);cursor:pointer" onclick="ir('relatorio')">
         <div class="sc-ico">📈</div><div class="sc-lbl">Lucro real</div>
         <div class="sc-val" id="v-lucro">R$ 0,00</div>
-        <div class="sc-hint">receitas − tudo</div>
+        <div class="sc-hint">ver relatório →</div>
       </div>
     </div>
 
@@ -1523,6 +1542,22 @@ async function fazerLogout(){
   toast('Até logo! 👋');
 }
 
+function irFiltrado(filtro){
+  ir('servicos');
+  setTimeout(()=>{
+    const sel = document.getElementById('srv-filtro');
+    if(sel){
+      // Mapear filtros de pagamento para status de serviço
+      if(filtro === 'Pago' || filtro === 'Pendente'){
+        sel.value = 'Realizado';
+      } else {
+        sel.value = filtro;
+      }
+      rServicos();
+    }
+  }, 100);
+}
+
 function mostrarSkeleton(){
   const cards = document.querySelectorAll('.sc-val');
   cards.forEach(c=>{ c.style.background='var(--sur2)'; c.style.borderRadius='6px'; c.style.color='transparent'; c.style.animation='pulse 1.5s infinite'; });
@@ -2354,35 +2389,52 @@ async function salvarSrv(){
     sts_srv: 'Agendado', sts_pag: null, pag: null,
     materiais: [], desc_feito: '', inicio: null, fim: null
   };
-  if(!o.cli || !o.dt) return toast('⚠️ Preencha data e nome do cliente');
-  D.servicos.push(o);
+  if(!o.cli || !o.dt){
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+    return toast('⚠️ Preencha data e nome do cliente');
+  }
 
-  // Cadastro automático do cliente se não existir
+  // Salvar no Supabase PRIMEIRO
+  const saved = await sbSalvarServico(o);
+  if(!saved){
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+    return toast('⚠️ Erro ao salvar. Verifique sua conexão.');
+  }
+  o._dbid = saved.id;
+  D.servicos.unshift(o);
+
+  // Cadastro automático do cliente
   const jaExiste = D.clientes.find(c => c.nm.toLowerCase() === o.cli.toLowerCase());
   if(!jaExiste){
-    D.clientes.push({ nm: o.cli, wpp: '', srv: o.tipo || '', end: o.end || '' });
-    toast('✅ Serviço agendado! Cliente cadastrado automaticamente 👤');
+    const nc = { nm: o.cli, wpp: '', srv: o.tipo||'', end: o.end||'' };
+    const sc = await sbSalvarCliente(nc);
+    if(sc) nc._dbid = sc.id;
+    D.clientes.push(nc);
+    toast('✅ Serviço agendado! Cliente cadastrado 👤');
   } else {
     toast('✅ Serviço agendado!');
   }
 
-  save(); fecha('m-srv'); render();
+  if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+  fecha('m-srv'); render();
   clr('s-cli','s-hr','s-tipo','s-end','s-val','s-prazo','s-qtd','s-entrada');
   const el = document.getElementById('s-saldo'); if(el) el.value = '';
 }
 
-function iniciarSrv(i){
+async function iniciarSrv(i){
   D.servicos[i].sts_srv = 'Em andamento';
   D.servicos[i].inicio  = new Date().toISOString();
-  save(); render();
+  await sbSalvarServico(D.servicos[i]);
+  render();
   toast('▶️ Serviço iniciado!');
   addNotif('agenda','▶️ Serviço iniciado',`Serviço com ${D.servicos[i].cli} iniciado agora.`);
 }
 
-function cancelarSrv(i){
+async function cancelarSrv(i){
   if(!confirm('Cancelar este serviço?')) return;
   D.servicos[i].sts_srv = 'Cancelado';
-  save(); render();
+  await sbSalvarServico(D.servicos[i]);
+  render();
   toast('❌ Serviço cancelado');
 }
 
@@ -3184,7 +3236,7 @@ function wppOrc(i){
   const tel = cli?.wpp?.replace(/\D/g,'')||'';
   const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
-  D.orcamentos[i].sts = 'Enviado'; save(); rOrcamentos();
+  D.orcamentos[i].sts = 'Enviado'; sbSalvarOrcamento(D.orcamentos[i]); rOrcamentos();
   toast('📱 Abrindo WhatsApp...');
 }
 
