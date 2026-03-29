@@ -410,7 +410,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="stats">
-      <div class="sc" style="--sc-c:var(--grn);cursor:pointer" onclick="irFiltrado('Pago')">
+      <div class="sc" style="--sc-c:var(--grn);cursor:pointer" onclick="abrirRecebidos()">
         <div class="sc-ico">💰</div><div class="sc-lbl">Recebido (mês)</div>
         <div class="sc-val" id="v-rec">R$ 0,00</div>
         <div class="sc-hint" id="v-rec-h">0 serviços pagos</div>
@@ -420,7 +420,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div class="sc-val" id="v-pend">R$ 0,00</div>
         <div class="sc-hint" id="v-pend-h">0 pendentes</div>
       </div>
-      <div class="sc" style="--sc-c:var(--red);cursor:pointer" onclick="ir('despesas')">
+      <div class="sc" style="--sc-c:var(--red);cursor:pointer" onclick="abrirCustos()">
         <div class="sc-ico">💸</div><div class="sc-lbl">Custos (mês)</div>
         <div class="sc-val" id="v-custo">R$ 0,00</div>
         <div class="sc-hint" id="v-custo-h">materiais + despesas</div>
@@ -1025,6 +1025,50 @@ input:checked+.slider:before{transform:translateX(19px)}
   </div>
 </div>
 
+<!-- Modal Recebidos -->
+<div class="overlay" id="m-recebidos">
+  <div class="modal modal-lg">
+    <div class="mt">✅ Recebido este mês <button class="xbtn" onclick="fecha('m-recebidos')">✕</button></div>
+    <div style="background:linear-gradient(135deg,var(--grn-bg),#c8eed9);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total recebido</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--brn)" id="rec-total">R$ 0,00</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Serviços pagos</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--grn)" id="rec-count">0</div>
+      </div>
+    </div>
+    <div id="rec-lista" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px"></div>
+    <div class="mf" style="margin-top:14px;border-top:1px solid var(--bor);padding-top:14px">
+      <button class="btn btn-gho" style="flex:1;justify-content:center" onclick="fecha('m-recebidos');ir('recebimentos')">Ver todos os recebimentos</button>
+      <button class="btn btn-gho" onclick="fecha('m-recebidos');ir('relatorio')">📊 Relatório</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Custos -->
+<div class="overlay" id="m-custos">
+  <div class="modal modal-lg">
+    <div class="mt">💸 Custos do mês <button class="xbtn" onclick="fecha('m-custos')">✕</button></div>
+    <div style="background:linear-gradient(135deg,var(--red-bg),#fdd);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total de custos</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--brn)" id="cst-total">R$ 0,00</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Este mês</div>
+        <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--mut)" id="cst-mes">—</div>
+      </div>
+    </div>
+    <div id="cst-lista" style="max-height:55vh;overflow-y:auto"></div>
+    <div class="mf" style="margin-top:14px;border-top:1px solid var(--bor);padding-top:14px">
+      <button class="btn btn-org btn-sm" onclick="fecha('m-custos');abreDesp()">+ Nova despesa</button>
+      <button class="btn btn-gho" style="flex:1;justify-content:center" onclick="fecha('m-custos');ir('despesas')">Ver todas as despesas</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal A Receber -->
 <div class="overlay" id="m-areceber">
   <div class="modal modal-lg">
@@ -1572,6 +1616,156 @@ async function fazerLogout(){
   D.notifs=[]; D.despesas=[];
   D.perfil={nome:'',tipo:'',wpp:'',meta:0};
   toast('Até logo! 👋');
+}
+
+function abrirRecebidos(){
+  const mes = hj().slice(0,7);
+  const pagos = D.servicos
+    .filter(s=>s.sts_srv==='Realizado' && s.sts_pag==='Pago' && (s.dt||'').startsWith(mes))
+    .sort((a,b)=>(b.dt||'').localeCompare(a.dt||''));
+
+  const total = pagos.reduce((a,b)=>a+(+b.val),0);
+  document.getElementById('rec-total').textContent = R$(total);
+  document.getElementById('rec-count').textContent = pagos.length;
+  document.getElementById('rec-mes').textContent   = nomeMes(mes);
+
+  const lista = document.getElementById('rec-lista');
+  if(!pagos.length){
+    lista.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mut)">
+        <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+        <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Nenhum recebimento ainda</div>
+        <div style="font-size:.85rem">Finalize serviços e marque como pago.</div>
+      </div>`;
+    abre('m-recebidos');
+    return;
+  }
+
+  // Agrupar por forma de pagamento
+  const formas = {};
+  pagos.forEach(s=>{
+    const f = s.pag||'Não informado';
+    if(!formas[f]) formas[f] = {total:0, count:0};
+    formas[f].total += +s.val;
+    formas[f].count++;
+  });
+
+  const resumoFormas = Object.entries(formas).map(([f,v])=>
+    `<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:4px 0">
+      <span style="color:var(--mut)">${f}</span>
+      <span style="font-weight:700;color:var(--grn)">${R$(v.total)} <span style="color:var(--mut);font-weight:400">(${v.count}x)</span></span>
+    </div>`
+  ).join('');
+
+  lista.innerHTML = `
+    <div style="background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:12px 14px;margin-bottom:4px">
+      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Por forma de pagamento</div>
+      ${resumoFormas}
+    </div>
+    <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:8px 0 4px">Serviços recebidos</div>
+    ${pagos.map(s=>`
+    <div style="background:var(--bg);border:1.5px solid var(--bor);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:var(--brn)">${s.cli||'—'}</div>
+        <div style="font-size:.76rem;color:var(--mut);margin-top:2px">${s.tipo||'—'} · ${fd(s.dt)}</div>
+        <div style="font-size:.72rem;color:var(--mut);margin-top:1px">${s.pag||'—'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--grn)">${R$(s.val)}</div>
+        <span class="badge b-g" style="margin-top:4px">Pago</span>
+      </div>
+    </div>`).join('')}`;
+
+  abre('m-recebidos');
+}
+
+function abrirCustos(){
+  const mes = hj().slice(0,7);
+
+  // Materiais dos serviços realizados no mês
+  const srvMes  = D.servicos.filter(s=>s.sts_srv==='Realizado'&&(s.dt||'').startsWith(mes));
+  const mats    = srvMes.flatMap(s=>(s.materiais||[]).map(m=>({...m, cli:s.cli, tipo:s.tipo})));
+  const tMats   = mats.reduce((a,b)=>a+(+b.val),0);
+
+  // Despesas do mês
+  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes)).sort((a,b)=>b.dt.localeCompare(a.dt));
+  const tDesp   = despMes.reduce((a,b)=>a+(+b.val),0);
+
+  const total   = tMats + tDesp;
+  document.getElementById('cst-total').textContent = R$(total);
+  document.getElementById('cst-mes').textContent   = nomeMes(mes);
+
+  const lista = document.getElementById('cst-lista');
+
+  let html = '';
+
+  // Bloco materiais
+  html += `
+    <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 8px;display:flex;justify-content:space-between">
+      <span>📦 Materiais dos serviços</span>
+      <span style="color:var(--red)">${R$(tMats)}</span>
+    </div>`;
+
+  if(mats.length){
+    html += mats.map(m=>`
+    <div style="background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:11px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.85rem;font-weight:600;color:var(--brn)">${m.desc||'—'}</div>
+        <div style="font-size:.73rem;color:var(--mut);margin-top:2px">${m.cli||''} · ${m.tipo||''}</div>
+      </div>
+      <div style="font-weight:700;color:var(--red);font-size:.9rem">−${R$(m.val)}</div>
+    </div>`).join('');
+  } else {
+    html += `<div style="font-size:.82rem;color:var(--mut);padding:8px 0 12px">Nenhum material registrado este mês</div>`;
+  }
+
+  // Separador
+  html += `<div style="border-top:1.5px dashed var(--bor);margin:12px 0"></div>`;
+
+  // Bloco despesas
+  html += `
+    <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 8px;display:flex;justify-content:space-between">
+      <span>💸 Despesas operacionais</span>
+      <span style="color:var(--red)">${R$(tDesp)}</span>
+    </div>`;
+
+  if(despMes.length){
+    // Agrupar por categoria
+    const cats = {};
+    despMes.forEach(d=>{
+      if(!cats[d.cat]) cats[d.cat] = {total:0, itens:[]};
+      cats[d.cat].total += +d.val;
+      cats[d.cat].itens.push(d);
+    });
+
+    html += Object.entries(cats).map(([cat, {total, itens}])=>`
+      <div style="background:var(--bg);border:1px solid var(--bor);border-radius:10px;margin-bottom:8px;overflow:hidden">
+        <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bor);background:var(--sur2)">
+          <span style="font-size:.8rem;font-weight:700;color:var(--brn)">${cat}</span>
+          <span style="font-weight:700;color:var(--red);font-size:.85rem">−${R$(total)}</span>
+        </div>
+        ${itens.map(d=>`
+        <div style="padding:9px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bor)">
+          <div>
+            <div style="font-size:.82rem;color:var(--brn)">${d.nm}</div>
+            <div style="font-size:.72rem;color:var(--mut)">${fd(d.dt)} · ${d.pag||'—'}</div>
+          </div>
+          <span style="font-size:.82rem;color:var(--red);font-weight:600">−${R$(d.val)}</span>
+        </div>`).join('')}
+      </div>`).join('');
+  } else {
+    html += `<div style="font-size:.82rem;color:var(--mut);padding:8px 0 12px">Nenhuma despesa este mês</div>`;
+  }
+
+  // Total final
+  html += `
+    <div style="background:linear-gradient(135deg,var(--red-bg),#fdd);border:1.5px solid rgba(220,38,38,.2);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+      <div style="font-size:.8rem;font-weight:700;color:var(--red)">Total geral de custos</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--red)">−${R$(total)}</div>
+    </div>`;
+
+  lista.innerHTML = html;
+  abre('m-custos');
 }
 
 function abrirAReceber(){
