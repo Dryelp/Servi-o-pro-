@@ -415,7 +415,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div class="sc-val" id="v-rec">R$ 0,00</div>
         <div class="sc-hint" id="v-rec-h">0 serviços pagos</div>
       </div>
-      <div class="sc" style="--sc-c:var(--org);cursor:pointer" onclick="irFiltrado('Pendente')">
+      <div class="sc" style="--sc-c:var(--org);cursor:pointer" onclick="abrirAReceber()">
         <div class="sc-ico">⏳</div><div class="sc-lbl">A receber</div>
         <div class="sc-val" id="v-pend">R$ 0,00</div>
         <div class="sc-hint" id="v-pend-h">0 pendentes</div>
@@ -1025,6 +1025,33 @@ input:checked+.slider:before{transform:translateX(19px)}
   </div>
 </div>
 
+<!-- Modal A Receber -->
+<div class="overlay" id="m-areceber">
+  <div class="modal modal-lg">
+    <div class="mt">💰 A Receber <button class="xbtn" onclick="fecha('m-areceber')">✕</button></div>
+
+    <!-- Resumo -->
+    <div style="background:linear-gradient(135deg,var(--org-bg),#ffe8d6);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.7rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total pendente</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--brn)" id="ar-total">R$ 0,00</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Em aberto</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--org)" id="ar-count">0</div>
+      </div>
+    </div>
+
+    <!-- Lista de pendentes -->
+    <div id="ar-lista" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px"></div>
+
+    <!-- Rodapé -->
+    <div class="mf" style="margin-top:14px;border-top:1px solid var(--bor);padding-top:14px">
+      <button class="btn btn-gho" style="flex:1;justify-content:center" onclick="fecha('m-areceber');ir('recebimentos')">Ver todos os recebimentos</button>
+    </div>
+  </div>
+</div>
+
 <!-- WhatsApp mensagens -->
 <div class="overlay" id="m-wpp">
   <div class="modal">
@@ -1545,6 +1572,99 @@ async function fazerLogout(){
   D.notifs=[]; D.despesas=[];
   D.perfil={nome:'',tipo:'',wpp:'',meta:0};
   toast('Até logo! 👋');
+}
+
+function abrirAReceber(){
+  const pendentes = D.servicos.filter(s=>
+    s.sts_srv==='Realizado' && s.sts_pag==='Pendente'
+  ).sort((a,b)=>(a.dt||'').localeCompare(b.dt||''));
+
+  const total = pendentes.reduce((a,b)=>a+(+b.val),0);
+  document.getElementById('ar-total').textContent = R$(total);
+  document.getElementById('ar-count').textContent = pendentes.length;
+
+  const lista = document.getElementById('ar-lista');
+
+  if(!pendentes.length){
+    lista.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mut)">
+        <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+        <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Tudo em dia!</div>
+        <div style="font-size:.85rem">Nenhum pagamento pendente no momento.</div>
+      </div>`;
+    abre('m-areceber');
+    return;
+  }
+
+  lista.innerHTML = pendentes.map((s,i)=>{
+    const cli = D.clientes.find(c=>c.nm===s.cli);
+    const tel = (cli?.wpp||'').replace(/[^0-9]/g,'');
+    const nome = D.perfil.nome || 'Prestador';
+    const msg  = encodeURIComponent(
+      `Olá, ${s.cli}! 😊
+
+Passando para lembrar sobre o pagamento de *${R$(s.val)}* referente ao serviço de *${s.tipo||'serviço'}* realizado em ${fd(s.dt)}.
+
+Quando puder, entre em contato! 🙏
+
+_${nome}_`
+    );
+    const wppUrl = tel
+      ? `https://wa.me/55${tel}?text=${msg}`
+      : `https://wa.me/?text=${msg}`;
+    const idx = D.servicos.indexOf(s);
+
+    return `
+    <div style="background:var(--bg);border:1.5px solid var(--bor);border-radius:12px;padding:14px;transition:border-color .2s" id="ar-item-${i}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--brn)">${s.cli||'—'}</div>
+          <div style="font-size:.78rem;color:var(--mut);margin-top:2px">${s.tipo||'—'} · ${fd(s.dt)}</div>
+          ${tel ? '' : '<div style="font-size:.72rem;color:var(--red);margin-top:3px">⚠️ Sem WhatsApp cadastrado</div>'}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--org)">${R$(s.val)}</div>
+          <span class="badge b-o" style="margin-top:4px">Pendente</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="${wppUrl}" target="_blank" class="btn btn-wpp btn-sm" style="flex:1;justify-content:center;text-decoration:none">
+          📱 Cobrar no WhatsApp
+        </a>
+        <button class="btn btn-grn btn-sm" onclick="marcarPagoModal(${idx},${i})">✅ Marcar pago</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  abre('m-areceber');
+}
+
+async function marcarPagoModal(srvIdx, itemIdx){
+  D.servicos[srvIdx].sts_pag = 'Pago';
+  await sbSalvarServico(D.servicos[srvIdx]);
+  // Remove item do modal com animação
+  const el = document.getElementById('ar-item-'+itemIdx);
+  if(el){ el.style.opacity='0'; el.style.transform='scale(.95)'; el.style.transition='all .25s'; setTimeout(()=>{ el.remove(); atualizarTotalAReceber(); },250); }
+  render();
+  toast('✅ Marcado como pago!');
+}
+
+function atualizarTotalAReceber(){
+  const pendentes = D.servicos.filter(s=>s.sts_srv==='Realizado'&&s.sts_pag==='Pendente');
+  const total = pendentes.reduce((a,b)=>a+(+b.val),0);
+  const el = document.getElementById('ar-total');
+  const elC = document.getElementById('ar-count');
+  if(el) el.textContent = R$(total);
+  if(elC) elC.textContent = pendentes.length;
+  if(!pendentes.length){
+    const lista = document.getElementById('ar-lista');
+    if(lista) lista.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mut)">
+        <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+        <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Tudo em dia!</div>
+        <div style="font-size:.85rem">Todos os pagamentos foram recebidos!</div>
+      </div>`;
+  }
 }
 
 function irFiltrado(filtro){
