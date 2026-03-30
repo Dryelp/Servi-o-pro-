@@ -3718,7 +3718,7 @@ function preencherTabelasRel(){
 }
 
 function gerarPDFRel(){
-  const mes = document.getElementById('rel-mes').value;
+  const mes      = document.getElementById('rel-mes').value;
   const detalhado = _modoRelAtual === 'detalhado';
   if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
   const {jsPDF} = window.jspdf;
@@ -3726,147 +3726,227 @@ function gerarPDFRel(){
   const pw   = doc.internal.pageSize.getWidth();
   const nome = D.perfil.nome || 'AutônomoPro';
 
-  doc.setFillColor(30,15,0); doc.rect(0,0,pw,30,'F');
+  // ── Cabeçalho ──────────────────────────────
+  doc.setFillColor(26,15,8); doc.rect(0,0,pw,30,'F');
   doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
   doc.text(nome,14,14);
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
   doc.text(D.perfil.tipo||'Prestador de Serviços',14,22);
   doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-  doc.text(`Relatório — ${nomeMes(mes)}`,pw-14,14,{align:'right'});
+  doc.text(`Relatório ${detalhado?'Detalhado':'Resumido'} — ${nomeMes(mes)}`,pw-14,14,{align:'right'});
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
   doc.text(`Gerado: ${new Date().toLocaleDateString('pt-BR')}`,pw-14,22,{align:'right'});
 
   let y = 38;
-  const srvMes = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
-  const reais  = srvMes.filter(s=>s.sts_srv==='Realizado');
-  const tRec   = reais.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
-  const tCusto = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
-  const lucro  = tRec-tCusto;
-  const tPend  = reais.filter(s=>s.sts_pag==='Pendente').reduce((a,b)=>a+(+b.val),0);
 
-  const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes));
-  const tDesp  = despMes.reduce((a,b)=>a+(+b.val),0);
-  const lucroReal = tRec - tCusto - tDesp;
+  // ── Dados ───────────────────────────────────
+  const srvMes   = D.servicos.filter(s=>(s.dt||'').startsWith(mes));
+  const reais    = srvMes.filter(s=>s.sts_srv==='Realizado');
+  const tRec     = reais.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
+  const tPend    = reais.filter(s=>s.sts_pag==='Pendente').reduce((a,b)=>a+(+b.val),0);
+  const tCusto   = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,z)=>x+(+z.val),0),0);
+  const despMes  = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes));
+  const tDesp    = despMes.reduce((a,b)=>a+(+b.val),0);
+  const lucroReal= tRec - tCusto - tDesp;
 
+  // ── Cards de resumo (sempre aparecem) ───────
   const cards = [
-    {l:'Recebido',  v:R$(tRec),     c:[26,107,60]},
-    {l:'Materiais', v:R$(tCusto),   c:[184,50,50]},
-    {l:'Despesas',  v:R$(tDesp),    c:[224,123,42]},
-    {l:'Lucro real',v:R$(lucroReal),c:lucroReal>=0?[26,107,60]:[184,50,50]},
+    {l:'Recebido',   v:R$(tRec),      c:[26,107,60]},
+    {l:'Materiais',  v:R$(tCusto),    c:[184,50,50]},
+    {l:'Despesas',   v:R$(tDesp),     c:[224,123,42]},
+    {l:'Lucro real', v:R$(lucroReal), c:lucroReal>=0?[26,107,60]:[184,50,50]},
   ];
   const cw = (pw-28-9)/4;
   cards.forEach((c,k)=>{
-    const x=14+k*(cw+3);
-    doc.setFillColor(...c.c); doc.roundedRect(x,y,cw,16,2,2,'F');
+    const x = 14+k*(cw+3);
+    doc.setFillColor(...c.c); doc.roundedRect(x,y,cw,18,2,2,'F');
     doc.setFontSize(6);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
     doc.text(c.l.toUpperCase(),x+3,y+6);
-    doc.setFontSize(11); doc.text(c.v,x+3,y+13);
+    doc.setFontSize(10); doc.text(c.v,x+3,y+14);
   });
-  y+=22;
+  y += 26;
 
-  // SERVIÇOS - cada um com seus materiais discriminados
-  if(reais.length){
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
-    doc.text('Servicos Realizados',14,y); y+=6;
+  // ── Estatísticas resumidas ───────────────────
+  doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
+  doc.text(`Serviços no mês: ${srvMes.length}  ·  Realizados: ${reais.length}  ·  A receber: ${R$(tPend)}`,14,y);
+  y += 10;
 
-    reais.sort((a,b)=>(a.dt||'').localeCompare(b.dt||'')).forEach(s=>{
-      if(y>255){ doc.addPage(); y=20; }
-      const mats  = s.materiais||[];
-      const custo = mats.reduce((a,b)=>a+(+b.val),0);
-      const lucroS = (+s.val) - custo;
-      const altBloco = 16 + (mats.length * 6) + (mats.length ? 8 : 0);
+  if(!detalhado){
+    // ══════════════════════════════════════════
+    // MODO RESUMIDO — só totais por forma de pagamento
+    // ══════════════════════════════════════════
 
-      // Caixa do serviço
-      doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,altBloco,3,3,'F');
-
-      // Cabeçalho serviço
-      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
-      doc.text(`${fd(s.dt)} · ${s.tipo||'—'}`,18,y+6);
-      doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
-      doc.text((s.cli||'—').slice(0,30),18,y+13);
-      doc.setFontSize(11);doc.setFont('helvetica','bold');
-      doc.setTextColor(...(s.sts_pag==='Pago'?[26,107,60]:[224,123,42]));
-      doc.text(R$(s.val),pw-18,y+13,{align:'right'});
-      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
-      doc.text(`${s.pag||'—'} · ${s.sts_pag||'—'}`,pw-18,y+19,{align:'right'});
-      y+=16;
-
-      // Materiais do serviço
-      if(mats.length){
-        doc.setDrawColor(220,210,200); doc.line(18,y,pw-18,y); y+=2;
-        mats.forEach(m=>{
-          doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
-          doc.text(`+ ${m.desc}`,20,y+4);
-          doc.setTextColor(184,50,50);
-          doc.text(`-${R$(m.val)}`,pw-18,y+4,{align:'right'});
-          y+=6;
-        });
-        // Lucro do serviço
-        doc.setDrawColor(200,190,180); doc.line(18,y,pw-18,y);
-        doc.setFillColor(235,245,238); doc.rect(14,y,pw-28,8,'F');
-        doc.setFontSize(8);doc.setFont('helvetica','bold');
-        doc.setTextColor(80,60,40); doc.text('Lucro do servico',18,y+5.5);
-        doc.setTextColor(lucroS>=0?26:184, lucroS>=0?107:50, lucroS>=0?60:50);
-        doc.setFontSize(9);
-        doc.text(R$(lucroS),pw-18,y+5.5,{align:'right'});
-        y+=8;
-      } else {
-        y+=2;
-      }
-      y+=4;
+    // Totais por forma de pagamento
+    const formas = {};
+    reais.filter(s=>s.sts_pag==='Pago').forEach(s=>{
+      const f = s.pag||'Não informado';
+      if(!formas[f]) formas[f] = {total:0, count:0};
+      formas[f].total += +s.val;
+      formas[f].count++;
     });
-  }
 
-  // DESPESAS OPERACIONAIS
-  if(despMes.length){
-    if(y>240){ doc.addPage(); y=20; }
-    y+=4;
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
-    doc.text('Despesas Operacionais',14,y); y+=6;
-    doc.setFillColor(224,123,42); doc.rect(14,y,pw-28,7,'F');
-    doc.setTextColor(255,255,255);doc.setFontSize(7.5);
-    doc.text('Data',16,y+4.8);
-    doc.text('Descricao',36,y+4.8);
-    doc.text('Categoria',110,y+4.8);
-    doc.text('Valor',pw-18,y+4.8,{align:'right'});
-    y+=7;
-    despMes.sort((a,b)=>a.dt.localeCompare(b.dt)).forEach((d,di)=>{
-      if(y>270){ doc.addPage(); y=20; }
-      if(di%2===0){ doc.setFillColor(255,244,235); doc.rect(14,y,pw-28,7,'F'); }
-      doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8);
-      doc.text(fd(d.dt),16,y+4.8);
-      doc.text(d.nm.slice(0,30),36,y+4.8);
-      doc.text(d.cat,110,y+4.8);
-      doc.setTextColor(184,50,50);doc.setFont('helvetica','bold');
-      doc.text(R$(d.val),pw-18,y+4.8,{align:'right'});
+    if(Object.keys(formas).length){
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text('RECEBIMENTOS POR FORMA DE PAGAMENTO',14,y); y+=5;
+      doc.setFillColor(26,107,60); doc.rect(14,y,pw-28,7,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);
+      doc.text('Forma',16,y+4.8); doc.text('Qtd',pw/2,y+4.8); doc.text('Total',pw-18,y+4.8,{align:'right'});
       y+=7;
+      Object.entries(formas).forEach(([f,v],di)=>{
+        if(di%2===0){ doc.setFillColor(245,240,232); doc.rect(14,y,pw-28,7,'F'); }
+        doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+        doc.text(f,16,y+4.8);
+        doc.text(String(v.count)+'x',pw/2,y+4.8);
+        doc.setFont('helvetica','bold');doc.setTextColor(26,107,60);
+        doc.text(R$(v.total),pw-18,y+4.8,{align:'right'});
+        y+=7;
+      });
+      y+=6;
+    }
+
+    // Top clientes
+    const porCli = {};
+    reais.filter(s=>s.sts_pag==='Pago').forEach(s=>{
+      if(!porCli[s.cli]) porCli[s.cli]={total:0,count:0};
+      porCli[s.cli].total += +s.val;
+      porCli[s.cli].count++;
     });
-    // Total despesas
-    doc.setFillColor(30,15,0); doc.rect(14,y,pw-28,8,'F');
-    doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('TOTAL DESPESAS',16,y+5.5);
-    doc.text(R$(tDesp),pw-16,y+5.5,{align:'right'});
-    y+=14;
+    const topClis = Object.entries(porCli).sort((a,b)=>b[1].total-a[1].total).slice(0,5);
+
+    if(topClis.length){
+      if(y>240){ doc.addPage(); y=20; }
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text('TOP CLIENTES DO MÊS',14,y); y+=5;
+      doc.setFillColor(26,15,8); doc.rect(14,y,pw-28,7,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);
+      doc.text('Cliente',16,y+4.8); doc.text('Serviços',pw/2,y+4.8); doc.text('Total',pw-18,y+4.8,{align:'right'});
+      y+=7;
+      topClis.forEach(([cli,v],di)=>{
+        if(di%2===0){ doc.setFillColor(245,240,232); doc.rect(14,y,pw-28,7,'F'); }
+        doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+        doc.text((cli||'—').slice(0,35),16,y+4.8);
+        doc.text(String(v.count)+'x',pw/2,y+4.8);
+        doc.setFont('helvetica','bold');doc.setTextColor(26,107,60);
+        doc.text(R$(v.total),pw-18,y+4.8,{align:'right'});
+        y+=7;
+      });
+      y+=6;
+    }
+
+    // Resumo despesas por categoria
+    if(despMes.length){
+      if(y>240){ doc.addPage(); y=20; }
+      const cats = {};
+      despMes.forEach(d=>{ if(!cats[d.cat]) cats[d.cat]=0; cats[d.cat]+=+d.val; });
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text('DESPESAS POR CATEGORIA',14,y); y+=5;
+      doc.setFillColor(184,50,50); doc.rect(14,y,pw-28,7,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);
+      doc.text('Categoria',16,y+4.8); doc.text('Total',pw-18,y+4.8,{align:'right'});
+      y+=7;
+      Object.entries(cats).forEach(([cat,total],di)=>{
+        if(di%2===0){ doc.setFillColor(254,234,234); doc.rect(14,y,pw-28,7,'F'); }
+        doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+        doc.text(cat,16,y+4.8);
+        doc.setFont('helvetica','bold');doc.setTextColor(184,50,50);
+        doc.text(R$(total),pw-18,y+4.8,{align:'right'});
+        y+=7;
+      });
+    }
+
+  } else {
+    // ══════════════════════════════════════════
+    // MODO DETALHADO — cada serviço discriminado
+    // ══════════════════════════════════════════
+    if(reais.length){
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text('SERVIÇOS REALIZADOS',14,y); y+=6;
+
+      reais.sort((a,b)=>(a.dt||'').localeCompare(b.dt||'')).forEach(s=>{
+        if(y>250){ doc.addPage(); y=20; }
+        const mats   = s.materiais||[];
+        const custo  = mats.reduce((a,b)=>a+(+b.val),0);
+        const lucroS = (+s.val) - custo;
+        const alt    = 18 + (mats.length * 6) + (mats.length ? 10 : 0);
+        doc.setFillColor(245,240,232); doc.roundedRect(14,y,pw-28,alt,3,3,'F');
+        doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+        doc.text(`${fd(s.dt)} · ${s.tipo||'—'}`,18,y+6);
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+        doc.text((s.cli||'—').slice(0,30),18,y+13);
+        doc.setFontSize(11);doc.setTextColor(...(s.sts_pag==='Pago'?[26,107,60]:[224,123,42]));
+        doc.text(R$(s.val),pw-18,y+13,{align:'right'});
+        doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(138,112,96);
+        doc.text(`${s.pag||'—'} · ${s.sts_pag||'—'}`,pw-18,y+19,{align:'right'});
+        y+=18;
+        if(mats.length){
+          doc.setDrawColor(220,210,200); doc.line(18,y,pw-18,y); y+=2;
+          mats.forEach(m=>{
+            doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(80,60,40);
+            doc.text(`· ${m.desc}`,20,y+4);
+            doc.setTextColor(184,50,50);
+            doc.text(`-${R$(m.val)}`,pw-18,y+4,{align:'right'});
+            y+=6;
+          });
+          doc.setFillColor(235,245,238); doc.rect(14,y,pw-28,8,'F');
+          doc.setFontSize(8);doc.setFont('helvetica','bold');
+          doc.setTextColor(80,60,40); doc.text('Lucro do serviço',18,y+5.5);
+          doc.setTextColor(lucroS>=0?26:184, lucroS>=0?107:50, lucroS>=0?60:50);
+          doc.text(R$(lucroS),pw-18,y+5.5,{align:'right'});
+          y+=10;
+        }
+        y+=4;
+      });
+    }
+
+    // Despesas detalhadas
+    if(despMes.length){
+      if(y>240){ doc.addPage(); y=20; }
+      y+=4;
+      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(30,15,0);
+      doc.text('DESPESAS OPERACIONAIS',14,y); y+=6;
+      doc.setFillColor(224,123,42); doc.rect(14,y,pw-28,7,'F');
+      doc.setTextColor(255,255,255);doc.setFontSize(7.5);
+      doc.text('Data',16,y+4.8); doc.text('Descrição',38,y+4.8);
+      doc.text('Categoria',110,y+4.8); doc.text('Valor',pw-18,y+4.8,{align:'right'});
+      y+=7;
+      despMes.sort((a,b)=>a.dt.localeCompare(b.dt)).forEach((d,di)=>{
+        if(y>270){ doc.addPage(); y=20; }
+        if(di%2===0){ doc.setFillColor(255,244,235); doc.rect(14,y,pw-28,7,'F'); }
+        doc.setTextColor(30,15,0);doc.setFont('helvetica','normal');doc.setFontSize(8);
+        doc.text(fd(d.dt),16,y+4.8); doc.text(d.nm.slice(0,28),38,y+4.8);
+        doc.text(d.cat,110,y+4.8);
+        doc.setTextColor(184,50,50);doc.setFont('helvetica','bold');
+        doc.text(R$(d.val),pw-18,y+4.8,{align:'right'});
+        y+=7;
+      });
+      doc.setFillColor(30,15,0); doc.rect(14,y,pw-28,8,'F');
+      doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+      doc.text('TOTAL DESPESAS',16,y+5.5);
+      doc.text(R$(tDesp),pw-16,y+5.5,{align:'right'});
+      y+=14;
+    }
   }
 
-  // LUCRO REAL FINAL
+  // ── Lucro real final ─────────────────────────
   if(y>270){ doc.addPage(); y=20; }
   doc.setFillColor(lucroReal>=0?26:184, lucroReal>=0?107:50, lucroReal>=0?60:50);
   doc.rect(14,y,pw-28,12,'F');
   doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-  doc.text('LUCRO REAL DO MES',16,y+8);
+  doc.text('LUCRO REAL DO MÊS',16,y+8);
   doc.setFontSize(13);
   doc.text(R$(lucroReal),pw-16,y+8,{align:'right'});
-  y+=18;
 
+  // ── Rodapé ───────────────────────────────────
   for(let k=1;k<=doc.internal.getNumberOfPages();k++){
     doc.setPage(k);
     doc.setFontSize(7);doc.setTextColor(160,140,120);
-    doc.text(`${nome} · ${detalhado?'Relatório Detalhado':'Relatório Resumido'} · Página ${k}`,pw/2,290,{align:'center'});
+    doc.text(`${nome} · Relatório ${detalhado?'Detalhado':'Resumido'} · Página ${k} de ${doc.internal.getNumberOfPages()}`,pw/2,290,{align:'center'});
   }
-  doc.save(`relatorio-${mes}${detalhado?'-detalhado':''}.pdf`);
-  toast('📄 PDF gerado!');
+
+  doc.save(`relatorio-${mes}-${detalhado?'detalhado':'resumido'}.pdf`);
+  toast(`📄 PDF ${detalhado?'detalhado':'resumido'} gerado!`);
 }
+
 
 // ══════════════════════════════════════════
 // MÓDULOS
