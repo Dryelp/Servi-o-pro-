@@ -78,6 +78,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sc-ico{font-size:1.3rem;margin-bottom:8px}
 .sc-lbl{font-size:.68rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 .sc-val{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;line-height:1;margin-bottom:5px}
+.sc-val-sm{font-size:1.1rem!important;word-break:break-word}
 .sc-hint{font-size:.73rem;color:var(--mut)}
 
 /* PANEL */
@@ -489,9 +490,9 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div><div class="pg-title">Recebimentos</div><div class="pg-sub">Gerado automaticamente ao finalizar serviços</div></div>
     </div>
     <div class="stats" style="grid-template-columns:repeat(3,1fr)">
-      <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido (mês)</div><div class="sc-val" id="r-rec">R$ 0,00</div></div>
-      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Pendente</div><div class="sc-val" id="r-pend">R$ 0,00</div></div>
-      <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total geral</div><div class="sc-val" id="r-tot">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido (mês)</div><div class="sc-val sc-val-sm" id="r-rec">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Pendente</div><div class="sc-val sc-val-sm" id="r-pend">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total geral</div><div class="sc-val sc-val-sm" id="r-tot">R$ 0,00</div></div>
     </div>
     <div class="tw">
       <table><thead><tr><th class="hide-mob">Data</th><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Forma</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
@@ -967,6 +968,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <div class="modal modal-lg">
     <div class="mt">⏹️ Finalizar Serviço <button class="xbtn" onclick="fecha('m-fin-srv')">✕</button></div>
     <input type="hidden" id="fin-idx">
+    <datalist id="dl-materiais-fin"></datalist>
 
     <div class="fg">
       <label class="fl">O que foi feito (descrição para o relatório)</label>
@@ -3593,7 +3595,9 @@ function relMesAnterior(){
   renderRel();
 }
 
+let _modoRelAtual = 'resumido';
 function setModoRel(modo){
+  _modoRelAtual = modo;
   const detalhado = modo === 'detalhado';
   document.getElementById('btn-rel-resumido').className = detalhado ? 'btn btn-gho btn-sm' : 'btn btn-brn btn-sm';
   document.getElementById('btn-rel-detalhado').className = detalhado ? 'btn btn-brn btn-sm' : 'btn btn-gho btn-sm';
@@ -3715,7 +3719,7 @@ function preencherTabelasRel(){
 
 function gerarPDFRel(){
   const mes = document.getElementById('rel-mes').value;
-  const detalhado = !document.getElementById('rel-tw-rec')?.classList.contains('rel-oculto');
+  const detalhado = _modoRelAtual === 'detalhado';
   if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
   const {jsPDF} = window.jspdf;
   const doc  = new jsPDF({unit:'mm',format:'a4'});
