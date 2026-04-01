@@ -431,6 +431,11 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div class="sc-val" id="v-lucro">R$ 0,00</div>
         <div class="sc-hint">ver relatório →</div>
       </div>
+      <div class="sc" id="card-vendas" style="--sc-c:var(--blu);cursor:pointer;display:none" onclick="ir('produtos')">
+        <div class="sc-ico">🛍️</div><div class="sc-lbl">Vendas (total)</div>
+        <div class="sc-val" id="v-vendas">R$ 0,00</div>
+        <div class="sc-hint" id="v-vendas-h">produtos vendidos</div>
+      </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-bottom:18px" class="dash-grid">
@@ -594,6 +599,8 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
+      <div class="fg"><label class="fl">CNPJ <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label><input class="fi" id="edit-cnpj" placeholder="00.000.000/0001-00" maxlength="18"></div>
+      <div class="fg"><label class="fl">Endereço <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label><input class="fi" id="edit-end" placeholder="Rua, número, cidade..."></div>
       <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
       <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%">🚪 Sair da conta</button>
     </div>
@@ -957,6 +964,10 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="mf">
+      <label style="display:flex;align-items:center;gap:7px;font-size:.82rem;color:var(--mut);cursor:pointer;white-space:nowrap">
+        <input type="checkbox" id="srv-agendar-outro" style="width:15px;height:15px;accent-color:var(--org)">
+        Agendar outro
+      </label>
       <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()">✅ Agendar serviço</button>
       <button class="btn btn-gho" onclick="fecha('m-srv')">Cancelar</button>
     </div>
@@ -1222,7 +1233,7 @@ const D = {
   orcamentos: [],
   notifs:     [],
   despesas:   [],
-  perfil:     {nome:'',tipo:'',wpp:'',meta:0},
+  perfil:     {nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',meta:0},
   cfg:        {togAg:true,togRes:true,togCob:true}
 };
 let finMats  = [];
@@ -1920,6 +1931,7 @@ async function carregarDadosSupabase(){
     if(perf){
       D.perfil = {
         nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
+        cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
         modulos: perf.modulos||{}
@@ -1973,6 +1985,8 @@ async function sbSalvarPerfil(){
       nome: D.perfil.nome,
       tipo: D.perfil.tipo,
       wpp: D.perfil.wpp,
+      cnpj: D.perfil.cnpj||null,
+      end_perfil: D.perfil.end_perfil||null,
       meta: D.perfil.meta||0,
       segmento: D.perfil.segmento||'geral',
       meus_srvs: D.perfil.meusSrvs||[],
@@ -2129,7 +2143,9 @@ async function salvarPerfil(){
 }
 
 async function atualizarPerfil(){
-  D.perfil.nome = document.getElementById('edit-nome').value.trim();
+  D.perfil.nome      = document.getElementById('edit-nome').value.trim();
+  D.perfil.cnpj      = document.getElementById('edit-cnpj')?.value.trim()||'';
+  D.perfil.end_perfil= document.getElementById('edit-end')?.value.trim()||'';
   D.perfil.tipo = document.getElementById('edit-tipo').value.trim();
   D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
   D.perfil.segmento = detectarSegmento(D.perfil.tipo);
@@ -2152,6 +2168,8 @@ function uiPerfil(){
   const en = document.getElementById('edit-nome'); if(en) en.value = D.perfil.nome;
   const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
   const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
+  const ec = document.getElementById('edit-cnpj');  if(ec) ec.value = D.perfil.cnpj||'';
+  const ee = document.getElementById('edit-end');   if(ee) ee.value = D.perfil.end_perfil||'';
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
   atualizarPreviewMeta();
   renderMeusSrvs();
@@ -2228,6 +2246,11 @@ function paginaAtiva(){ return document.querySelector('.page.active')?.id.replac
 function abre(id){
   document.getElementById(id).classList.add('open');
   updDL();
+  // Resetar modal serviço ao abrir
+  if(id === 'm-srv'){
+    const btn = document.querySelector('#m-srv .btn-org');
+    if(btn){ btn.disabled=false; btn.textContent='✅ Agendar serviço'; }
+  }
   if(id === 'm-orc'){
     const editIdx = parseInt(document.getElementById('orc-edit-idx')?.value ?? '-1');
     if(editIdx < 0){ orcItens = []; renderOrcItens(); }
@@ -2279,8 +2302,11 @@ function rDash(){
   const tPend   = pends.reduce((a,b)=>a+(+b.val),0);
   const tMateri = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
   const tDesp   = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes)).reduce((a,b)=>a+(+b.val),0);
+  // Vendas de produtos do mês
+  const tVendas = (D.perfil.modulos?.produtos && D.produtos?.length)
+    ? D.produtos.reduce((a,p)=>a+(p.preco*(p.vendidos||0)),0) : 0;
   const tCusto  = tMateri + tDesp;
-  const lucro   = tRec - tCusto;
+  const lucro   = tRec + tVendas - tCusto;
 
   // Cards de status clicáveis — TODOS os serviços, não só do mês
   const agend = D.servicos.filter(s=>s.sts_srv==='Agendado').length;
@@ -2305,6 +2331,18 @@ function rDash(){
   if(hAn) hAn.textContent = andHoje > 0 ? 'em execução agora' : 'nenhum ativo';
   if(hRe) hRe.textContent = realMes > 0 ? realMes+' este mês' : 'nenhum este mês';
 
+  // Atualizar card vendas
+  const cardVendas = document.getElementById('card-vendas');
+  const elVendas   = document.getElementById('v-vendas');
+  const elVendasH  = document.getElementById('v-vendas-h');
+  if(D.perfil.modulos?.produtos && D.produtos?.length){
+    if(cardVendas) cardVendas.style.display = '';
+    if(elVendas)  elVendas.textContent  = R$(tVendas);
+    if(elVendasH) elVendasH.textContent = D.produtos.reduce((a,p)=>a+(p.vendidos||0),0)+' vendidos';
+  } else {
+    if(cardVendas) cardVendas.style.display = 'none';
+  }
+
   const oculto = localStorage.getItem('sp_ocultar') === '1';
   const mask = '••••••';
   document.getElementById('v-rec').textContent    = oculto ? mask : R$(tRec);
@@ -2312,7 +2350,8 @@ function rDash(){
   document.getElementById('v-custo').textContent  = oculto ? mask : R$(tCusto);
   document.getElementById('v-lucro').textContent  = oculto ? mask : R$(lucro);
   document.getElementById('v-lucro').style.color  = oculto ? 'var(--mut)' : (lucro>=0 ? 'var(--grn)':'var(--red)');
-  document.getElementById('v-rec-h').textContent  = oculto ? '' : pagos.length+' serviços pagos';
+  const hintRec = oculto ? '' : (tVendas > 0 ? pagos.length+' serviços · vendas: '+R$(tVendas) : pagos.length+' serviços pagos');
+  document.getElementById('v-rec-h').textContent = hintRec;
   document.getElementById('v-pend-h').textContent = oculto ? '' : pends.length+' pendentes';
   // Atualiza botão
   const btnOc = document.getElementById('btn-ocultar');
@@ -2691,6 +2730,9 @@ function autoPreencherCliente(){
 }
 
 function abreSrv(){
+  // Resetar botão antes de abrir
+  const btn = document.querySelector('#m-srv .btn-org');
+  if(btn){ btn.disabled=false; btn.textContent='✅ Agendar serviço'; }
   // Mostrar campos conforme segmento atual
   const seg = D.perfil.segmento || 'geral';
   const segsP = ['confeitaria','artesanato','embalagens','fotografia'];
@@ -2761,9 +2803,16 @@ async function salvarSrv(){
   }
 
   if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
-  fecha('m-srv'); render();
+  render();
   clr('s-cli','s-hr','s-tipo','s-end','s-val','s-prazo','s-qtd','s-entrada');
   const el = document.getElementById('s-saldo'); if(el) el.value = '';
+  const agenOu = document.getElementById('srv-agendar-outro');
+  if(agenOu?.checked){
+    // Mantém modal aberto, limpa campos, foca no cliente
+    setTimeout(()=>{ document.getElementById('s-cli')?.focus(); },100);
+  } else {
+    fecha('m-srv');
+  }
 }
 
 async function iniciarSrv(i){
@@ -3508,7 +3557,8 @@ function pdfOrc(i){
   doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
   doc.text(nome,14,14);
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
-  doc.text(D.perfil.tipo||'Prestador de Serviços',14,22);
+  const subtituloPerfil = [D.perfil.tipo||'Prestador de Serviços', D.perfil.cnpj ? 'CNPJ: '+D.perfil.cnpj : ''].filter(Boolean).join('  ·  ');
+  doc.text(subtituloPerfil,14,22);
   doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
   doc.text('ORÇAMENTO',pw-14,14,{align:'right'});
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(200,160,100);
@@ -3552,7 +3602,11 @@ function pdfOrc(i){
     const lines = doc.splitTextToSize('📌 '+o.obs,pw-28);
     doc.text(lines,14,y); y+=lines.length*5+6;
   }
-  if(D.perfil.wpp){ doc.setFontSize(8);doc.setTextColor(90,70,50); doc.text(`📱 Contato: ${D.perfil.wpp}`,14,y); }
+  let infoRodape = [];
+  if(D.perfil.wpp) infoRodape.push('📱 '+D.perfil.wpp);
+  if(D.perfil.cnpj) infoRodape.push('CNPJ: '+D.perfil.cnpj);
+  if(D.perfil.end_perfil) infoRodape.push(D.perfil.end_perfil);
+  if(infoRodape.length){ doc.setFontSize(8);doc.setTextColor(90,70,50); doc.text(infoRodape.join('   '),14,y); y+=6; }
   doc.setFontSize(7);doc.setTextColor(160,140,120);
   doc.text(`Emitido em ${new Date().toLocaleDateString('pt-BR')} · ${nome}`,pw/2,287,{align:'center'});
   doc.save(`orcamento-${(o.cli||'cliente').replace(/\s/g,'-')}-${o.dt||'data'}.pdf`);
@@ -3622,7 +3676,9 @@ function renderRel(){
   const tCusto  = reais.reduce((a,b)=>a+(b.materiais||[]).reduce((x,y)=>x+(+y.val),0),0);
   const despMes = (D.despesas||[]).filter(d=>(d.dt||'').startsWith(mes));
   const tDesp   = despMes.reduce((a,b)=>a+(+b.val),0);
-  const lucro   = tRec - tCusto - tDesp;
+  const tVendasRel = (D.perfil.modulos?.produtos && D.produtos?.length)
+    ? D.produtos.reduce((a,p)=>a+(p.preco*(p.vendidos||0)),0) : 0;
+  const lucro   = tRec + tVendasRel - tCusto - tDesp;
   const ticket  = pagos.length>0 ? tRec/pagos.length : 0;
 
   document.getElementById('rel-cards').innerHTML = `
@@ -3632,6 +3688,7 @@ function renderRel(){
     <div class="sc" style="--sc-c:var(--pur)"><div class="sc-lbl">Lucro real</div><div class="sc-val" style="color:${lucro>=0?'var(--grn)':'var(--red)'}">${R$(lucro)}</div><div class="sc-hint">receita − tudo</div></div>
     <div class="sc" style="--sc-c:var(--blu)"><div class="sc-lbl">Serviços</div><div class="sc-val">${srvMes.length}</div><div class="sc-hint">${reais.length} realizados</div></div>
     <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Ticket médio</div><div class="sc-val">${R$(ticket)}</div><div class="sc-hint">por serviço pago</div></div>
+    ${tVendasRel > 0 ? `<div class="sc" style="--sc-c:var(--blu)"><div class="sc-lbl">Vendas produtos</div><div class="sc-val" style="color:var(--blu)">${R$(tVendasRel)}</div><div class="sc-hint">${D.produtos?.reduce((a,p)=>a+(p.vendidos||0),0)||0} unidades</div></div>` : ''}
   `;
 }
 
