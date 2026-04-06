@@ -329,14 +329,121 @@ input:checked+.slider:before{transform:translateX(19px)}
 </div>
 
 <!-- WELCOME -->
-<div class="welcome-overlay" id="welcome">
-  <div class="welcome-box">
-    <div class="welcome-ico" id="welcome-ico">⚡</div>
-    <div class="welcome-title" id="welcome-title">Bem-vindo ao AutônomoPro!</div>
-    <div class="welcome-sub">Gestão completa para autônomos de qualquer segmento.<br>Antes de começar, nos diga quem é você!</div>
-    <div class="fg" style="text-align:left"><label class="fl">Seu nome</label><input class="fi" id="p-nome" placeholder="Ex: João Silva"></div>
-    <div class="fg" style="text-align:left"><label class="fl">Tipo de serviço que você faz</label><input class="fi" id="p-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
-    <button class="btn btn-org" style="width:100%;justify-content:center;margin-top:6px;padding:12px" onclick="salvarPerfil()">Começar agora 🚀</button>
+<!-- Modal Upgrade Pro -->
+<div class="overlay" id="m-upgrade">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:2.5rem;margin-bottom:12px">🚀</div>
+    <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:8px">Limite do plano Free</div>
+    <div id="upgrade-msg" style="font-size:.88rem;color:var(--mut);margin-bottom:16px;line-height:1.6"></div>
+    <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Plano Pro — R$ 29,90/mês</div>
+      <div style="font-size:.84rem;color:var(--brn);line-height:2">
+        ✅ Serviços ilimitados<br>
+        ✅ Clientes ilimitados<br>
+        ✅ Orçamentos ilimitados<br>
+        ✅ Todos os módulos<br>
+        ✅ Relatórios completos
+      </div>
+    </div>
+    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="window.open('https://autonomopro.app','_blank');fecha('m-upgrade')">⚡ Assinar Pro agora</button>
+    <button class="btn btn-gho" style="width:100%;justify-content:center" onclick="fecha('m-upgrade')">Continuar no Free</button>
+  </div>
+</div>
+
+<!-- ONBOARDING — aparece só no primeiro acesso -->
+<div class="welcome-overlay" id="welcome" style="align-items:center">
+  <div class="welcome-box" style="max-width:440px;width:100%;padding:0;overflow:hidden;border-radius:20px">
+
+    <!-- Progress bar -->
+    <div style="height:4px;background:var(--bor)">
+      <div id="ob-progress" style="height:4px;background:var(--org);transition:width .4s ease;width:25%"></div>
+    </div>
+
+    <!-- Passo 1 — Boas vindas -->
+    <div id="ob-1" style="padding:32px 28px">
+      <div style="font-size:2.5rem;margin-bottom:12px">⚡</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--brn);margin-bottom:8px">Bem-vindo ao<br>AutônomoPro!</div>
+      <div style="font-size:.9rem;color:var(--mut);line-height:1.6;margin-bottom:28px">Gestão completa para autônomos de qualquer segmento. Vamos configurar tudo em menos de 1 minuto.</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <div style="flex:1;background:var(--org-bg);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1.2rem">📋</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--org);margin-top:4px">Serviços</div>
+        </div>
+        <div style="flex:1;background:var(--grn-bg);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1.2rem">💰</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--grn);margin-top:4px">Financeiro</div>
+        </div>
+        <div style="flex:1;background:var(--blu-bg);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1.2rem">📄</div>
+          <div style="font-size:.72rem;font-weight:600;color:var(--blu);margin-top:4px">PDF & WhatsApp</div>
+        </div>
+      </div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:14px;font-size:.95rem" onclick="obAvancar(2)">Vamos lá →</button>
+      <div style="text-align:center;margin-top:12px;font-size:.75rem;color:var(--mut)">Passo 1 de 4</div>
+    </div>
+
+    <!-- Passo 2 — Segmento -->
+    <div id="ob-2" style="padding:32px 28px;display:none">
+      <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:6px">Qual é o seu segmento?</div>
+      <div style="font-size:.85rem;color:var(--mut);margin-bottom:20px">O app vai se adaptar ao seu negócio.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px" id="ob-segmentos">
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('construcao',this)" data-seg="construcao" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">⚒️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Construção</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('beleza',this)" data-seg="beleza" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">💅</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Beleza</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('confeitaria',this)" data-seg="confeitaria" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">🍰</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Confeitaria</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('fotografia',this)" data-seg="fotografia" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">📷</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Fotografia</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('frete',this)" data-seg="frete" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">🚛</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Frete</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('cerimonial',this)" data-seg="cerimonial" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">🎊</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Cerimonial</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('artesanato',this)" data-seg="artesanato" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">✂️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Artesanato</div>
+        </div>
+        <div class="ob-seg-btn" onclick="obSelecionarSeg('geral',this)" data-seg="geral" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
+          <div style="font-size:1.3rem">🛠️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Outro</div>
+        </div>
+      </div>
+      <button class="btn btn-org" id="ob-btn-2" style="width:100%;justify-content:center;padding:14px;opacity:.5" onclick="obAvancar(3)" disabled>Continuar →</button>
+      <div style="text-align:center;margin-top:12px;font-size:.75rem;color:var(--mut)">Passo 2 de 4</div>
+    </div>
+
+    <!-- Passo 3 — Dados pessoais -->
+    <div id="ob-3" style="padding:32px 28px;display:none">
+      <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:6px">Seus dados</div>
+      <div style="font-size:.85rem;color:var(--mut);margin-bottom:20px">Aparecerão nos seus orçamentos e relatórios.</div>
+      <div class="fg"><label class="fl">Seu nome completo *</label><input class="fi" id="ob-nome" placeholder="Ex: João Silva"></div>
+      <div class="fg"><label class="fl">WhatsApp *</label><input class="fi" id="ob-wpp" placeholder="(11) 99999-9999" type="tel"></div>
+      <div class="fg"><label class="fl">CNPJ <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label><input class="fi" id="ob-cnpj" placeholder="00.000.000/0001-00" maxlength="18"></div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:14px;margin-top:4px" onclick="obSalvarDados()">Continuar →</button>
+      <div style="text-align:center;margin-top:12px;font-size:.75rem;color:var(--mut)">Passo 3 de 4</div>
+    </div>
+
+    <!-- Passo 4 — Pronto! -->
+    <div id="ob-4" style="padding:32px 28px;display:none;text-align:center">
+      <div style="font-size:3rem;margin-bottom:16px">🎉</div>
+      <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--brn);margin-bottom:8px" id="ob-nome-final">Tudo pronto!</div>
+      <div style="font-size:.88rem;color:var(--mut);line-height:1.6;margin-bottom:24px">Seu perfil foi configurado. Agora você pode começar a gerenciar seus serviços com facilidade.</div>
+      <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:24px;text-align:left">
+        <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">O que você pode fazer agora:</div>
+        <div style="font-size:.84rem;color:var(--brn);line-height:2">
+          ⚡ Agendar seu primeiro serviço<br>
+          📋 Criar um orçamento profissional<br>
+          💰 Controlar seus recebimentos<br>
+          📊 Ver seus relatórios mensais
+        </div>
+      </div>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:14px;font-size:.95rem" onclick="obConcluir()">Começar a usar →</button>
+    </div>
+
   </div>
 </div>
 
@@ -660,6 +767,55 @@ input:checked+.slider:before{transform:translateX(19px)}
           <div class="ts">Receba avaliações via link pelo WhatsApp</div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-avaliacoes" onchange="salvarModulo('avaliacoes',this.checked)"><span class="slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Minha Assinatura -->
+    <div class="cfg-sec" id="sec-assinatura">
+      <div class="cfg-t">⚡ Minha Assinatura</div>
+      <div id="assin-free" style="display:none">
+        <div style="background:var(--bg);border:1.5px solid var(--bor);border-radius:14px;padding:16px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-size:.72rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px">Plano atual</div>
+              <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--brn);margin-top:2px">Free</div>
+            </div>
+            <span class="badge b-o">Limitado</span>
+          </div>
+          <div id="assin-uso" style="font-size:.82rem;color:var(--mut);line-height:1.9;margin-bottom:14px"></div>
+          <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px" onclick="window.open('https://www.asaas.com/c/dkzl46p40biaxutg','_blank')">
+            🚀 Fazer upgrade — R$ 29,90/mês
+          </button>
+          <div style="font-size:.72rem;color:var(--mut);text-align:center;margin-top:8px">PIX · Cartão · Boleto · Cancele quando quiser</div>
+        </div>
+        <div style="background:var(--org-bg);border-radius:12px;padding:14px">
+          <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Plano Pro inclui:</div>
+          <div style="font-size:.83rem;color:var(--brn);line-height:2">
+            ✅ Serviços ilimitados<br>
+            ✅ Clientes ilimitados<br>
+            ✅ Orçamentos ilimitados<br>
+            ✅ Todos os módulos<br>
+            ✅ Relatórios completos<br>
+            ✅ Suporte prioritário
+          </div>
+        </div>
+      </div>
+      <div id="assin-pro" style="display:none">
+        <div style="background:linear-gradient(135deg,#1a0f0a,#2d1810);border-radius:14px;padding:20px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:#fff">👑 Plano Pro</div>
+            <span style="background:var(--org);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px">ATIVO</span>
+          </div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.6)" id="assin-expira">Renovação automática</div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.8">
+            ✅ Serviços ilimitados<br>
+            ✅ Todos os módulos ativos<br>
+            ✅ Suporte prioritário
+          </div>
+        </div>
+        <button class="btn btn-gho" style="width:100%;justify-content:center;font-size:.8rem;color:var(--mut)" onclick="if(confirm('Tem certeza que deseja cancelar?')) window.open('https://www.asaas.com/c/dkzl46p40biaxutg','_blank')">
+          Gerenciar assinatura
+        </button>
       </div>
     </div>
 
@@ -1910,6 +2066,7 @@ function iniciarApp(){
   uiPerfil();
   if(!D.perfil.nome) document.getElementById('welcome').classList.add('open');
   verificarMigracao();
+  verificarOnboarding();
   carregarAvaliacoes();
   carregarProdutos();
   carregarMateriais();
@@ -1934,7 +2091,9 @@ async function carregarDadosSupabase(){
         cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
-        modulos: perf.modulos||{}
+        modulos: perf.modulos||{},
+        plano: perf.plano||'free',
+        onboarding_completo: perf.onboarding_completo||false
       };
       D.cfg = {togAg:true,togRes:true,togCob:true};
     }
@@ -1987,6 +2146,8 @@ async function sbSalvarPerfil(){
       wpp: D.perfil.wpp,
       cnpj: D.perfil.cnpj||null,
       end_perfil: D.perfil.end_perfil||null,
+      plano: D.perfil.plano||'free',
+      onboarding_completo: D.perfil.onboarding_completo||false,
       meta: D.perfil.meta||0,
       segmento: D.perfil.segmento||'geral',
       meus_srvs: D.perfil.meusSrvs||[],
@@ -2175,6 +2336,7 @@ function uiPerfil(){
   renderMeusSrvs();
   atualizarDatalistTipo();
   renderModulos();
+  renderAssinatura();
 }
 
 function atualizarPreviewMeta(){
@@ -2780,6 +2942,10 @@ async function salvarSrv(){
     if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
     return toast('⚠️ Preencha data e nome do cliente');
   }
+  if(!verificarLimite('servico')){
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+    return;
+  }
 
   // Salvar no Supabase PRIMEIRO
   const saved = await sbSalvarServico(o);
@@ -3192,6 +3358,7 @@ async function salvarCli(){
   };
   if(!o.nm) return toast('⚠️ Digite o nome do cliente');
   if(D.clientes.find(c=>c.nm.toLowerCase()===o.nm.toLowerCase())) return toast('⚠️ Cliente já cadastrado');
+  if(!verificarLimite('cliente')){ if(btnCli){ btnCli.disabled=false; btnCli.textContent='✅ Salvar'; } return; }
   const sc = await sbSalvarCliente(o);
   if(sc) o._dbid = sc.id;
   D.clientes.push(o);
@@ -4632,6 +4799,165 @@ function renderAvaliacoes(){
       ${a.comentario ? `<div style="font-size:.84rem;color:var(--mut);font-style:italic">"${a.comentario}"</div>` : ''}
     </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+// ASSINATURA
+// ══════════════════════════════════════════
+function renderAssinatura(){
+  const plano = D.perfil.plano || 'free';
+  const isPro  = plano === 'pro';
+  const free   = document.getElementById('assin-free');
+  const pro    = document.getElementById('assin-pro');
+  if(!free || !pro) return;
+
+  if(isPro){
+    free.style.display = 'none';
+    pro.style.display  = '';
+    const expira = document.getElementById('assin-expira');
+    if(expira && D.perfil.plano_expira){
+      const dt = new Date(D.perfil.plano_expira).toLocaleDateString('pt-BR');
+      expira.textContent = 'Ativo até ' + dt + ' · Renovação automática';
+    }
+  } else {
+    free.style.display = '';
+    pro.style.display  = 'none';
+    // Mostrar uso atual
+    const mes   = hj().slice(0,7);
+    const srvs  = D.servicos.filter(s=>(s.dt||'').startsWith(mes)).length;
+    const clis  = D.clientes.length;
+    const orcs  = D.orcamentos.filter(o=>(o.dt||'').startsWith(mes)).length;
+    const uso   = document.getElementById('assin-uso');
+    if(uso) uso.innerHTML =
+      `📋 Serviços: <strong>${srvs}/10</strong> este mês<br>` +
+      `👤 Clientes: <strong>${clis}/15</strong> cadastrados<br>` +
+      `📄 Orçamentos: <strong>${orcs}/8</strong> este mês`;
+  }
+}
+
+// ══════════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════════
+let _obSegmento = '';
+
+function obAvancar(passo){
+  // Esconder todos
+  [1,2,3,4].forEach(p=>{
+    const el = document.getElementById('ob-'+p);
+    if(el) el.style.display = 'none';
+  });
+  // Mostrar passo atual
+  const el = document.getElementById('ob-'+passo);
+  if(el) el.style.display = '';
+  // Progress bar
+  const prog = document.getElementById('ob-progress');
+  if(prog) prog.style.width = (passo * 25) + '%';
+}
+
+function obSelecionarSeg(seg, el){
+  _obSegmento = seg;
+  // Reset todos
+  document.querySelectorAll('.ob-seg-btn').forEach(b=>{
+    b.style.borderColor = 'var(--bor)';
+    b.style.background  = 'var(--bg)';
+  });
+  // Destacar selecionado
+  el.style.borderColor = 'var(--org)';
+  el.style.background  = 'var(--org-bg)';
+  // Habilitar botão
+  const btn = document.getElementById('ob-btn-2');
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; }
+}
+
+async function obSalvarDados(){
+  const nome = document.getElementById('ob-nome')?.value.trim();
+  const wpp  = document.getElementById('ob-wpp')?.value.trim();
+  const cnpj = document.getElementById('ob-cnpj')?.value.trim();
+  if(!nome) return toast('⚠️ Digite seu nome');
+  if(!wpp)  return toast('⚠️ Digite seu WhatsApp');
+
+  D.perfil.nome       = nome;
+  D.perfil.wpp        = wpp;
+  D.perfil.cnpj       = cnpj||'';
+  D.perfil.segmento   = _obSegmento || 'geral';
+
+  // Mostrar passo 4 com nome
+  const nf = document.getElementById('ob-nome-final');
+  if(nf) nf.textContent = 'Tudo pronto, ' + nome.split(' ')[0] + '!';
+
+  obAvancar(4);
+}
+
+async function obConcluir(){
+  D.perfil.onboarding_completo = true;
+  await sbSalvarPerfil();
+  document.getElementById('welcome').classList.remove('open');
+  // Aplicar segmento escolhido
+  if(_obSegmento && typeof SEGMENTOS !== 'undefined'){
+    aplicarSegmento(SEGMENTOS[_obSegmento] || SEGMENTOS.geral);
+  }
+  render(); uiPerfil();
+  toast('✅ Bem-vindo ao AutônomoPro!');
+}
+
+// Verificar se deve mostrar onboarding
+function verificarOnboarding(){
+  if(!D.perfil.onboarding_completo){
+    document.getElementById('welcome').classList.add('open');
+    obAvancar(1);
+  }
+}
+
+// ══════════════════════════════════════════
+// PLANOS FREE / PRO
+// ══════════════════════════════════════════
+const LIMITES_FREE = {
+  servicos_mes: 10,
+  clientes: 15,
+  orcamentos: 8,
+};
+
+function isPro(){
+  return D.perfil.plano === 'pro';
+}
+
+function verificarLimite(tipo){
+  if(isPro()) return true;
+  const mes = hj().slice(0,7);
+
+  if(tipo === 'servico'){
+    const count = D.servicos.filter(s=>(s.dt||'').startsWith(mes)).length;
+    if(count >= LIMITES_FREE.servicos_mes){
+      mostrarModalUpgrade('servicos', count);
+      return false;
+    }
+  }
+  if(tipo === 'cliente'){
+    if(D.clientes.length >= LIMITES_FREE.clientes){
+      mostrarModalUpgrade('clientes', D.clientes.length);
+      return false;
+    }
+  }
+  if(tipo === 'orcamento'){
+    const count = D.orcamentos.filter(o=>(o.dt||'').startsWith(mes)).length;
+    if(count >= LIMITES_FREE.orcamentos){
+      mostrarModalUpgrade('orcamentos', count);
+      return false;
+    }
+  }
+  return true;
+}
+
+function mostrarModalUpgrade(tipo, count){
+  const msgs = {
+    servicos:  `Você atingiu ${LIMITES_FREE.servicos_mes} serviços este mês.`,
+    clientes:  `Você atingiu ${LIMITES_FREE.clientes} clientes cadastrados.`,
+    orcamentos:`Você atingiu ${LIMITES_FREE.orcamentos} orçamentos este mês.`,
+  };
+  const el = document.getElementById('m-upgrade');
+  if(!el) return;
+  document.getElementById('upgrade-msg').textContent = msgs[tipo]||'Limite do plano Free atingido.';
+  el.classList.add('open');
 }
 
 // ══════════════════════════════════════════
