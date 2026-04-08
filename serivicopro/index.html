@@ -329,6 +329,29 @@ input:checked+.slider:before{transform:translateX(19px)}
 </div>
 
 <!-- WELCOME -->
+<!-- Modal Cancelar Assinatura -->
+<div class="overlay" id="m-cancelar-assin">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:2rem;margin-bottom:12px">😢</div>
+    <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--brn);margin-bottom:8px">Cancelar assinatura?</div>
+    <div style="font-size:.85rem;color:var(--mut);line-height:1.6;margin-bottom:20px">
+      Você perderá acesso ao plano Pro ao fim do período pago.<br><br>
+      Seus dados ficam salvos — se quiser voltar, é só assinar novamente.
+    </div>
+    <div style="background:var(--red-bg);border-radius:10px;padding:12px;margin-bottom:20px;font-size:.82rem;color:var(--red);text-align:left;line-height:1.8">
+      ❌ Limite de 10 serviços/mês<br>
+      ❌ Limite de 15 clientes<br>
+      ❌ Módulos desativados
+    </div>
+    <button class="btn btn-gho" style="width:100%;justify-content:center;padding:12px;margin-bottom:8px;color:var(--red);border-color:rgba(220,38,38,.3)" onclick="confirmarCancelamento()">
+      Confirmar cancelamento
+    </button>
+    <button class="btn btn-org" style="width:100%;justify-content:center;padding:12px" onclick="fecha('m-cancelar-assin')">
+      Manter meu Pro 👑
+    </button>
+  </div>
+</div>
+
 <!-- Modal Upgrade Pro -->
 <div class="overlay" id="m-upgrade">
   <div class="modal" style="text-align:center">
@@ -783,7 +806,7 @@ input:checked+.slider:before{transform:translateX(19px)}
             <span class="badge b-o">Limitado</span>
           </div>
           <div id="assin-uso" style="font-size:.82rem;color:var(--mut);line-height:1.9;margin-bottom:14px"></div>
-          <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px" onclick="window.open('https://www.asaas.com/c/dkzl46p40biaxutg','_blank')">
+          <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px" onclick="abrirWhatsAppPro()">
             🚀 Fazer upgrade — R$ 29,90/mês
           </button>
           <div style="font-size:.72rem;color:var(--mut);text-align:center;margin-top:8px">PIX · Cartão · Boleto · Cancele quando quiser</div>
@@ -801,21 +824,34 @@ input:checked+.slider:before{transform:translateX(19px)}
         </div>
       </div>
       <div id="assin-pro" style="display:none">
-        <div style="background:linear-gradient(135deg,#1a0f0a,#2d1810);border-radius:14px;padding:20px;margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <!-- Card Pro ativo -->
+        <div style="background:linear-gradient(135deg,#1a0f0a,#2d1810);border-radius:14px;padding:20px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:#fff">👑 Plano Pro</div>
-            <span style="background:var(--org);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px">ATIVO</span>
+            <span style="background:var(--org);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px">ATIVO</span>
           </div>
-          <div style="font-size:.82rem;color:rgba(255,255,255,.6)" id="assin-expira">Renovação automática</div>
-          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.8">
-            ✅ Serviços ilimitados<br>
-            ✅ Todos os módulos ativos<br>
-            ✅ Suporte prioritário
+          <div style="font-size:.8rem;color:rgba(255,255,255,.5)" id="assin-expira">Renovação automática mensal</div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Serviços ilimitados</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Clientes ilimitados</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Todos os módulos</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Suporte prioritário</div>
           </div>
         </div>
-        <button class="btn btn-gho" style="width:100%;justify-content:center;font-size:.8rem;color:var(--mut)" onclick="if(confirm('Tem certeza que deseja cancelar?')) window.open('https://www.asaas.com/c/dkzl46p40biaxutg','_blank')">
-          Gerenciar assinatura
-        </button>
+
+        <!-- Cancelamento -->
+        <div style="background:var(--bg);border:1.5px solid var(--bor);border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="font-size:.8rem;font-weight:700;color:var(--brn);margin-bottom:4px">Cancelar assinatura</div>
+          <div style="font-size:.76rem;color:var(--mut);margin-bottom:12px;line-height:1.5">Ao cancelar, seu plano Pro permanece ativo até o fim do período pago. Após isso, volta para o Free.</div>
+          <button class="btn btn-gho" style="width:100%;justify-content:center;color:var(--red);border-color:rgba(220,38,38,.3);font-size:.82rem" onclick="abrirCancelarAssinatura()">
+            Cancelar assinatura
+          </button>
+        </div>
+
+        <!-- Suporte -->
+        <div style="text-align:center;font-size:.75rem;color:var(--mut)">
+          Dúvidas? Fale pelo WhatsApp da AutônomoPro
+        </div>
       </div>
     </div>
 
@@ -4799,6 +4835,44 @@ function renderAvaliacoes(){
       ${a.comentario ? `<div style="font-size:.84rem;color:var(--mut);font-style:italic">"${a.comentario}"</div>` : ''}
     </div>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════
+// PAGAMENTO — PIX MANUAL (sem automação)
+// ══════════════════════════════════════════
+const WPP_SUPORTE = '5533999129384';
+
+function abrirWhatsAppPro(){
+  const nome = D.perfil.nome || 'usuário';
+  const msg  = encodeURIComponent(
+    'Olá! Tenho interesse em assinar o AutônomoPro Pro por R$ 29,90/mês.
+
+' +
+    'Meu nome: ' + nome + '
+' +
+    'Email: ' + (D.perfil.email || '')
+  );
+  window.open('https://wa.me/' + WPP_SUPORTE + '?text=' + msg, '_blank');
+}
+
+// ══════════════════════════════════════════
+// CANCELAMENTO ASSINATURA
+// ══════════════════════════════════════════
+function abrirCancelarAssinatura(){
+  abre('m-cancelar-assin');
+}
+
+async function confirmarCancelamento(){
+  // Cancela localmente — sem Edge Function
+  D.perfil.plano = 'free';
+  D.perfil.plano_expira = null;
+  await sbSalvarPerfil();
+  fecha('m-cancelar-assin');
+  renderAssinatura();
+  // Notifica via WhatsApp pra você processar manualmente
+  const msg = encodeURIComponent('Olá! Quero cancelar minha assinatura AutônomoPro. Meu email: ' + (D.perfil.email || USER_ID));
+  window.open('https://wa.me/55' + WPP_SUPORTE + '?text=' + msg, '_blank');
+  toast('Cancelamento solicitado!');
 }
 
 // ══════════════════════════════════════════
