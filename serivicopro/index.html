@@ -1414,6 +1414,7 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').cat
 // ══════════════════════════════════════════
 const SUPA = supabase.createClient('https://dwuhhdxhxveucajhejrk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dWhoZHhoeHZldWNhamhlanJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjU1NzgsImV4cCI6MjA4OTUwMTU3OH0.aCa2l7V9ScB5LuqGD1B3za0WIKqj7PmtJtIWk7AcyYQ');
 let USER_ID = null;
+let USER_EMAIL = '';
 
 const D = {
   servicos:   [],
@@ -1648,6 +1649,7 @@ window.onload = async () => {
   const { data: { session } } = await SUPA.auth.getSession();
   if(session){
     USER_ID = session.user.id;
+    USER_EMAIL = session.user.email || '';
     await carregarDadosSupabase();
     iniciarApp();
   } else {
@@ -1657,6 +1659,7 @@ window.onload = async () => {
   SUPA.auth.onAuthStateChange(async (event, session) => {
     if(event === 'SIGNED_IN' && session){
       USER_ID = session.user.id;
+      USER_EMAIL = session.user.email || '';
       await carregarDadosSupabase();
       iniciarApp();
     } else if(event === 'SIGNED_OUT'){
@@ -4844,7 +4847,7 @@ const WPP_SUPORTE = '5533999129384';
 
 function abrirWhatsAppPro(){
   var nome  = D.perfil.nome || 'usuario';
-  var email = D.perfil.email || USER_ID || '';
+  var email = USER_EMAIL || D.perfil.email || '';
   var msg   = 'Ola! Quero assinar o AutonomoPro Pro - R$ 29,90/mes. Nome: ' + nome + ' | Email: ' + email;
   window.open('https://wa.me/5533999129384?text=' + encodeURIComponent(msg), '_blank');
 }
@@ -4862,7 +4865,7 @@ async function confirmarCancelamento(){
   await sbSalvarPerfil();
   fecha('m-cancelar-assin');
   renderAssinatura();
-  var msg = 'Ola! Quero cancelar minha assinatura AutonomoPro. Email: ' + (D.perfil.email || USER_ID || '');
+  var msg = 'Ola! Quero cancelar minha assinatura AutonomoPro. Email: ' + (USER_EMAIL || D.perfil.email || '');
   window.open('https://wa.me/5533999129384?text=' + encodeURIComponent(msg), '_blank');
   toast('Cancelamento solicitado!');
 }
