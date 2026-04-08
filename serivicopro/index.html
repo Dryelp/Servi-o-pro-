@@ -4843,16 +4843,10 @@ function renderAvaliacoes(){
 const WPP_SUPORTE = '5533999129384';
 
 function abrirWhatsAppPro(){
-  const nome = D.perfil.nome || 'usuário';
-  const msg  = encodeURIComponent(
-    'Olá! Tenho interesse em assinar o AutônomoPro Pro por R$ 29,90/mês.
-
-' +
-    'Meu nome: ' + nome + '
-' +
-    'Email: ' + (D.perfil.email || '')
-  );
-  window.open('https://wa.me/' + WPP_SUPORTE + '?text=' + msg, '_blank');
+  var nome  = D.perfil.nome || 'usuario';
+  var email = D.perfil.email || USER_ID || '';
+  var msg   = 'Ola! Quero assinar o AutonomoPro Pro - R$ 29,90/mes. Nome: ' + nome + ' | Email: ' + email;
+  window.open('https://wa.me/5533999129384?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // ══════════════════════════════════════════
@@ -4863,15 +4857,13 @@ function abrirCancelarAssinatura(){
 }
 
 async function confirmarCancelamento(){
-  // Cancela localmente — sem Edge Function
   D.perfil.plano = 'free';
   D.perfil.plano_expira = null;
   await sbSalvarPerfil();
   fecha('m-cancelar-assin');
   renderAssinatura();
-  // Notifica via WhatsApp pra você processar manualmente
-  const msg = encodeURIComponent('Olá! Quero cancelar minha assinatura AutônomoPro. Meu email: ' + (D.perfil.email || USER_ID));
-  window.open('https://wa.me/55' + WPP_SUPORTE + '?text=' + msg, '_blank');
+  var msg = 'Ola! Quero cancelar minha assinatura AutonomoPro. Email: ' + (D.perfil.email || USER_ID || '');
+  window.open('https://wa.me/5533999129384?text=' + encodeURIComponent(msg), '_blank');
   toast('Cancelamento solicitado!');
 }
 
