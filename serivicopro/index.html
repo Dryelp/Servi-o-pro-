@@ -359,16 +359,17 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:8px">Limite do plano Free</div>
     <div id="upgrade-msg" style="font-size:.88rem;color:var(--mut);margin-bottom:16px;line-height:1.6"></div>
     <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
-      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Plano Pro — R$ 29,90/mês</div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Plano Pro — R$ 29,90/mês</div>
       <div style="font-size:.84rem;color:var(--brn);line-height:2">
-        ✅ Serviços ilimitados<br>
-        ✅ Clientes ilimitados<br>
-        ✅ Orçamentos ilimitados<br>
-        ✅ Todos os módulos<br>
-        ✅ Relatórios completos
+        ✅ Serviços ilimitados (Free: 5/mês)<br>
+        ✅ Clientes ilimitados (Free: 10)<br>
+        ✅ Orçamentos ilimitados (Free: 3/mês)<br>
+        ✅ Todos os módulos extras<br>
+        ✅ Relatórios PDF completos<br>
+        ✅ Suporte prioritário via WhatsApp
       </div>
     </div>
-    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="window.open('https://autonomopro.app','_blank');fecha('m-upgrade')">⚡ Assinar Pro agora</button>
+    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="abrirWhatsAppPro();fecha('m-upgrade')">📱 Quero ser Pro — R$ 29,90/mês</button>
     <button class="btn btn-gho" style="width:100%;justify-content:center" onclick="fecha('m-upgrade')">Continuar no Free</button>
   </div>
 </div>
@@ -2206,15 +2207,27 @@ async function sbSalvarServico(srv){
     materiais: srv.materiais||[], desc_feito: srv.desc_feito||null,
     inicio: srv.inicio||null, fim: srv.fim||null
   };
-  let q;
-  if(srv._dbid){
-    q = SUPA.from('servicos').update(payload).eq('id', srv._dbid).eq('user_id', USER_ID);
-  } else {
-    q = SUPA.from('servicos').insert(payload);
+  try {
+    let q;
+    if(srv._dbid){
+      q = SUPA.from('servicos').update(payload).eq('id', srv._dbid).eq('user_id', USER_ID);
+    } else {
+      q = SUPA.from('servicos').insert(payload);
+    }
+    // Timeout de 8 segundos — evita travar por 2 minutos
+    const timeoutPromise = new Promise((_,reject) =>
+      setTimeout(()=>reject(new Error('timeout')), 8000)
+    );
+    const { data, error } = await Promise.race([
+      q.select().single(),
+      timeoutPromise
+    ]);
+    if(error){ console.error('Erro servico:', error); return null; }
+    return data;
+  } catch(e) {
+    console.error('sbSalvarServico erro/timeout:', e.message);
+    return null;
   }
-  const { data, error } = await q.select().single();
-  if(error){ console.error('Erro servico:', error); return null; }
-  return data;
 }
 
 async function sbDeletarServico(dbid){
@@ -4898,9 +4911,9 @@ function renderAssinatura(){
     const orcs  = D.orcamentos.filter(o=>(o.dt||'').startsWith(mes)).length;
     const uso   = document.getElementById('assin-uso');
     if(uso) uso.innerHTML =
-      `📋 Serviços: <strong>${srvs}/10</strong> este mês<br>` +
-      `👤 Clientes: <strong>${clis}/15</strong> cadastrados<br>` +
-      `📄 Orçamentos: <strong>${orcs}/8</strong> este mês`;
+      '📋 Servicos: <strong>' + srvs + '/5</strong> este mes<br>' +
+      '👤 Clientes: <strong>' + clis + '/10</strong> cadastrados<br>' +
+      '📄 Orcamentos: <strong>' + orcs + '/3</strong> este mes';
   }
 }
 
@@ -4981,9 +4994,9 @@ function verificarOnboarding(){
 // PLANOS FREE / PRO
 // ══════════════════════════════════════════
 const LIMITES_FREE = {
-  servicos_mes: 10,
-  clientes: 15,
-  orcamentos: 8,
+  servicos_mes: 5,   // 5 serviços/mês
+  clientes: 10,      // 10 clientes
+  orcamentos: 3,     // 3 orçamentos/mês
 };
 
 function isPro(){
@@ -5019,9 +5032,9 @@ function verificarLimite(tipo){
 
 function mostrarModalUpgrade(tipo, count){
   const msgs = {
-    servicos:  `Você atingiu ${LIMITES_FREE.servicos_mes} serviços este mês.`,
-    clientes:  `Você atingiu ${LIMITES_FREE.clientes} clientes cadastrados.`,
-    orcamentos:`Você atingiu ${LIMITES_FREE.orcamentos} orçamentos este mês.`,
+    servicos:  'Voce atingiu o limite de ' + LIMITES_FREE.servicos_mes + ' servicos/mes do plano Free.',
+    clientes:  'Voce atingiu o limite de ' + LIMITES_FREE.clientes + ' clientes do plano Free.',
+    orcamentos:'Voce atingiu o limite de ' + LIMITES_FREE.orcamentos + ' orcamentos/mes do plano Free.',
   };
   const el = document.getElementById('m-upgrade');
   if(!el) return;
