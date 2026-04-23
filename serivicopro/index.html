@@ -3422,17 +3422,16 @@ function pdfRelSrv(){
     doc.text('DESCRICAO', 14, y);
     y += 5;
 
-    // Margem interna: 21 esquerda, 7 direita = pw-28 (caixa) - 7 padding direito = pw-35 de texto
-    var maxW   = pw - 28 - 14; // largura da caixa menos padding dos dois lados (7px cada)
+    // Largura segura: página (210mm) - margem esq (14) - margem dir (14) - padding caixa (8 cada lado)
+    var maxW   = pw - 28 - 16; // 210 - 28 - 16 = 166mm de texto
     var dLines = doc.splitTextToSize(s.desc_feito, maxW);
-    var dH     = dLines.length * 5.8 + 16;
+    var dH     = dLines.length * 6 + 18;
     doc.setFillColor(...C.bg);
     doc.roundedRect(14, y, pw-28, dH, 2, 2, 'F');
-    doc.setFontSize(9);
+    doc.setFontSize(8.5);
     doc.setFont('helvetica','normal');
     doc.setTextColor(...C.ink);
-    // Texto começa em x=21 (7px padding esquerdo dentro da caixa)
-    doc.text(dLines, 21, y+9);
+    doc.text(dLines, 22, y+10);
     y += dH + 10;
   }
 
