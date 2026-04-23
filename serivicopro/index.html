@@ -3422,16 +3422,15 @@ function pdfRelSrv(){
     doc.text('DESCRICAO', 14, y);
     y += 5;
 
-    // Largura segura: página (210mm) - margem esq (14) - margem dir (14) - padding caixa (8 cada lado)
-    var maxW   = pw - 28 - 16; // 210 - 28 - 16 = 166mm de texto
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    var maxW   = 150;
     var dLines = doc.splitTextToSize(s.desc_feito, maxW);
-    var dH     = dLines.length * 6 + 18;
+    var dH     = dLines.length * 6 + 16;
     doc.setFillColor(...C.bg);
     doc.roundedRect(14, y, pw-28, dH, 2, 2, 'F');
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica','normal');
     doc.setTextColor(...C.ink);
-    doc.text(dLines, 22, y+10);
+    doc.text(dLines, 22, y+9);
     y += dH + 10;
   }
 
