@@ -2232,14 +2232,8 @@ async function sbSalvarServico(srv){
       q = SUPA.from('servicos').insert(payload);
     }
     // Timeout de 8 segundos — evita travar por 2 minutos
-    const timeoutPromise = new Promise((_,reject) =>
-      setTimeout(()=>reject(new Error('timeout')), 8000)
-    );
-    const { data, error } = await Promise.race([
-      q.select().single(),
-      timeoutPromise
-    ]);
-    if(error){ console.error('Erro servico:', error); return null; }
+    const { data, error } = await q.select().single();
+    if(error){ console.error('Erro servico:', error.message); return null; }
     return data;
   } catch(e) {
     console.error('sbSalvarServico erro/timeout:', e.message);
@@ -2281,25 +2275,32 @@ async function sbSalvarOrcamento(orc){
     descricao: orc.desc||null, valid: orc.valid||null,
     obs: orc.obs||null, itens: orc.itens||[], sts: orc.sts
   };
-  console.log('Salvando orcamento payload:', JSON.stringify(payload));
   try {
-    let q;
+    let result;
     if(orc._dbid){
-      q = SUPA.from('orcamentos').update(payload).eq('id', orc._dbid).eq('user_id', USER_ID);
+      result = await SUPA.from('orcamentos')
+        .update(payload)
+        .eq('id', orc._dbid)
+        .eq('user_id', USER_ID)
+        .select()
+        .single();
     } else {
-      q = SUPA.from('orcamentos').insert(payload);
+      result = await SUPA.from('orcamentos')
+        .insert(payload)
+        .select()
+        .single();
     }
-    const timeout = new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 8000));
-    const { data, error } = await Promise.race([q.select().single(), timeout]);
+    const { data, error } = result;
     if(error){
       const msg = error.message || error.details || error.hint || JSON.stringify(error);
       console.error('ERRO ORCAMENTO:', msg);
-      toast('Erro: ' + msg.slice(0,80));
+      toast('Erro ao salvar: ' + msg.slice(0,60));
       return null;
     }
     return data;
   } catch(e) {
-    console.error('sbSalvarOrcamento timeout/erro:', e.message);
+    console.error('sbSalvarOrcamento erro:', e.message);
+    toast('Erro de conexao. Tente novamente.');
     return null;
   }
 }
@@ -5160,13 +5161,13 @@ async function uploadLogo(input){
 
     // Upload para Supabase Storage
     const { error: upErr } = await SUPA.storage
-      .from('logos')
+      .from('Logo')
       .upload(fileName, file, { upsert: true, contentType: file.type });
 
     if(upErr){ console.error('Upload erro detalhado:', JSON.stringify(upErr)); return toast('Erro: ' + (upErr.message||upErr.error||'verifique o console')); }
 
     // Pegar URL pública
-    const { data } = SUPA.storage.from('logos').getPublicUrl(fileName);
+    const { data } = SUPA.storage.from('Logo').getPublicUrl(fileName);
     const url = data.publicUrl + '?t=' + Date.now(); // cache bust
 
     D.perfil.logo_url = url;
