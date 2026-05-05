@@ -1412,7 +1412,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
     <div class="fg"><label class="fl">Observações</label><input class="fi" id="o-obs" placeholder="Prazo, condições, materiais inclusos..."></div>
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
+      <button class="btn btn-org" id="btn-salvar-orc" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
       <button class="btn btn-gho" onclick="fecha('m-orc')">Cancelar</button>
     </div>
   </div>
@@ -3915,7 +3915,7 @@ function remOrcItem(j){ orcItens.splice(j,1); renderOrcItens(); }
 document.getElementById('oi-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addOrcItem(); });
 
 async function salvarOrc(){
-  const btnOrc = document.querySelector('#m-orc .btn-org');
+  const btnOrc = document.getElementById('btn-salvar-orc');
   const resetBtnOrc = () => { if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; } };
 
   if(!orcItens.length){ return toast('⚠️ Adicione pelo menos 1 item'); }
