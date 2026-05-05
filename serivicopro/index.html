@@ -2281,6 +2281,7 @@ async function sbSalvarOrcamento(orc){
     descricao: orc.desc||null, valid: orc.valid||null,
     obs: orc.obs||null, itens: orc.itens||[], sts: orc.sts
   };
+  console.log('Salvando orcamento payload:', JSON.stringify(payload));
   try {
     let q;
     if(orc._dbid){
@@ -2290,7 +2291,12 @@ async function sbSalvarOrcamento(orc){
     }
     const timeout = new Promise((_,rej) => setTimeout(()=>rej(new Error('timeout')), 8000));
     const { data, error } = await Promise.race([q.select().single(), timeout]);
-    if(error){ console.error('Erro orcamento:', error); return null; }
+    if(error){
+      const msg = error.message || error.details || error.hint || JSON.stringify(error);
+      console.error('ERRO ORCAMENTO:', msg);
+      toast('Erro: ' + msg.slice(0,80));
+      return null;
+    }
     return data;
   } catch(e) {
     console.error('sbSalvarOrcamento timeout/erro:', e.message);
@@ -5157,7 +5163,7 @@ async function uploadLogo(input){
       .from('logos')
       .upload(fileName, file, { upsert: true, contentType: file.type });
 
-    if(upErr){ console.error('Upload erro:', upErr); return toast('Erro ao enviar logo'); }
+    if(upErr){ console.error('Upload erro detalhado:', JSON.stringify(upErr)); return toast('Erro: ' + (upErr.message||upErr.error||'verifique o console')); }
 
     // Pegar URL pública
     const { data } = SUPA.storage.from('logos').getPublicUrl(fileName);
