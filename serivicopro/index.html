@@ -727,22 +727,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Suas informações pessoais</div></div></div>
     <div class="cfg-sec">
       <div class="cfg-t">👤 Informações pessoais</div>
-      <!-- Logo da empresa -->
-      <div class="fg">
-        <label class="fl">Logo da empresa <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label>
-        <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
-          <div id="logo-preview" style="width:64px;height:64px;border-radius:10px;border:2px dashed var(--bor);background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
-            <span id="logo-placeholder" style="font-size:1.4rem">🏢</span>
-            <img id="logo-img" style="width:100%;height:100%;object-fit:contain;display:none">
-          </div>
-          <div style="flex:1">
-            <button class="btn btn-gho btn-sm" onclick="document.getElementById('logo-input').click()" style="width:100%;justify-content:center;margin-bottom:6px">📷 Escolher logo</button>
-            <button class="btn btn-del btn-sm" id="logo-remover" onclick="removerLogo()" style="width:100%;justify-content:center;display:none">Remover logo</button>
-          </div>
-          <input type="file" id="logo-input" accept="image/png,image/jpeg,image/jpg" style="display:none" onchange="uploadLogo(this)">
-        </div>
-        <div style="font-size:.72rem;color:var(--mut);margin-top:6px">PNG ou JPG. Aparece no orçamento e na OS.</div>
-      </div>
+
       <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
@@ -2144,7 +2129,7 @@ async function carregarDadosSupabase(){
     if(perf){
       D.perfil = {
         nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
-        cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'', logo_url: perf.logo_url||'',
+        cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
         modulos: perf.modulos||{},
@@ -2202,7 +2187,6 @@ async function sbSalvarPerfil(){
       wpp: D.perfil.wpp,
       cnpj: D.perfil.cnpj||null,
       end_perfil: D.perfil.end_perfil||null,
-      logo_url: D.perfil.logo_url||null,
       plano: D.perfil.plano||'free',
       onboarding_completo: D.perfil.onboarding_completo||false,
       meta: D.perfil.meta||0,
@@ -2271,36 +2255,37 @@ async function sbDeletarCliente(dbid){
 async function sbSalvarOrcamento(orc){
   if(!USER_ID) return null;
   const payload = {
-    user_id: USER_ID, dt: orc.dt, cli: orc.cli,
-    descricao: orc.desc||null, valid: orc.valid||null,
-    obs: orc.obs||null, itens: orc.itens||[], sts: orc.sts
+    user_id: USER_ID,
+    dt:       orc.dt,
+    cli:      orc.cli,
+    descricao:orc.desc||null,
+    valid:    orc.valid||null,
+    obs:      orc.obs||null,
+    itens:    orc.itens||[],
+    sts:      orc.sts
   };
   try {
-    let result;
     if(orc._dbid){
-      result = await SUPA.from('orcamentos')
+      // UPDATE — não usa .single() pra não travar
+      const { error } = await SUPA
+        .from('orcamentos')
         .update(payload)
         .eq('id', orc._dbid)
-        .eq('user_id', USER_ID)
-        .select()
-        .single();
+        .eq('user_id', USER_ID);
+      if(error){ console.error('ORC update err:', error.message); return null; }
+      return { id: orc._dbid, ...payload };
     } else {
-      result = await SUPA.from('orcamentos')
+      // INSERT — pega só o id de volta
+      const { data, error } = await SUPA
+        .from('orcamentos')
         .insert(payload)
-        .select()
+        .select('id')
         .single();
+      if(error){ console.error('ORC insert err:', error.message); return null; }
+      return { id: data.id, ...payload };
     }
-    const { data, error } = result;
-    if(error){
-      const msg = error.message || error.details || error.hint || JSON.stringify(error);
-      console.error('ERRO ORCAMENTO:', msg);
-      toast('Erro ao salvar: ' + msg.slice(0,60));
-      return null;
-    }
-    return data;
-  } catch(e) {
-    console.error('sbSalvarOrcamento erro:', e.message);
-    toast('Erro de conexao. Tente novamente.');
+  } catch(e){
+    console.error('sbSalvarOrcamento catch:', e.message);
     return null;
   }
 }
@@ -2412,15 +2397,7 @@ function uiPerfil(){
   const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
   const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
   const ec = document.getElementById('edit-cnpj');  if(ec) ec.value = D.perfil.cnpj||'';
-  // Carregar logo preview
-  if(D.perfil.logo_url){
-    const img = document.getElementById('logo-img');
-    const ph  = document.getElementById('logo-placeholder');
-    const rem = document.getElementById('logo-remover');
-    if(img){ img.src=D.perfil.logo_url; img.style.display='block'; }
-    if(ph)  ph.style.display='none';
-    if(rem) rem.style.display='';
-  }
+
   const ee = document.getElementById('edit-end');   if(ee) ee.value = D.perfil.end_perfil||'';
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
   atualizarPreviewMeta();
@@ -4904,107 +4881,6 @@ function renderAvaliacoes(){
       ${a.comentario ? `<div style="font-size:.84rem;color:var(--mut);font-style:italic">"${a.comentario}"</div>` : ''}
     </div>`;
   }).join('');
-}
-
-// ══════════════════════════════════════════
-// LOGO DA EMPRESA
-// ══════════════════════════════════════════
-async function uploadLogo(input){
-  const file = input.files[0];
-  if(!file) return;
-
-  // Validar tipo
-  if(!['image/png','image/jpeg','image/jpg'].includes(file.type)){
-    return toast('Use PNG ou JPG');
-  }
-
-  // Validar tamanho (max 2MB)
-  if(file.size > 2 * 1024 * 1024){
-    return toast('Imagem muito grande. Max 2MB');
-  }
-
-  toast('Enviando logo...');
-
-  try {
-    const ext      = file.name.split('.').pop().toLowerCase();
-    const fileName = USER_ID + '/logo.' + ext;
-
-    // Upload para Supabase Storage
-    const { error: upErr } = await SUPA.storage
-      .from('Logo')
-      .upload(fileName, file, { upsert: true, contentType: file.type });
-
-    if(upErr){ console.error('Upload erro detalhado:', JSON.stringify(upErr)); return toast('Erro: ' + (upErr.message||upErr.error||'verifique o console')); }
-
-    // Pegar URL pública
-    const { data } = SUPA.storage.from('Logo').getPublicUrl(fileName);
-    const url = data.publicUrl + '?t=' + Date.now(); // cache bust
-
-    D.perfil.logo_url = url;
-    await sbSalvarPerfil();
-
-    // Atualizar preview
-    const img = document.getElementById('logo-img');
-    const ph  = document.getElementById('logo-placeholder');
-    const rem = document.getElementById('logo-remover');
-    if(img){ img.src=url; img.style.display='block'; }
-    if(ph)  ph.style.display='none';
-    if(rem) rem.style.display='';
-
-    toast('Logo salva!');
-  } catch(e) {
-    console.error('uploadLogo:', e);
-    toast('Erro ao enviar logo');
-  }
-  input.value = '';
-}
-
-async function removerLogo(){
-  D.perfil.logo_url = '';
-  await sbSalvarPerfil();
-
-  const img = document.getElementById('logo-img');
-  const ph  = document.getElementById('logo-placeholder');
-  const rem = document.getElementById('logo-remover');
-  if(img){ img.src=''; img.style.display='none'; }
-  if(ph)  ph.style.display='';
-  if(rem) rem.style.display='none';
-
-  toast('Logo removida');
-}
-
-// Converter URL de imagem para base64 (necessario pro jsPDF)
-async function urlParaBase64(url){
-  try {
-    const res  = await fetch(url);
-    const blob = await res.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror  = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch(e) {
-    console.error('urlParaBase64:', e);
-    return null;
-  }
-}
-
-// Calcular dimensões da logo sem estourar (max 30x20mm)
-function calcLogoSize(imgBase64, maxW, maxH){
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = function(){
-      var w = this.naturalWidth;
-      var h = this.naturalHeight;
-      var ratio = w / h;
-      var fw = maxW, fh = maxW / ratio;
-      if(fh > maxH){ fh = maxH; fw = maxH * ratio; }
-      resolve({ w: fw, h: fh });
-    };
-    img.onerror = function(){ resolve({ w: maxW, h: maxH }); };
-    img.src = imgBase64;
-  });
 }
 
 // ══════════════════════════════════════════
