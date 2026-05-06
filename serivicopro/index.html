@@ -3974,26 +3974,56 @@ async function pdfOrc(i){
     y += dLines.length * 5 + 6;
   }
 
-  // ── Tabela de itens ───────────────────────────────────
+  // ── Tabela de itens — altura dinâmica por linha ────────
+  // Largura coluna descrição: pw - 28 (margens) - 35 (coluna valor) - 10 (padding)
+  var colDescW = pw - 28 - 35 - 10;
+  var colValX  = pw - 19; // valor alinhado à direita
+
+  // Cabeçalho
   doc.setFillColor(...DARK); doc.rect(14, y, pw-28, 9, 'F');
   doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...WHITE);
   doc.text('DESCRICAO DO SERVICO / ITEM', 19, y+6);
-  doc.text('VALOR', pw-19, y+6, {align:'right'});
+  doc.text('VALOR', colValX, y+6, {align:'right'});
   y += 9;
 
   (o.itens||[]).forEach(function(it, j){
-    if(y > 240){ doc.addPage(); y = 20; }
-    var rH = 10;
-    if(j%2===0){ doc.setFillColor(...GRAY_L); doc.rect(14, y, pw-28, rH, 'F'); }
-    doc.setDrawColor(...GRAY_B); doc.line(14, y+rH, pw-14, y+rH);
-    var txt = doc.splitTextToSize(String(it.desc||''), pw-60);
-    doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(...INK);
-    doc.text(txt[0], 19, y+6.5);
+    // Calcular quantas linhas o texto vai ocupar
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+    var descLines = doc.splitTextToSize(String(it.desc||''), colDescW);
+    var rH = Math.max(descLines.length * 5.5 + 8, 12);
+
+    // Nova página se necessário
+    if(y + rH > 252){ doc.addPage(); y = 20; }
+
+    // Fundo alternado
+    if(j%2===0){
+      doc.setFillColor(...GRAY_L);
+      doc.rect(14, y, pw-28, rH, 'F');
+    }
+
+    // Linha separadora inferior
+    doc.setDrawColor(...GRAY_B);
+    doc.setLineWidth(0.2);
+    doc.line(14, y+rH, pw-14, y+rH);
+
+    // Linha vertical separando descrição do valor
+    doc.line(pw-38, y, pw-38, y+rH);
+
+    // Texto da descrição — com quebra automática
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(...INK);
+    doc.text(descLines, 19, y+6);
+
+    // Valor — negrito, centralizado verticalmente na célula
+    var valY = y + rH/2 + 2.5;
     doc.setFont('helvetica','bold');
-    doc.text(R$(it.val), pw-19, y+6.5, {align:'right'});
+    doc.setTextColor(...INK);
+    doc.text(R$(it.val), colValX, valY, {align:'right'});
+
     y += rH;
   });
-  y += 4;
+  y += 6;
 
   // ── Total ─────────────────────────────────────────────
   doc.setFillColor(...GREEN); doc.roundedRect(14, y, pw-28, 14, 2, 2, 'F');
