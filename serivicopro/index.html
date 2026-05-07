@@ -728,6 +728,21 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="cfg-sec">
       <div class="cfg-t">👤 Informações pessoais</div>
 
+      <div class="fg">
+        <label class="fl">Logo da empresa <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+          <div style="width:72px;height:72px;border-radius:10px;border:2px dashed var(--bor);background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0" id="logo-preview-box">
+            <img id="logo-preview-img" style="width:100%;height:100%;object-fit:contain;display:none">
+            <span id="logo-placeholder-ico" style="font-size:1.6rem">🏢</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-gho btn-sm" style="justify-content:center" onclick="document.getElementById('logo-file-input').click()">📷 Enviar logo</button>
+            <button class="btn btn-del btn-sm" id="logo-btn-remover" style="justify-content:center;display:none" onclick="removerLogo()">Remover</button>
+            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none" onchange="uploadLogo(this)">
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--mut);margin-top:6px">PNG ou JPG. Aparece no orçamento e na OS.</div>
+      </div>
       <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
@@ -2129,7 +2144,7 @@ async function carregarDadosSupabase(){
     if(perf){
       D.perfil = {
         nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
-        cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'',
+        cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'', logo_url: perf.logo_url||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
         modulos: perf.modulos||{},
@@ -2187,6 +2202,7 @@ async function sbSalvarPerfil(){
       wpp: D.perfil.wpp,
       cnpj: D.perfil.cnpj||null,
       end_perfil: D.perfil.end_perfil||null,
+      logo_url: D.perfil.logo_url||null,
       plano: D.perfil.plano||'free',
       onboarding_completo: D.perfil.onboarding_completo||false,
       meta: D.perfil.meta||0,
@@ -2374,6 +2390,7 @@ async function atualizarPerfil(){
   D.perfil.nome      = document.getElementById('edit-nome').value.trim();
   D.perfil.cnpj      = document.getElementById('edit-cnpj')?.value.trim()||'';
   D.perfil.end_perfil= document.getElementById('edit-end')?.value.trim()||'';
+  // logo_url é salvo direto pelo uploadLogo — não precisa ler aqui
   D.perfil.tipo = document.getElementById('edit-tipo').value.trim();
   D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
   D.perfil.segmento = detectarSegmento(D.perfil.tipo);
@@ -2397,6 +2414,16 @@ function uiPerfil(){
   const et = document.getElementById('edit-tipo'); if(et) et.value = D.perfil.tipo;
   const ew = document.getElementById('edit-wpp');  if(ew) ew.value = D.perfil.wpp;
   const ec = document.getElementById('edit-cnpj');  if(ec) ec.value = D.perfil.cnpj||'';
+  // Carregar preview da logo
+  const prevImg2 = document.getElementById('logo-preview-img');
+  const prevIco  = document.getElementById('logo-placeholder-ico');
+  const prevRem  = document.getElementById('logo-btn-remover');
+  if(D.perfil.logo_url && prevImg2){
+    prevImg2.src = D.perfil.logo_url;
+    prevImg2.style.display = 'block';
+    if(prevIco) prevIco.style.display = 'none';
+    if(prevRem) prevRem.style.display = '';
+  }
 
   const ee = document.getElementById('edit-end');   if(ee) ee.value = D.perfil.end_perfil||'';
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
@@ -3325,13 +3352,28 @@ async function pdfRelSrv(){
   var INK   = [24,24,27];
 
   // ── Cabeçalho ────────────────────────────────────────
+  // Logo — se existir
+  var logoH = 0;
+  if(D.perfil.logo_url){
+    try {
+      var lb = await logoParaBase64(D.perfil.logo_url);
+      if(lb){
+        var tmpImg = new Image();
+        await new Promise(function(res){ tmpImg.onload=res; tmpImg.onerror=res; tmpImg.src=lb; });
+        var ls = calcLogoSize(40, 18, tmpImg.naturalWidth||100, tmpImg.naturalHeight||100);
+        doc.addImage(lb, 'PNG', 14, 8, ls.w, ls.h);
+        logoH = ls.h + 4;
+      }
+    } catch(e){ logoH = 0; }
+  }
+
   doc.setFontSize(22);
   doc.setFont('helvetica','bold');
   doc.setTextColor(...INK);
-  doc.text(nome, 14, 18);
+  doc.text(nome, 14, logoH > 0 ? logoH + 14 : 18);
 
   // Infos empresa — cada uma em linha própria, negrito
-  var iy = 27;
+  var iy = logoH > 0 ? logoH + 22 : 27;
   if(tipo){
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
     doc.text(tipo, 14, iy); iy += 6;
@@ -3913,14 +3955,29 @@ async function pdfOrc(i){
   var GREEN = [21,128,61];   var INK   = [24,24,27];
 
   // ── Cabeçalho ────────────────────────────────────────
+  // Logo — se existir
+  var logoH = 0;
+  if(D.perfil.logo_url){
+    try {
+      var lb = await logoParaBase64(D.perfil.logo_url);
+      if(lb){
+        var tmpImg = new Image();
+        await new Promise(function(res){ tmpImg.onload=res; tmpImg.onerror=res; tmpImg.src=lb; });
+        var ls = calcLogoSize(40, 18, tmpImg.naturalWidth||100, tmpImg.naturalHeight||100);
+        doc.addImage(lb, 'PNG', 14, 8, ls.w, ls.h);
+        logoH = ls.h + 4;
+      }
+    } catch(e){ logoH = 0; }
+  }
+
   // Nome protagonista
   doc.setFontSize(22);
   doc.setFont('helvetica','bold');
   doc.setTextColor(...INK);
-  doc.text(nome, 14, 18);
+  doc.text(nome, 14, logoH > 0 ? logoH + 14 : 18);
 
   // Infos empresa — cada uma em linha própria, negrito
-  var iy = 27;
+  var iy = logoH > 0 ? logoH + 22 : 27;
   if(tipo){
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
     doc.text(tipo, 14, iy); iy += 6;
@@ -4914,6 +4971,68 @@ function renderAvaliacoes(){
 }
 
 // ══════════════════════════════════════════
+// LOGO — Upload Supabase Storage
+// ══════════════════════════════════════════
+async function uploadLogo(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 2*1024*1024) return toast('Imagem muito grande. Max 2MB');
+  toast('Enviando logo...');
+  try {
+    const ext  = file.name.split('.').pop().toLowerCase();
+    const path = USER_ID + '/logo.' + ext;
+    const { error } = await SUPA.storage.from('logos').upload(path, file, {
+      upsert: true, contentType: file.type
+    });
+    if(error){ console.error('Logo upload:', error.message); return toast('Erro ao enviar: ' + error.message); }
+    const { data } = SUPA.storage.from('logos').getPublicUrl(path);
+    D.perfil.logo_url = data.publicUrl + '?v=' + Date.now();
+    await sbSalvarPerfil();
+    const img = document.getElementById('logo-preview-img');
+    const ico = document.getElementById('logo-placeholder-ico');
+    const rem = document.getElementById('logo-btn-remover');
+    if(img){ img.src = D.perfil.logo_url; img.style.display='block'; }
+    if(ico) ico.style.display='none';
+    if(rem) rem.style.display='';
+    toast('Logo salva!');
+  } catch(e){ toast('Erro: ' + e.message); }
+  input.value='';
+}
+
+async function removerLogo(){
+  D.perfil.logo_url = '';
+  await sbSalvarPerfil();
+  const img = document.getElementById('logo-preview-img');
+  const ico = document.getElementById('logo-placeholder-ico');
+  const rem = document.getElementById('logo-btn-remover');
+  if(img){ img.src=''; img.style.display='none'; }
+  if(ico) ico.style.display='';
+  if(rem) rem.style.display='none';
+  toast('Logo removida');
+}
+
+async function logoParaBase64(url){
+  if(!url) return null;
+  try {
+    const res  = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror  = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e){ return null; }
+}
+
+function calcLogoSize(maxW, maxH, natW, natH){
+  var ratio = natW / natH;
+  var fw = maxW, fh = maxW / ratio;
+  if(fh > maxH){ fh = maxH; fw = maxH * ratio; }
+  return { w: fw, h: fh };
+}
+
+// ══════════════════════════════════════════
 // PAGAMENTO — PIX MANUAL (sem automação)
 // ══════════════════════════════════════════
 const WPP_SUPORTE = '5533999129384';
@@ -5320,6 +5439,8 @@ function toast(msg, dur){
   clearTimeout(tT);
   tT = setTimeout(()=>el.style.display='none', dur||3200);
 }
+
+
 </script>
 </body>
 </html>
