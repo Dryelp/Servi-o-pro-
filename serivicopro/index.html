@@ -359,7 +359,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:8px">Limite do plano Free</div>
     <div id="upgrade-msg" style="font-size:.88rem;color:var(--mut);margin-bottom:16px;line-height:1.6"></div>
     <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
-      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Plano Pro — R$ 29,90/mês</div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Plano Pro — R$ 49,90/mês</div>
       <div style="font-size:.84rem;color:var(--brn);line-height:2">
         ✅ Serviços ilimitados (Free: 5/mês)<br>
         ✅ Clientes ilimitados (Free: 10)<br>
@@ -369,7 +369,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         ✅ Suporte prioritário via WhatsApp
       </div>
     </div>
-    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="abrirWhatsAppPro();fecha('m-upgrade')">📱 Quero ser Pro — R$ 29,90/mês</button>
+    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="abrirWhatsAppPro();fecha('m-upgrade')">📱 Quero ser Pro — R$ 49,90/mês</button>
     <button class="btn btn-gho" style="width:100%;justify-content:center" onclick="fecha('m-upgrade')">Continuar no Free</button>
   </div>
 </div>
@@ -824,7 +824,7 @@ input:checked+.slider:before{transform:translateX(19px)}
           </div>
           <div id="assin-uso" style="font-size:.82rem;color:var(--mut);line-height:1.9;margin-bottom:14px"></div>
           <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px" onclick="abrirWhatsAppPro()">
-            🚀 Fazer upgrade — R$ 29,90/mês
+            🚀 Fazer upgrade — R$ 49,90/mês
           </button>
           <div style="font-size:.72rem;color:var(--mut);text-align:center;margin-top:8px">PIX · Cartão · Boleto · Cancele quando quiser</div>
         </div>
@@ -5040,7 +5040,7 @@ const WPP_SUPORTE = '5533999129384';
 function abrirWhatsAppPro(){
   var nome  = D.perfil.nome || 'usuario';
   var email = USER_EMAIL || D.perfil.email || '';
-  var msg   = 'Ola! Quero assinar o AutonomoPro Pro - R$ 29,90/mes. Nome: ' + nome + ' | Email: ' + email;
+  var msg   = 'Ola! Quero assinar o AutonomoPro Pro - R$ 49,90/mes. Nome: ' + nome + ' | Email: ' + email;
   window.open('https://wa.me/5533999129384?text=' + encodeURIComponent(msg), '_blank');
 }
 
