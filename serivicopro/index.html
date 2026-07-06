@@ -2115,6 +2115,7 @@ function esconderSkeleton(){
 
 function iniciarApp(){
   esconderTelaLogin();
+  iniciarHistoricoNavegacao();
   render();
   renderRel();
   iniciarNotificacoes();
@@ -2462,7 +2463,12 @@ async function salvarMeta(){
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
-function ir(pg, el){
+const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil','config'];
+let historicoIniciado = false;
+
+function ir(pg, el, opts){
+  opts = opts || {};
+  const atual = paginaAtiva();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nb,.mb').forEach(b => b.classList.remove('on'));
   const pgEl = document.getElementById('pg-'+pg);
@@ -2484,11 +2490,20 @@ function ir(pg, el){
     aplicarSegmento(SEGMENTOS[D.perfil.segmento] || SEGMENTOS.geral);
   }
   if(pg === 'relatorio') setTimeout(renderRel, 30);
+  if(!opts.skipHistory && pgEl && atual !== pg && window.history){
+    history.pushState({pg}, '', '#'+pg);
+  }
 }
 
 function toggleMais(){
-  document.getElementById('mob-more').classList.toggle('open');
-  document.getElementById('mb-mais').classList.toggle('on');
+  const menu = document.getElementById('mob-more');
+  const btn = document.getElementById('mb-mais');
+  const abriu = !menu.classList.contains('open');
+  menu.classList.toggle('open');
+  btn.classList.toggle('on');
+  if(abriu && window.history){
+    history.pushState({pg: paginaAtiva(), menu:'mais'}, '', location.hash || '#'+paginaAtiva());
+  }
 }
 function fecharMais(){
   document.getElementById('mob-more').classList.remove('open');
@@ -2496,12 +2511,35 @@ function fecharMais(){
     document.getElementById('mb-mais')?.classList.remove('on');
 }
 function paginaAtiva(){ return document.querySelector('.page.active')?.id.replace('pg-','') || ''; }
+function fecharModaisAbertos(){
+  const aberto = document.querySelector('.overlay.open');
+  if(aberto){ aberto.classList.remove('open'); return true; }
+  return false;
+}
+function iniciarHistoricoNavegacao(){
+  if(historicoIniciado || !window.history) return;
+  historicoIniciado = true;
+  const hashPg = (location.hash || '').replace('#','');
+  const inicial = NAV_PAGES.includes(hashPg) ? hashPg : (paginaAtiva() || 'dashboard');
+  history.replaceState({pg: inicial}, '', '#'+inicial);
+  if(inicial !== paginaAtiva()) ir(inicial, null, {skipHistory:true});
+  window.addEventListener('popstate', e => {
+    if(fecharModaisAbertos()) return;
+    const menu = document.getElementById('mob-more');
+    if(menu?.classList.contains('open')){ fecharMais(); return; }
+    const pg = e.state?.pg || (location.hash || '').replace('#','') || 'dashboard';
+    ir(NAV_PAGES.includes(pg) ? pg : 'dashboard', null, {skipHistory:true});
+  });
+}
 
 // ══════════════════════════════════════════
 // MODAIS
 // ══════════════════════════════════════════
 function abre(id){
   document.getElementById(id).classList.add('open');
+  if(window.history){
+    history.pushState({pg: paginaAtiva(), modal:id}, '', location.hash || '#'+paginaAtiva());
+  }
   updDL();
   // Resetar modal serviço ao abrir
   if(id === 'm-srv'){
@@ -2763,6 +2801,7 @@ function rServicos(){
         ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
         ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Marcar pendente</button>`:''}
         ${isReal?`<button class="btn btn-pdf btn-sm" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
+        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-pdf btn-sm" onclick="pdfRecibo(${i})">🧾 Recibo</button>`:''}
         <button class="btn btn-wpp btn-sm" onclick="abrirWpp(${i})">📱 WhatsApp</button>
         ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm\" onclick=\"pedirAvaliacao('+i+')\">⭐ Pedir avaliação</button>' : ''}
         <button class="btn btn-del btn-sm" onclick="delSrv(${i})" style="margin-left:auto">🗑</button>
@@ -2797,7 +2836,7 @@ function rRecebimentos(){
               ${srv.sts_pag==='Pendente'?`
                 <button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">✅ Pago</button>
                 <button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌</button>`:''}
-              ${srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
+              ${srv.sts_pag==='Pago'?`<button class="btn btn-pdf btn-sm" onclick="pdfRecibo(${i})">🧾 Recibo</button><button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
               ${srv.sts_pag==='Cancelado'?`<span style="font-size:.75rem;color:var(--red)">Cancelado</span>`:''}
             </div>
           </td>
@@ -3536,6 +3575,168 @@ async function pdfRelSrv(){
 
   doc.save('OS-' + osNum + '-' + (s.cli||'cliente').replace(/[^a-zA-Z0-9]/g,'-') + '.pdf');
   toast('OS gerada!');
+}
+
+async function pdfRecibo(i){
+  i = +i;
+  const s = D.servicos[i];
+  if(!s){ toast('Serviço não encontrado'); return; }
+  if(s.sts_pag !== 'Pago'){ toast('Marque como pago para gerar recibo'); return; }
+  if(!window.jspdf){ toast('Aguarde...'); return; }
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  const nome = D.perfil.nome || 'Prestador';
+  const tipo = D.perfil.tipo || '';
+  const cnpj = D.perfil.cnpj || '';
+  const wpp = D.perfil.wpp || '';
+  const endPerfil = D.perfil.end_perfil || '';
+  const reciboNum = 'REC-' + String(s._dbid || s.id || (i+1)).replace(/\D/g,'').slice(-6).padStart(6,'0');
+  const emissao = hj();
+  const valor = R$(s.val);
+  const cliente = s.cli || 'Cliente';
+  const servico = s.tipo || 'serviço prestado';
+  const forma = s.pag || 'Não informado';
+
+  var ORANGE = [234,88,12];
+  var DARK = [24,24,27];
+  var GRAY_T = [110,103,99];
+  var GRAY_L = [246,246,247];
+  var GRAY_B = [220,220,224];
+  var GREEN = [21,128,61];
+
+  var logoH = 0;
+  if(D.perfil.logo_url){
+    try {
+      var lb = await logoParaBase64(D.perfil.logo_url);
+      if(lb){
+        var tmpImg = new Image();
+        await new Promise(function(res){ tmpImg.onload=res; tmpImg.onerror=res; tmpImg.src=lb; });
+        var ls = calcLogoSize(36, 16, tmpImg.naturalWidth||100, tmpImg.naturalHeight||100);
+        doc.addImage(lb, 'PNG', 14, 10, ls.w, ls.h);
+        logoH = ls.h + 4;
+      }
+    } catch(e){ logoH = 0; }
+  }
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(...DARK);
+  doc.text(nome, 14, logoH > 0 ? logoH + 16 : 20);
+
+  var iy = logoH > 0 ? logoH + 24 : 29;
+  doc.setFontSize(8.5);
+  doc.setTextColor(...GRAY_T);
+  if(tipo){ doc.text(tipo, 14, iy); iy += 5; }
+  if(cnpj){ doc.text('CNPJ: ' + cnpj, 14, iy); iy += 5; }
+  if(wpp){ doc.text('Tel: ' + wpp, 14, iy); iy += 5; }
+  if(endPerfil){ doc.text(doc.splitTextToSize(endPerfil, 95)[0], 14, iy); }
+
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY_T);
+  doc.text('RECIBO', pw-14, 16, {align:'right'});
+  doc.setFontSize(24);
+  doc.setTextColor(...ORANGE);
+  doc.text(reciboNum, pw-14, 29, {align:'right'});
+  doc.setFontSize(8.5);
+  doc.setTextColor(...GRAY_T);
+  doc.text('Emissão: ' + fd(emissao), pw-14, 38, {align:'right'});
+
+  var y = 58;
+  doc.setDrawColor(...DARK);
+  doc.setLineWidth(0.8);
+  doc.line(14, y, pw-14, y);
+  y += 16;
+
+  doc.setFillColor(...GRAY_L);
+  doc.roundedRect(14, y, pw-28, 30, 3, 3, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY_T);
+  doc.text('VALOR RECEBIDO', 22, y+9);
+  doc.setFontSize(26);
+  doc.setTextColor(...GREEN);
+  doc.text(valor, 22, y+23);
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY_T);
+  doc.text('FORMA DE PAGAMENTO', pw-72, y+9);
+  doc.setFontSize(13);
+  doc.setTextColor(...DARK);
+  doc.text(doc.splitTextToSize(forma, 50)[0], pw-72, y+22);
+  y += 48;
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...GRAY_T);
+  doc.text('DECLARAÇÃO DE RECEBIMENTO', 14, y);
+  y += 10;
+
+  const texto = 'Recebi de ' + cliente + ' a importância de ' + valor + ' referente a ' + servico + ', realizado em ' + fd(s.dt) + (s.hr ? ' às ' + s.hr : '') + '. Para maior clareza, firmo o presente recibo.';
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(12);
+  doc.setTextColor(...DARK);
+  const linhas = doc.splitTextToSize(texto, pw-28);
+  doc.text(linhas, 14, y);
+  y += linhas.length * 7 + 14;
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY_T);
+  doc.text('CLIENTE', 14, y);
+  doc.text('SERVIÇO', pw/2, y);
+  y += 7;
+  doc.setFontSize(11);
+  doc.setTextColor(...DARK);
+  doc.text(doc.splitTextToSize(cliente, 80)[0], 14, y);
+  doc.text(doc.splitTextToSize(servico, 80)[0], pw/2, y);
+  y += 16;
+
+  if(s.desc_feito){
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...GRAY_T);
+    doc.text('OBSERVAÇÃO / DESCRIÇÃO', 14, y);
+    y += 6;
+    doc.setFillColor(...GRAY_L);
+    const descLines = doc.splitTextToSize(s.desc_feito, pw-38);
+    const boxH = Math.max(18, descLines.length * 6 + 10);
+    doc.roundedRect(14, y, pw-28, boxH, 2, 2, 'F');
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...DARK);
+    doc.text(descLines, 20, y+8);
+    y += boxH + 16;
+  }
+
+  var assY = Math.max(y+18, ph-62);
+  doc.setDrawColor(...GRAY_B);
+  doc.setLineWidth(0.4);
+  doc.line(48, assY, pw-48, assY);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...GRAY_T);
+  doc.text('Assinatura do prestador', pw/2, assY+6, {align:'center'});
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(10);
+  doc.setTextColor(...DARK);
+  doc.text(doc.splitTextToSize(nome, 100)[0], pw/2, assY+14, {align:'center'});
+
+  var ry = ph-12;
+  doc.setDrawColor(...ORANGE);
+  doc.line(14, ry-4, pw-14, ry-4);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(...GRAY_T);
+  doc.text('Gerado pelo AutonomoPro em ' + fd(emissao), 14, ry);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...ORANGE);
+  doc.text('AutonomoPro', pw-14, ry, {align:'right'});
+
+  doc.save(reciboNum + '-' + cliente.replace(/[^a-zA-Z0-9]/g,'-') + '.pdf');
+  toast('Recibo gerado!');
 }
 
 function wppRelSrv(){
