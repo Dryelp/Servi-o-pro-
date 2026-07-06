@@ -544,9 +544,8 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" onclick="ir('notificacoes',this)"><span class="ni">🔔</span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
     <div class="nav-sec">Conta</div>
     <button class="nb" onclick="ir('perfil',this)"><span class="ni">👤</span>Meu Perfil</button>
-    <button class="nb" onclick="ir('config',this)"><span class="ni">⚙️</span>Configurações</button>
   </nav>
-  <div class="sfoot">AutônomoPro v5.0<br><span id="sb-nome" style="color:rgba(255,255,255,.35)">Dados locais</span></div>
+  <div class="sfoot">AutônomoPro v5.0<br><span id="sb-nome" style="color:rgba(255,255,255,.35)">Dados na nuvem</span></div>
 </aside>
 
 <!-- MAIN CONTENT -->
@@ -783,6 +782,12 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- PERFIL -->
   <div class="page" id="pg-perfil">
     <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Suas informações pessoais</div></div></div>
+    <div class="cfg-sec" id="migracao-box" style="display:none">
+      <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados antigos</div>
+      <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Encontramos dados antigos salvos só neste aparelho. Migre para a nuvem para manter tudo junto na conta.</p>
+      <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
+      <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
+    </div>
     <div class="cfg-sec">
       <div class="cfg-t">👤 Informações pessoais</div>
 
@@ -1069,30 +1074,6 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="ajudantes-lista"></div>
   </div>
 
-  <!-- CONFIG -->
-  <div class="page" id="pg-config">
-    <div class="topbar"><div><div class="pg-title">Configurações</div></div></div>
-    <div class="cfg-sec" id="migracao-box" style="display:none">
-      <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados para a nuvem</div>
-      <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Detectamos dados salvos localmente no seu dispositivo. Deseja migrar para a nuvem agora?</p>
-      <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
-      <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
-    </div>
-    <div class="cfg-sec">
-      <div class="cfg-t" style="color:var(--red)">⚠️ Zona de perigo</div>
-      <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Apaga todos os dados do app localmente. Esta ação <strong>não pode ser desfeita</strong>.</p>
-      <button class="btn btn-del" onclick="limparTudo()">🗑️ Limpar todos os dados</button>
-    </div>
-    <div class="cfg-sec">
-      <div class="cfg-t">ℹ️ Sobre o AutônomoPro</div>
-      <p style="font-size:.83rem;color:var(--mut);line-height:1.8">
-        Versão: 5.0<br>
-        Gestão completa para autônomos de qualquer segmento<br>
-        Dados salvos localmente no seu dispositivo
-      </p>
-    </div>
-  </div>
-
 </main>
 </div>
 
@@ -1113,7 +1094,6 @@ input:checked+.slider:before{transform:translateX(19px)}
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
   <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
   <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi">👤</span>Perfil</button>
-  <button class="mob-more-btn" onclick="ir('config');fecharMais()"><span class="mi">⚙️</span>Config</button>
 </div>
 
 <!-- ═══ MODAIS ═══ -->
@@ -2555,7 +2535,7 @@ async function salvarMeta(){
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
-const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil','config'];
+const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
 let historicoIniciado = false;
 
 function ir(pg, el, opts){
@@ -2568,7 +2548,7 @@ function ir(pg, el, opts){
   if(el){
     el.classList.add('on');
   } else {
-    const navMap = ['dashboard','servicos','recebimentos','clientes','orcamentos','relatorio','notificacoes','perfil','config'];
+    const navMap = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
     const ni = navMap.indexOf(pg);
     if(ni >= 0) document.querySelectorAll('.nb')[ni]?.classList.add('on');
     const mobMap = ['dashboard','servicos','orcamentos','recebimentos'];
@@ -2611,7 +2591,8 @@ function fecharModaisAbertos(){
 function iniciarHistoricoNavegacao(){
   if(historicoIniciado || !window.history) return;
   historicoIniciado = true;
-  const hashPg = (location.hash || '').replace('#','');
+  let hashPg = (location.hash || '').replace('#','');
+  if(hashPg === 'config') hashPg = 'perfil';
   const inicial = NAV_PAGES.includes(hashPg) ? hashPg : (paginaAtiva() || 'dashboard');
   history.replaceState({pg: inicial}, '', '#'+inicial);
   if(inicial !== paginaAtiva()) ir(inicial, null, {skipHistory:true});
@@ -2619,7 +2600,8 @@ function iniciarHistoricoNavegacao(){
     if(fecharModaisAbertos()) return;
     const menu = document.getElementById('mob-more');
     if(menu?.classList.contains('open')){ fecharMais(); return; }
-    const pg = e.state?.pg || (location.hash || '').replace('#','') || 'dashboard';
+    let pg = e.state?.pg || (location.hash || '').replace('#','') || 'dashboard';
+    if(pg === 'config') pg = 'perfil';
     ir(NAV_PAGES.includes(pg) ? pg : 'dashboard', null, {skipHistory:true});
   });
 }
