@@ -159,6 +159,11 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .srv-prazo{font-size:.74rem;color:var(--org);font-weight:600;margin-top:3px}
 .srv-etapas{font-size:.74rem;color:var(--blu);font-weight:600;margin-top:3px}
 .srv-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding-top:11px;border-top:1px solid var(--bor)}
+.srv-primary-action{flex:1 1 160px;justify-content:center}
+.srv-secondary-action{opacity:.88}
+.srv-danger-action{margin-left:auto}
+.toast-action{margin-top:9px;display:flex;gap:8px;align-items:center}
+.toast-action .btn{background:#fff;color:var(--grn);justify-content:center;flex:1;padding:7px 10px}
 
 /* MATERIAIS */
 .mat-lista{border:1.5px solid var(--bor);border-radius:9px;overflow:hidden;margin-bottom:10px;min-height:38px}
@@ -654,12 +659,12 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- RECEBIMENTOS -->
   <div class="page" id="pg-recebimentos">
     <div class="topbar">
-      <div><div class="pg-title">Recebimentos</div><div class="pg-sub">Gerado automaticamente ao finalizar serviços</div></div>
+      <div><div class="pg-title">Receber</div><div class="pg-sub">Veja quem pagou e quem ainda falta receber</div></div>
     </div>
     <div class="stats" style="grid-template-columns:repeat(3,1fr)">
-      <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido (mês)</div><div class="sc-val sc-val-sm" id="r-rec">R$ 0,00</div></div>
-      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Pendente</div><div class="sc-val sc-val-sm" id="r-pend">R$ 0,00</div></div>
-      <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total geral</div><div class="sc-val sc-val-sm" id="r-tot">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--grn)"><div class="sc-lbl">Recebido no mês</div><div class="sc-val sc-val-sm" id="r-rec">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Falta receber</div><div class="sc-val sc-val-sm" id="r-pend">R$ 0,00</div></div>
+      <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total em serviços</div><div class="sc-val sc-val-sm" id="r-tot">R$ 0,00</div></div>
     </div>
     <div class="tw">
       <table><thead><tr><th class="hide-mob">Data</th><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Forma</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
@@ -2097,7 +2102,7 @@ async function marcarPagoModal(srvIdx, itemIdx){
   const el = document.getElementById('ar-item-'+itemIdx);
   if(el){ el.style.opacity='0'; el.style.transform='scale(.95)'; el.style.transition='all .25s'; setTimeout(()=>{ el.remove(); atualizarTotalAReceber(); },250); }
   render();
-  toast('✅ Marcado como pago!');
+  toastPagamentoRecebido(srvIdx);
 }
 
 function atualizarTotalAReceber(){
@@ -2796,6 +2801,11 @@ function rServicos(){
     const isAnd  = srv.sts_srv === 'Em andamento';
     const isReal = srv.sts_srv === 'Realizado';
     const isCan  = srv.sts_srv === 'Cancelado';
+    let acaoPrincipal = '';
+    if(isAg) acaoPrincipal = `<button class="btn btn-grn btn-sm srv-primary-action" onclick="iniciarSrv(${i})">▶️ Iniciar serviço</button>`;
+    else if(isAnd) acaoPrincipal = `<button class="btn btn-org btn-sm srv-primary-action" onclick="abrirFinalizar(${i})">⏹️ Finalizar serviço</button>`;
+    else if(isReal && srv.sts_pag === 'Pendente') acaoPrincipal = `<button class="btn btn-ok btn-sm srv-primary-action" onclick="marcarPago(${i})">✅ Marcar como pago</button>`;
+    else if(isReal && srv.sts_pag === 'Pago') acaoPrincipal = `<button class="btn btn-pdf btn-sm srv-primary-action" onclick="pdfRecibo(${i})">🧾 Gerar recibo</button>`;
 
     return `
     <div class="srv-card ${isAnd?'sts-andamento':''} ${isReal?'sts-realizado':''} ${isCan?'sts-cancelado':''}">
@@ -2825,17 +2835,14 @@ function rServicos(){
           💸 Materiais: ${(srv.materiais||[]).map(m=>`${m.desc} (${R$(m.val)})`).join(', ')}
         </div>`:''}
       <div class="srv-card-actions">
-        ${isAg?`<button class="btn btn-grn btn-sm" onclick="iniciarSrv(${i})">▶️ Iniciar</button>`:''}
-        ${isAg?`<button class="btn btn-del btn-sm" onclick="cancelarSrv(${i})">❌ Cancelar</button>`:''}
-        ${isAnd?`<button class="btn btn-org btn-sm" onclick="abrirFinalizar(${i})">⏹️ Finalizar</button>`:''}
-        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">✅ Marcar pago</button>`:''}
-        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
-        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Marcar pendente</button>`:''}
-        ${isReal?`<button class="btn btn-pdf btn-sm" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
-        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-pdf btn-sm" onclick="pdfRecibo(${i})">🧾 Recibo</button>`:''}
-        <button class="btn btn-wpp btn-sm" onclick="abrirWpp(${i})">📱 WhatsApp</button>
-        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm\" onclick=\"pedirAvaliacao('+i+')\">⭐ Pedir avaliação</button>' : ''}
-        <button class="btn btn-del btn-sm" onclick="delSrv(${i})" style="margin-left:auto">🗑</button>
+        ${acaoPrincipal}
+        ${isReal?`<button class="btn btn-pdf btn-sm srv-secondary-action" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
+        <button class="btn btn-wpp btn-sm srv-secondary-action" onclick="abrirWpp(${i})">📱 WhatsApp</button>
+        ${isAg?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarSrv(${i})">❌ Cancelar</button>`:''}
+        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
+        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm srv-secondary-action" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
+        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm srv-secondary-action\" onclick=\"pedirAvaliacao('+i+')\">⭐ Avaliação</button>' : ''}
+        <button class="btn btn-del btn-sm srv-danger-action" onclick="delSrv(${i})">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -3289,7 +3296,7 @@ async function marcarPago(i){
   D.servicos[i].sts_pag = 'Pago';
   await sbSalvarServico(D.servicos[i]);
   render();
-  toast('✅ Marcado como pago!');
+  toastPagamentoRecebido(i);
 }
 async function marcarPendente(i){
   D.servicos[i].sts_pag = 'Pendente';
@@ -5670,6 +5677,19 @@ function toast(msg, dur){
   el.style.display = 'block';
   clearTimeout(tT);
   tT = setTimeout(()=>el.style.display='none', dur||3200);
+}
+
+function toastPagamentoRecebido(i){
+  const el = document.getElementById('toast');
+  el.className = 'toast t-ok';
+  el.innerHTML = `
+    <div>✅ Pagamento marcado como recebido</div>
+    <div class="toast-action">
+      <button class="btn btn-sm" onclick="pdfRecibo(${i});document.getElementById('toast').style.display='none'">🧾 Gerar recibo</button>
+    </div>`;
+  el.style.display = 'block';
+  clearTimeout(tT);
+  tT = setTimeout(()=>el.style.display='none', 7000);
 }
 
 
