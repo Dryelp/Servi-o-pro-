@@ -1,4 +1,4 @@
-const CACHE = 'autonomopro-v8';
+const CACHE = 'autonomopro-v9';
 // Atualizar este número a cada novo deploy para forçar atualização nos dispositivos
 const FILES = ['./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
 

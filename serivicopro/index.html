@@ -81,6 +81,24 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .sc-val-sm{font-size:1.1rem!important;word-break:break-word}
 .sc-hint{font-size:.73rem;color:var(--mut)}
 
+/* DASHBOARD */
+.dash-hero{background:linear-gradient(135deg,#fff 0%,#fff7ed 100%);border:1px solid var(--bor);border-radius:16px;padding:18px;box-shadow:var(--shd);margin-bottom:14px}
+.dash-hero .topbar{margin-bottom:0}
+.dash-actions .btn-org{box-shadow:0 8px 22px rgba(234,88,12,.22)}
+.dash-status-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dash-status-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:13px 14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:82px}
+.dash-status-card:hover{border-color:var(--status-c);box-shadow:var(--shd);transform:translateY(-1px)}
+.dash-status-card:active{transform:scale(.98)}
+.dash-status-kicker{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--status-c);margin-bottom:5px}
+.dash-status-hint{font-size:.72rem;color:var(--mut);line-height:1.25}
+.dash-status-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:2rem;font-weight:800;line-height:1;color:var(--status-c)}
+.dash-money{display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:12px;margin-bottom:18px}
+.dash-money .sc{margin-bottom:0}
+.dash-money-main{padding:20px 18px}
+.dash-money-main .sc-val{font-size:2rem}
+.dash-money-main .sc-lbl{font-size:.72rem}
+.dash-money .sc-ico{font-size:1rem;margin-bottom:6px;opacity:.85}
+
 /* PANEL */
 .panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden}
 .ph{padding:13px 18px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--bor);background:var(--sur2);flex-wrap:wrap;gap:8px}
@@ -236,6 +254,15 @@ input:checked+.slider:before{transform:translateX(19px)}
   .sidebar{display:none}
   .main{margin-left:0;padding:12px 11px 80px;overflow-x:hidden}
   .stats{grid-template-columns:1fr 1fr}
+  .dash-hero{padding:16px 14px;border-radius:14px;margin-bottom:12px}
+  .dash-hero .pg-title{font-size:1.55rem;line-height:1.05}
+  .dash-hero .pg-sub{font-size:.78rem}
+  .dash-status-list{grid-template-columns:1fr;gap:8px}
+  .dash-status-card{min-height:64px;padding:11px 13px}
+  .dash-status-num{font-size:1.65rem}
+  .dash-money{grid-template-columns:1fr 1fr;gap:10px}
+  .dash-money-main{grid-column:1/-1;padding:18px 16px}
+  .dash-money-main .sc-val{font-size:1.9rem}
   .topbar{gap:9px}
   .tb-right{width:100%}
   .tb-right .btn{flex:1;justify-content:center}
@@ -507,63 +534,67 @@ input:checked+.slider:before{transform:translateX(19px)}
 
   <!-- DASHBOARD -->
   <div class="page active" id="pg-dashboard">
-    <div class="topbar">
-      <div>
-        <div class="pg-title" id="dash-ola"></div>
-        <div class="pg-sub" id="data-hoje"></div>
-      </div>
-      <div class="tb-right">
-        <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
-        <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
-        <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
-      </div>
-    </div>
-
-    <!-- Cards clicáveis status serviços -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px" id="dash-status-cards">
-      <div onclick="irFiltrado('Agendado')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--org)'" onmouseout="this.style.borderColor='var(--bor)'">
-        <div style="font-size:1.5rem;margin-bottom:4px">📅</div>
-        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--org)" id="v-agendados">0</div>
-        <div style="font-size:.7rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Agendados</div>
-        <div style="font-size:.65rem;color:var(--mut);margin-top:2px" id="v-agendados-hint">clique para ver</div>
-      </div>
-      <div onclick="irFiltrado('Em andamento')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--pur)'" onmouseout="this.style.borderColor='var(--bor)'">
-        <div style="font-size:1.5rem;margin-bottom:4px">▶️</div>
-        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--pur)" id="v-andamento">0</div>
-        <div style="font-size:.7rem;font-weight:700;color:var(--pur);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Em andamento</div>
-        <div style="font-size:.65rem;color:var(--mut);margin-top:2px" id="v-andamento-hint">clique para ver</div>
-      </div>
-      <div onclick="irFiltrado('Realizado')" style="background:var(--sur);border:2px solid var(--bor);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center" onmouseover="this.style.borderColor='var(--grn)'" onmouseout="this.style.borderColor='var(--bor)'">
-        <div style="font-size:1.5rem;margin-bottom:4px">✅</div>
-        <div style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--grn)" id="v-realizados">0</div>
-        <div style="font-size:.7rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.4px;margin-top:2px">Realizados</div>
-        <div style="font-size:.65rem;color:var(--mut);margin-top:2px" id="v-realizados-hint">clique para ver</div>
+    <div class="dash-hero">
+      <div class="topbar">
+        <div>
+          <div class="pg-title" id="dash-ola"></div>
+          <div class="pg-sub" id="data-hoje"></div>
+        </div>
+        <div class="tb-right dash-actions">
+          <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
+          <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
+          <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
+        </div>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="sc" style="--sc-c:var(--grn);cursor:pointer" onclick="abrirRecebidos()">
-        <div class="sc-ico">💰</div><div class="sc-lbl">Recebido (mês)</div>
+    <div class="dash-status-list" id="dash-status-cards">
+      <div class="dash-status-card" onclick="irFiltrado('Agendado')" style="--status-c:var(--org)">
+        <div>
+          <div class="dash-status-kicker">Agendados</div>
+          <div class="dash-status-hint" id="v-agendados-hint">nenhum hoje</div>
+        </div>
+        <div class="dash-status-num" id="v-agendados">0</div>
+      </div>
+      <div class="dash-status-card" onclick="irFiltrado('Em andamento')" style="--status-c:var(--pur)">
+        <div>
+          <div class="dash-status-kicker">Em andamento</div>
+          <div class="dash-status-hint" id="v-andamento-hint">nenhum ativo</div>
+        </div>
+        <div class="dash-status-num" id="v-andamento">0</div>
+      </div>
+      <div class="dash-status-card" onclick="irFiltrado('Realizado')" style="--status-c:var(--grn)">
+        <div>
+          <div class="dash-status-kicker">Realizados no total</div>
+          <div class="dash-status-hint" id="v-realizados-hint">0 este mês</div>
+        </div>
+        <div class="dash-status-num" id="v-realizados">0</div>
+      </div>
+    </div>
+
+    <div class="dash-money">
+      <div class="sc dash-money-main" style="--sc-c:var(--grn);cursor:pointer" onclick="abrirRecebidos()">
+        <div class="sc-lbl">Recebido este mês</div>
         <div class="sc-val" id="v-rec">R$ 0,00</div>
         <div class="sc-hint" id="v-rec-h">0 serviços pagos</div>
       </div>
       <div class="sc" style="--sc-c:var(--org);cursor:pointer" onclick="abrirAReceber()">
-        <div class="sc-ico">⏳</div><div class="sc-lbl">A receber</div>
+        <div class="sc-lbl">A receber</div>
         <div class="sc-val" id="v-pend">R$ 0,00</div>
         <div class="sc-hint" id="v-pend-h">0 pendentes</div>
       </div>
       <div class="sc" style="--sc-c:var(--red);cursor:pointer" onclick="abrirCustos()">
-        <div class="sc-ico">💸</div><div class="sc-lbl">Custos (mês)</div>
+        <div class="sc-lbl">Custos do mês</div>
         <div class="sc-val" id="v-custo">R$ 0,00</div>
         <div class="sc-hint" id="v-custo-h">materiais + despesas</div>
       </div>
       <div class="sc" style="--sc-c:var(--pur);cursor:pointer" onclick="ir('relatorio')">
-        <div class="sc-ico">📈</div><div class="sc-lbl">Lucro real</div>
+        <div class="sc-lbl">Lucro real</div>
         <div class="sc-val" id="v-lucro">R$ 0,00</div>
         <div class="sc-hint">ver relatório →</div>
       </div>
       <div class="sc" id="card-vendas" style="--sc-c:var(--blu);cursor:pointer;display:none" onclick="ir('produtos')">
-        <div class="sc-ico">🛍️</div><div class="sc-lbl">Vendas (total)</div>
+        <div class="sc-lbl">Vendas (total)</div>
         <div class="sc-val" id="v-vendas">R$ 0,00</div>
         <div class="sc-hint" id="v-vendas-h">produtos vendidos</div>
       </div>
@@ -2622,9 +2653,9 @@ function rDash(){
   const hAg  = document.getElementById('v-agendados-hint');
   const hAn  = document.getElementById('v-andamento-hint');
   const hRe  = document.getElementById('v-realizados-hint');
-  if(hAg) hAg.textContent = agHoje > 0 ? agHoje+' hoje' : 'nenhum hoje';
-  if(hAn) hAn.textContent = andHoje > 0 ? 'em execução agora' : 'nenhum ativo';
-  if(hRe) hRe.textContent = realMes > 0 ? realMes+' este mês' : 'nenhum este mês';
+  if(hAg) hAg.textContent = agHoje > 0 ? agHoje+' para hoje' : 'nenhum para hoje';
+  if(hAn) hAn.textContent = andHoje > 0 ? andHoje+' ativo agora' : 'nenhum ativo agora';
+  if(hRe) hRe.textContent = realMes > 0 ? realMes+' realizados este mês' : 'nenhum realizado este mês';
 
   // Atualizar card vendas
   const cardVendas = document.getElementById('card-vendas');
