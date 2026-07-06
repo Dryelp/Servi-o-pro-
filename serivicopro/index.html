@@ -98,6 +98,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .dash-money-main .sc-val{font-size:2rem}
 .dash-money-main .sc-lbl{font-size:.72rem}
 .dash-money .sc-ico{font-size:1rem;margin-bottom:6px;opacity:.85}
+.dash-alert{display:none;background:var(--brn);color:#fff;border-radius:14px;padding:13px 15px;margin-bottom:14px;box-shadow:var(--shd);font-size:.88rem;font-weight:600;line-height:1.45}
+.dash-alert span{color:#fed7aa}
+.signature-preview{background:var(--bg);border:1.5px dashed var(--bor);border-radius:10px;min-height:74px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
+.signature-preview img{max-width:100%;max-height:64px;object-fit:contain}
+.signature-pad{width:100%;height:210px;background:#fff;border:1.5px solid var(--bor);border-radius:12px;touch-action:none;display:block}
+.signature-hint{font-size:.75rem;color:var(--mut);line-height:1.45;margin-top:8px}
 
 /* PANEL */
 .panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);box-shadow:var(--shd);overflow:hidden}
@@ -552,6 +558,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         </div>
       </div>
     </div>
+    <div class="dash-alert" id="dash-alerta"></div>
 
     <div class="dash-status-list" id="dash-status-cards">
       <div class="dash-status-card" onclick="irFiltrado('Agendado')" style="--status-c:var(--org)">
@@ -778,6 +785,17 @@ input:checked+.slider:before{transform:translateX(19px)}
           </div>
         </div>
         <div style="font-size:.72rem;color:var(--mut);margin-top:6px">PNG ou JPG. Aparece no orçamento e na OS.</div>
+      </div>
+      <div class="fg">
+        <label class="fl">Assinatura para recibos <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label>
+        <div class="signature-preview" id="assinatura-preview">
+          <span style="font-size:.82rem;color:var(--mut)">Nenhuma assinatura cadastrada</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-gho btn-sm" style="flex:1;justify-content:center" onclick="abrirAssinaturaDigital()">✍️ Cadastrar assinatura</button>
+          <button class="btn btn-del btn-sm" id="assinatura-btn-remover" style="display:none;justify-content:center" onclick="removerAssinaturaDigital()">Remover</button>
+        </div>
+        <div style="font-size:.72rem;color:var(--mut);margin-top:6px">A assinatura aparece automaticamente nos recibos pagos.</div>
       </div>
       <div class="fg"><label class="fl">Seu nome</label><input class="fi" id="edit-nome" placeholder="Nome completo"></div>
       <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-tipo" placeholder="Ex: Seu segmento de atuação..."></div>
@@ -1389,6 +1407,19 @@ input:checked+.slider:before{transform:translateX(19px)}
   </div>
 </div>
 
+<!-- Assinatura digital -->
+<div class="overlay" id="m-assinatura-digital">
+  <div class="modal">
+    <div class="mt">✍️ Assinatura para recibos <button class="xbtn" onclick="fecha('m-assinatura-digital')">✕</button></div>
+    <canvas id="assinatura-canvas" class="signature-pad"></canvas>
+    <div class="signature-hint">Assine com o dedo na área branca. Essa assinatura será inserida automaticamente nos recibos.</div>
+    <div class="mf">
+      <button class="btn btn-gho" onclick="limparAssinaturaCanvas()">Limpar</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarAssinaturaDigital()">Salvar assinatura</button>
+    </div>
+  </div>
+</div>
+
 <!-- Cliente -->
 <div class="overlay" id="m-cli">
   <div class="modal">
@@ -1479,7 +1510,7 @@ const D = {
   orcamentos: [],
   notifs:     [],
   despesas:   [],
-  perfil:     {nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',meta:0},
+  perfil:     {nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',assinatura_data:'',meta:0},
   cfg:        {togAg:true,togRes:true,togCob:true}
 };
 let finMats  = [];
@@ -1876,7 +1907,7 @@ async function fazerLogout(){
   await SUPA.auth.signOut();
   D.servicos=[]; D.clientes=[]; D.orcamentos=[];
   D.notifs=[]; D.despesas=[];
-  D.perfil={nome:'',tipo:'',wpp:'',meta:0};
+  D.perfil={nome:'',tipo:'',wpp:'',assinatura_data:'',meta:0};
   toast('Até logo! 👋');
 }
 
@@ -2182,6 +2213,7 @@ async function carregarDadosSupabase(){
       D.perfil = {
         nome: perf.nome||'', tipo: perf.tipo||'', wpp: perf.wpp||'',
         cnpj: perf.cnpj||'', end_perfil: perf.end_perfil||'', logo_url: perf.logo_url||'',
+        assinatura_data: perf.assinatura_data||'',
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
         modulos: perf.modulos||{},
@@ -2240,6 +2272,7 @@ async function sbSalvarPerfil(){
       cnpj: D.perfil.cnpj||null,
       end_perfil: D.perfil.end_perfil||null,
       logo_url: D.perfil.logo_url||null,
+      assinatura_data: D.perfil.assinatura_data||null,
       plano: D.perfil.plano||'free',
       onboarding_completo: D.perfil.onboarding_completo||false,
       meta: D.perfil.meta||0,
@@ -2461,6 +2494,14 @@ function uiPerfil(){
     if(prevIco) prevIco.style.display = 'none';
     if(prevRem) prevRem.style.display = '';
   }
+  const assPrev = document.getElementById('assinatura-preview');
+  const assRem = document.getElementById('assinatura-btn-remover');
+  if(assPrev){
+    assPrev.innerHTML = D.perfil.assinatura_data
+      ? `<img src="${D.perfil.assinatura_data}" alt="Assinatura salva">`
+      : '<span style="font-size:.82rem;color:var(--mut)">Nenhuma assinatura cadastrada</span>';
+  }
+  if(assRem) assRem.style.display = D.perfil.assinatura_data ? 'inline-flex' : 'none';
 
   const ee = document.getElementById('edit-end');   if(ee) ee.value = D.perfil.end_perfil||'';
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
@@ -2638,6 +2679,15 @@ function rDash(){
     ? D.produtos.reduce((a,p)=>a+(p.preco*(p.vendidos||0)),0) : 0;
   const tCusto  = tMateri + tDesp;
   const lucro   = tRec + tVendas - tCusto;
+  const alerta = document.getElementById('dash-alerta');
+  if(alerta){
+    const hojeQtd = D.servicos.filter(s=>s.dt===hj()).length;
+    const partes = [];
+    if(hojeQtd > 0) partes.push(`Hoje você tem <span>${hojeQtd} serviço(s)</span>`);
+    if(tPend > 0) partes.push(`falta receber <span>${R$(tPend)}</span>`);
+    alerta.innerHTML = partes.length ? partes.join(' e ') + '.' : 'Tudo certo por agora. Nenhum serviço hoje e nada pendente para receber.';
+    alerta.style.display = 'block';
+  }
 
   // Cards de status clicáveis — TODOS os serviços, não só do mês
   const agend = D.servicos.filter(s=>s.sts_srv==='Agendado').length;
@@ -3749,6 +3799,11 @@ async function pdfRecibo(i){
   }
 
   var assY = Math.max(y+18, ph-62);
+  if(D.perfil.assinatura_data){
+    try{
+      doc.addImage(D.perfil.assinatura_data, 'PNG', pw/2 - 38, assY - 24, 76, 22);
+    }catch(e){}
+  }
   doc.setDrawColor(...GRAY_B);
   doc.setLineWidth(0.4);
   doc.line(48, assY, pw-48, assY);
@@ -5248,6 +5303,101 @@ async function removerLogo(){
   if(ico) ico.style.display='';
   if(rem) rem.style.display='none';
   toast('Logo removida');
+}
+
+// ══════════════════════════════════════════
+// ASSINATURA DIGITAL
+// ══════════════════════════════════════════
+let assinaturaCtx = null;
+let assinaturaDesenhando = false;
+let assinaturaTemRisco = false;
+
+function abrirAssinaturaDigital(){
+  abre('m-assinatura-digital');
+  setTimeout(prepararAssinaturaCanvas, 80);
+}
+
+function prepararAssinaturaCanvas(){
+  const canvas = document.getElementById('assinatura-canvas');
+  if(!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+  canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+  assinaturaCtx = canvas.getContext('2d');
+  assinaturaCtx.setTransform(ratio,0,0,ratio,0,0);
+  assinaturaCtx.lineWidth = 2.4;
+  assinaturaCtx.lineCap = 'round';
+  assinaturaCtx.lineJoin = 'round';
+  assinaturaCtx.strokeStyle = '#1a0f0a';
+  assinaturaCtx.fillStyle = '#fff';
+  assinaturaCtx.fillRect(0,0,rect.width,rect.height);
+  assinaturaTemRisco = false;
+  if(D.perfil.assinatura_data){
+    const img = new Image();
+    img.onload = () => assinaturaCtx.drawImage(img, 12, 26, rect.width - 24, rect.height - 52);
+    img.src = D.perfil.assinatura_data;
+    assinaturaTemRisco = true;
+  }
+  canvas.onpointerdown = iniciarRiscoAssinatura;
+  canvas.onpointermove = moverRiscoAssinatura;
+  canvas.onpointerup = pararRiscoAssinatura;
+  canvas.onpointerleave = pararRiscoAssinatura;
+}
+
+function pontoAssinatura(e){
+  const canvas = document.getElementById('assinatura-canvas');
+  const rect = canvas.getBoundingClientRect();
+  return {x:e.clientX-rect.left, y:e.clientY-rect.top};
+}
+
+function iniciarRiscoAssinatura(e){
+  if(!assinaturaCtx) return;
+  assinaturaDesenhando = true;
+  assinaturaTemRisco = true;
+  const p = pontoAssinatura(e);
+  assinaturaCtx.beginPath();
+  assinaturaCtx.moveTo(p.x,p.y);
+  e.preventDefault();
+}
+
+function moverRiscoAssinatura(e){
+  if(!assinaturaDesenhando || !assinaturaCtx) return;
+  const p = pontoAssinatura(e);
+  assinaturaCtx.lineTo(p.x,p.y);
+  assinaturaCtx.stroke();
+  e.preventDefault();
+}
+
+function pararRiscoAssinatura(){
+  assinaturaDesenhando = false;
+}
+
+function limparAssinaturaCanvas(){
+  const canvas = document.getElementById('assinatura-canvas');
+  if(!canvas || !assinaturaCtx) return;
+  const rect = canvas.getBoundingClientRect();
+  assinaturaCtx.fillStyle = '#fff';
+  assinaturaCtx.fillRect(0,0,rect.width,rect.height);
+  assinaturaTemRisco = false;
+}
+
+async function salvarAssinaturaDigital(){
+  const canvas = document.getElementById('assinatura-canvas');
+  if(!canvas || !assinaturaTemRisco) return toast('Assine antes de salvar');
+  D.perfil.assinatura_data = canvas.toDataURL('image/png');
+  await sbSalvarPerfil();
+  fecha('m-assinatura-digital');
+  uiPerfil();
+  toast('✅ Assinatura salva!');
+}
+
+async function removerAssinaturaDigital(){
+  if(!confirm('Remover a assinatura dos recibos?')) return;
+  D.perfil.assinatura_data = '';
+  await sbSalvarPerfil();
+  uiPerfil();
+  toast('Assinatura removida');
 }
 
 async function logoParaBase64(url){
