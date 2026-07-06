@@ -100,6 +100,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .dash-money .sc-ico{font-size:1rem;margin-bottom:6px;opacity:.85}
 .dash-alert{display:none;background:var(--brn);color:#fff;border-radius:14px;padding:13px 15px;margin-bottom:14px;box-shadow:var(--shd);font-size:.88rem;font-weight:600;line-height:1.45}
 .dash-alert span{color:#fed7aa}
+.dash-alert-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dash-alert-actions button{background:#fff;color:var(--brn);border:0;border-radius:9px;padding:7px 10px;font-size:.74rem;font-weight:800;white-space:nowrap}
 .signature-preview{background:var(--bg);border:1.5px dashed var(--bor);border-radius:10px;min-height:74px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
 .signature-preview img{max-width:100%;max-height:64px;object-fit:contain}
 .signature-pad{width:100%;height:210px;background:#fff;border:1.5px solid var(--bor);border-radius:12px;touch-action:none;display:block}
@@ -236,6 +238,13 @@ input:checked+.slider:before{transform:translateX(19px)}
 .notif-title{font-weight:600;font-size:.85rem;margin-bottom:2px}
 .notif-msg{font-size:.76rem;color:var(--mut);line-height:1.4}
 .notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap}
+.priority-list{display:grid;gap:9px}
+.priority-item{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--bor);border-radius:11px;padding:12px}
+.priority-item strong{display:block;font-size:.86rem;color:var(--brn);margin-bottom:2px}
+.priority-item span{display:block;font-size:.76rem;color:var(--mut);line-height:1.38}
+.priority-dot{width:9px;height:9px;border-radius:99px;margin-top:5px;flex:none;background:var(--org)}
+.priority-item.high .priority-dot{background:var(--red)}
+.priority-item.ok .priority-dot{background:var(--grn)}
 
 /* CFG */
 .cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px}
@@ -751,6 +760,12 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="tb-right">
         <button class="btn btn-gho btn-sm" onclick="limparNotifs()">Limpar tudo</button>
         <button class="btn btn-org" id="btn-ativar" onclick="ativarNotifs()">🔔 Ativar notificações</button>
+      </div>
+    </div>
+    <div class="cfg-sec" style="margin-bottom:18px">
+      <div class="cfg-t">📌 Prioridades de hoje</div>
+      <div class="priority-list" id="priority-list">
+        <div class="empty"><div class="empty-ico">✅</div>Tudo certo por agora</div>
       </div>
     </div>
     <div class="cfg-sec" style="margin-bottom:18px">
@@ -2662,7 +2677,123 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderNotifs(); rDespesas(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); }
+
+function dataLocal(iso){
+  if(!iso) return null;
+  const p = iso.split('-').map(Number);
+  return new Date(p[0], (p[1]||1)-1, p[2]||1);
+}
+
+function diasEntre(a,b){
+  const da = dataLocal(a), db = dataLocal(b);
+  if(!da || !db) return 0;
+  da.setHours(0,0,0,0); db.setHours(0,0,0,0);
+  return Math.round((db-da)/86400000);
+}
+
+function minutosAteServico(s, agora){
+  if(!s.dt || !s.hr) return null;
+  const [hh,mm] = s.hr.split(':').map(Number);
+  const d = dataLocal(s.dt);
+  if(!d || Number.isNaN(hh)) return null;
+  d.setHours(hh, mm||0, 0, 0);
+  return Math.round((d-agora)/60000);
+}
+
+function calcularPrioridades(){
+  const hoje = hj();
+  const agora = new Date();
+  const itens = [];
+  const servHoje = D.servicos
+    .filter(s=>s.dt===hoje && s.sts_srv!=='Cancelado' && s.sts_srv!=='Realizado')
+    .sort((a,b)=>(a.hr||'99:99').localeCompare(b.hr||'99:99'));
+  const prox = D.servicos
+    .filter(s=>s.sts_srv==='Agendado' && s.dt && diasEntre(hoje,s.dt)>=0 && diasEntre(hoje,s.dt)<=7)
+    .sort((a,b)=>(a.dt+a.hr).localeCompare(b.dt+b.hr));
+  const pend = D.servicos.filter(s=>s.sts_srv==='Realizado' && s.sts_pag==='Pendente');
+  const atrasados = pend.filter(s=>s.dt && diasEntre(s.dt,hoje)>0);
+  const orcPend = D.orcamentos.filter(o=>['Pendente','Enviado'].includes(o.sts));
+
+  if(servHoje.length){
+    const primeiro = servHoje[0];
+    const min = minutosAteServico(primeiro, agora);
+    const tempo = min===null ? '' : (min>=0 ? ` começa em ${min} min` : ' já passou do horário');
+    itens.push({
+      tipo:'agenda', nivel: min!==null && min<=60 ? 'high' : '',
+      title:`${servHoje.length} serviço(s) para hoje`,
+      msg:`Próximo: ${primeiro.cli||'Cliente'} ${primeiro.hr?'às '+primeiro.hr:''}${tempo}.`,
+      key:`prio-hoje-${hoje}`,
+      action:"ir('servicos')"
+    });
+  }
+
+  if(atrasados.length){
+    const total = atrasados.reduce((a,b)=>a+(+b.val),0);
+    itens.push({
+      tipo:'cobranca', nivel:'high',
+      title:`${atrasados.length} cobrança(s) atrasada(s)`,
+      msg:`Total atrasado: ${R$(total)}. Vale priorizar cobrança pelo WhatsApp.`,
+      key:`prio-atraso-${hoje}`,
+      action:'abrirAReceber()'
+    });
+  } else if(pend.length){
+    const total = pend.reduce((a,b)=>a+(+b.val),0);
+    itens.push({
+      tipo:'cobranca',
+      title:`${pend.length} pagamento(s) pendente(s)`,
+      msg:`Ainda falta receber ${R$(total)}.`,
+      key:`prio-pendente-${hoje}`,
+      action:'abrirAReceber()'
+    });
+  }
+
+  if(!servHoje.length && prox.length){
+    const p = prox[0];
+    itens.push({
+      tipo:'agenda',
+      title:'Próximo serviço agendado',
+      msg:`${p.cli||'Cliente'} em ${fd(p.dt)}${p.hr?' às '+p.hr:''}.`,
+      key:`prio-proximo-${hoje}`,
+      action:"ir('servicos')"
+    });
+  }
+
+  if(orcPend.length){
+    itens.push({
+      tipo:'resumo',
+      title:`${orcPend.length} orçamento(s) aguardando retorno`,
+      msg:'Acompanhar orçamentos aumenta a chance de fechar serviço.',
+      key:`prio-orc-${hoje}`,
+      action:"ir('orcamentos')"
+    });
+  }
+
+  if(!itens.length){
+    itens.push({
+      tipo:'sistema', nivel:'ok',
+      title:'Tudo certo por agora',
+      msg:'Nenhum serviço hoje, nada pendente para receber e nenhum orçamento em aberto.',
+      key:`prio-ok-${hoje}`,
+      action:"ir('servicos')"
+    });
+  }
+  return itens;
+}
+
+function renderPrioridades(){
+  const el = document.getElementById('priority-list');
+  if(!el) return;
+  el.innerHTML = calcularPrioridades().map(p=>`
+    <div class="priority-item ${p.nivel||''}" onclick="${p.action||"ir('notificacoes')"}">
+      <div class="priority-dot"></div>
+      <div>
+        <strong>${p.title}</strong>
+        <span>${p.msg}</span>
+      </div>
+    </div>
+  `).join('');
+}
 
 function rDash(){
   const mes = hj().slice(0,7);
@@ -2681,11 +2812,12 @@ function rDash(){
   const lucro   = tRec + tVendas - tCusto;
   const alerta = document.getElementById('dash-alerta');
   if(alerta){
-    const hojeQtd = D.servicos.filter(s=>s.dt===hj()).length;
-    const partes = [];
-    if(hojeQtd > 0) partes.push(`Hoje você tem <span>${hojeQtd} serviço(s)</span>`);
-    if(tPend > 0) partes.push(`falta receber <span>${R$(tPend)}</span>`);
-    alerta.innerHTML = partes.length ? partes.join(' e ') + '.' : 'Tudo certo por agora. Nenhum serviço hoje e nada pendente para receber.';
+    const prioridade = calcularPrioridades()[0];
+    alerta.innerHTML = `
+      <div class="dash-alert-actions">
+        <div><span>${prioridade.title}</span><br><small>${prioridade.msg}</small></div>
+        <button onclick="${prioridade.action||"ir('notificacoes')"}">Ver</button>
+      </div>`;
     alerta.style.display = 'block';
   }
 
@@ -3761,7 +3893,7 @@ async function pdfRecibo(i){
   doc.text('DECLARAÇÃO DE RECEBIMENTO', 14, y);
   y += 10;
 
-  const texto = 'Recebi de ' + cliente + ' a importância de ' + valor + ' referente a ' + servico + ', realizado em ' + fd(s.dt) + (s.hr ? ' às ' + s.hr : '') + '. Para maior clareza, firmo o presente recibo.';
+  const texto = 'Recebi de ' + cliente + ' a quantia de ' + valor + ' referente ao serviço "' + servico + '", realizado em ' + fd(s.dt) + (s.hr ? ' às ' + s.hr : '') + '. Para os devidos fins, firmo o presente recibo.';
   doc.setFont('helvetica','normal');
   doc.setFontSize(12);
   doc.setTextColor(...DARK);
@@ -3779,7 +3911,7 @@ async function pdfRecibo(i){
   doc.setTextColor(...DARK);
   doc.text(doc.splitTextToSize(cliente, 80)[0], 14, y);
   doc.text(doc.splitTextToSize(servico, 80)[0], pw/2, y);
-  y += 16;
+  y += 10;
 
   if(s.desc_feito){
     doc.setFont('helvetica','bold');
@@ -3798,23 +3930,29 @@ async function pdfRecibo(i){
     y += boxH + 16;
   }
 
-  var assY = Math.max(y+18, ph-62);
+  var assY = Math.min(Math.max(y+26, 202), ph-48);
   if(D.perfil.assinatura_data){
     try{
-      doc.addImage(D.perfil.assinatura_data, 'PNG', pw/2 - 38, assY - 24, 76, 22);
+      doc.addImage(D.perfil.assinatura_data, 'PNG', pw/2 - 52, assY - 33, 104, 30);
     }catch(e){}
   }
   doc.setDrawColor(...GRAY_B);
   doc.setLineWidth(0.4);
-  doc.line(48, assY, pw-48, assY);
+  doc.line(52, assY, pw-52, assY);
   doc.setFont('helvetica','normal');
   doc.setFontSize(8);
   doc.setTextColor(...GRAY_T);
-  doc.text('Assinatura do prestador', pw/2, assY+6, {align:'center'});
+  doc.text('Assinatura', pw/2, assY+6, {align:'center'});
   doc.setFont('helvetica','bold');
   doc.setFontSize(10);
   doc.setTextColor(...DARK);
   doc.text(doc.splitTextToSize(nome, 100)[0], pw/2, assY+14, {align:'center'});
+  if(cnpj){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...GRAY_T);
+    doc.text('CNPJ: ' + cnpj, pw/2, assY+20, {align:'center'});
+  }
 
   var ry = ph-12;
   doc.setDrawColor(...ORANGE);
@@ -5382,10 +5520,38 @@ function limparAssinaturaCanvas(){
   assinaturaTemRisco = false;
 }
 
+function assinaturaCortadaDataURL(canvas){
+  const ctx = canvas.getContext('2d');
+  const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+  let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+  for(let y=0; y<canvas.height; y++){
+    for(let x=0; x<canvas.width; x++){
+      const i = (y*canvas.width+x)*4;
+      const r = img.data[i], g = img.data[i+1], b = img.data[i+2], a = img.data[i+3];
+      if(a > 20 && (r < 245 || g < 245 || b < 245)){
+        minX = Math.min(minX,x); minY = Math.min(minY,y);
+        maxX = Math.max(maxX,x); maxY = Math.max(maxY,y);
+      }
+    }
+  }
+  if(maxX <= minX || maxY <= minY) return canvas.toDataURL('image/png');
+  const pad = Math.round(14 * (window.devicePixelRatio || 1));
+  minX = Math.max(0,minX-pad); minY = Math.max(0,minY-pad);
+  maxX = Math.min(canvas.width,maxX+pad); maxY = Math.min(canvas.height,maxY+pad);
+  const w = maxX-minX, h = maxY-minY;
+  const out = document.createElement('canvas');
+  out.width = w; out.height = h;
+  const outCtx = out.getContext('2d');
+  outCtx.fillStyle = '#fff';
+  outCtx.fillRect(0,0,w,h);
+  outCtx.drawImage(canvas,minX,minY,w,h,0,0,w,h);
+  return out.toDataURL('image/png');
+}
+
 async function salvarAssinaturaDigital(){
   const canvas = document.getElementById('assinatura-canvas');
   if(!canvas || !assinaturaTemRisco) return toast('Assine antes de salvar');
-  D.perfil.assinatura_data = canvas.toDataURL('image/png');
+  D.perfil.assinatura_data = assinaturaCortadaDataURL(canvas);
   await sbSalvarPerfil();
   fecha('m-assinatura-digital');
   uiPerfil();
@@ -5694,9 +5860,10 @@ async function ativarNotifs(){
 }
 
 function iniciarNotificacoes(){
+  carregarNotifsLocal();
   setInterval(verificarNotifs, 60000);
   verificarNotifs();
-  if(Notification.permission==='granted'){
+  if('Notification' in window && Notification.permission==='granted'){
     document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
     document.getElementById('btn-ativar').className='btn btn-ok';
   }
@@ -5708,13 +5875,20 @@ function verificarNotifs(){
   const m  = String(agora.getMinutes()).padStart(2,'0');
   const hoje = hj();
 
+  calcularPrioridades()
+    .filter(p=>p.nivel==='high' || p.tipo==='cobranca' || p.tipo==='agenda')
+    .forEach(p=>{
+      const criou = addNotif(p.tipo,p.title,p.msg,p.key);
+      if(criou && p.nivel==='high') envNotif(p.title,p.msg,p.key);
+    });
+
   if(D.cfg.togRes && h==='08' && m==='00'){
     const agHj = D.servicos.filter(s=>s.dt===hoje&&s.sts_srv==='Agendado');
     if(agHj.length){
       const prim = [...agHj].sort((a,b)=>(a.hr||'').localeCompare(b.hr||''))[0];
       const msg  = `${agHj.length} serviço(s) agendado(s) hoje. Primeiro às ${prim.hr||'?'}.`;
       envNotif('🌅 Bom dia! Resumo do dia',msg,'resumo-'+hoje);
-      addNotif('resumo','🌅 Resumo do dia',msg);
+      addNotif('resumo','🌅 Resumo do dia',msg,'resumo-'+hoje);
     }
   }
 
@@ -5724,7 +5898,7 @@ function verificarNotifs(){
     D.servicos.filter(s=>s.dt===hoje&&s.hr===hr1&&s.sts_srv==='Agendado').forEach(s=>{
       const msg = `Serviço com ${s.cli} às ${s.hr} - ${s.tipo}`;
       envNotif('⏰ Serviço em 1 hora!',msg,'ag-'+s.dt+s.hr);
-      addNotif('agenda','⏰ Serviço em 1 hora!',msg);
+      addNotif('agenda','⏰ Serviço em 1 hora!',msg,'ag-'+s.dt+s.hr);
     });
   }
 
@@ -5733,12 +5907,13 @@ function verificarNotifs(){
     if(pends.length){
       const msg = `${pends.length} pagamento(s) em aberto - ${R$(pends.reduce((a,b)=>a+(+b.val),0))}`;
       envNotif('💰 Cobranças pendentes',msg,'cob-'+hoje);
-      addNotif('cobranca','💰 Cobranças pendentes',msg);
+      addNotif('cobranca','💰 Cobranças pendentes',msg,'cob-'+hoje);
     }
   }
 }
 
 function envNotif(title,body,tag){
+  if(!('Notification' in window)) return;
   if(Notification.permission!=='granted') return;
   navigator.serviceWorker?.ready.then(sw=>{
     sw.active?.postMessage({type:'NOTIFY',title,body,tag});
@@ -5747,6 +5922,11 @@ function envNotif(title,body,tag){
 
 function testarNotif(){
   const msg = `Teste às ${new Date().toLocaleTimeString('pt-BR')}. Tudo funcionando! ✅`;
+  if(!('Notification' in window)){
+    addNotif('sistema','🧪 Teste',msg,'teste-local-'+Date.now());
+    toast('Notificação interna registrada');
+    return;
+  }
   if(Notification.permission==='granted'){
     envNotif('🧪 Teste AutônomoPro',msg,'teste-'+Date.now());
     addNotif('sistema','🧪 Teste',msg);
@@ -5757,14 +5937,34 @@ function testarNotif(){
   }
 }
 
-function addNotif(tipo,title,msg){
+function notifStorageKey(){
+  return 'sp4_nf_' + (USER_ID || 'local');
+}
+
+function carregarNotifsLocal(){
+  try{
+    const raw = localStorage.getItem(notifStorageKey());
+    if(raw) D.notifs = JSON.parse(raw) || [];
+  }catch(e){ D.notifs = D.notifs || []; }
+  atualizarBadge();
+  renderNotifs();
+}
+
+function salvarNotifsLocal(){
+  try{ localStorage.setItem(notifStorageKey(), JSON.stringify((D.notifs||[]).slice(0,80))); }catch(e){}
+}
+
+function addNotif(tipo,title,msg,key){
+  if(key && D.notifs.some(n=>n.key===key)) return false;
   D.notifs.unshift({
-    id: gerarId(), tipo, title, msg,
+    id: gerarId(), tipo, title, msg, key:key||'',
     hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    data: hj(),
     lida: false
   });
   if(D.notifs.length>50) D.notifs=D.notifs.slice(0,50);
-  save(); atualizarBadge(); renderNotifs();
+  salvarNotifsLocal(); atualizarBadge(); renderNotifs();
+  return true;
 }
 
 function renderNotifs(){
@@ -5784,8 +5984,8 @@ function renderNotifs(){
     : '<div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div>';
 }
 
-function lerNotif(i){ D.notifs[i].lida=true; save(); atualizarBadge(); renderNotifs(); }
-function limparNotifs(){ D.notifs=[]; save(); atualizarBadge(); renderNotifs(); toast('🗑 Notificações limpas'); }
+function lerNotif(i){ D.notifs[i].lida=true; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); }
+function limparNotifs(){ D.notifs=[]; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); toast('🗑 Notificações limpas'); }
 
 function atualizarBadge(){
   const n   = D.notifs.filter(x=>!x.lida).length;
