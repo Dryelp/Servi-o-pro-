@@ -204,6 +204,33 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .rec-actions{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--bor)}
 .rec-actions .btn{flex:1 1 120px;justify-content:center}
 
+/* CLIENTES / ORCAMENTOS */
+.client-list,.orc-list{display:grid;gap:10px}
+.client-card,.orc-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:14px;box-shadow:var(--shd);transition:border-color .16s,box-shadow .16s}
+.client-card:hover,.orc-card:hover{border-color:rgba(234,88,12,.45);box-shadow:var(--shd2)}
+.pill{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--bor);background:var(--bg);border-radius:999px;padding:4px 9px;font-size:.68rem;font-weight:800;color:var(--mut);white-space:nowrap}
+.client-head,.orc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.client-name,.orc-name{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--brn)}
+.client-sub,.orc-sub{font-size:.78rem;color:var(--mut);margin-top:2px;line-height:1.4}
+.client-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.client-stat{background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:9px}
+.client-stat small{display:block;font-size:.65rem;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.client-stat strong{font-size:.9rem;color:var(--brn)}
+.client-actions,.orc-actions{display:flex;gap:7px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--bor)}
+.client-actions .btn,.orc-actions .btn{justify-content:center}
+.client-actions .btn:first-child,.orc-actions .btn:first-child{flex:1 1 120px}
+.client-contact{display:inline-flex;align-items:center;gap:5px;color:var(--grn);font-size:.78rem;font-weight:700;text-decoration:none}
+.client-contact .ico{width:14px;height:14px}
+.orc-total{text-align:right;flex-shrink:0}
+.orc-total small{display:block;font-size:.65rem;color:var(--mut);font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.orc-total strong{font-family:'Fraunces',serif;font-size:1.22rem;color:var(--grn)}
+.orc-items{border-top:1px solid var(--bor);padding-top:9px;margin-bottom:9px}
+.orc-note{font-size:.78rem;color:var(--mut);background:var(--bg);padding:8px 10px;border-radius:9px;margin-top:8px;border:1px solid var(--bor);line-height:1.45}
+.orc-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.orc-meta span{font-size:.72rem;color:var(--mut);display:inline-flex;align-items:center;gap:4px}
+.orc-meta .ico{width:13px;height:13px}
+.orc-status{width:128px;font-size:.76rem;padding:6px 8px;flex:none}
+
 /* MATERIAIS */
 .mat-lista{border:1.5px solid var(--bor);border-radius:9px;overflow:hidden;margin-bottom:10px;min-height:38px}
 .mat-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bor);background:var(--bg)}
@@ -218,8 +245,6 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .search-inp:focus{border-color:var(--org)}
 
 /* ORC CARD */
-.orc-card{background:var(--sur);border:1.5px solid var(--bor);border-radius:var(--rad);padding:17px;box-shadow:var(--shd);margin-bottom:12px;transition:border-color .2s}
-.orc-card:hover{border-color:var(--org)}
 .orc-item-row{display:flex;justify-content:space-between;font-size:.82rem;padding:5px 0;border-bottom:1px dashed var(--bor)}
 .orc-item-row:last-child{border-bottom:none}
 
@@ -736,10 +761,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div><div class="pg-title">Clientes</div><div class="pg-sub">Base de clientes cadastrados</div></div>
       <div class="tb-right"><button class="btn btn-org" onclick="abre('m-cli')">+ Novo cliente</button></div>
     </div>
-    <div class="tw">
-      <table><thead><tr><th>Nome</th><th>WhatsApp</th><th>Serviço</th><th>Total gasto</th><th>Último atend.</th><th></th></tr></thead>
-      <tbody id="tb-cli"></tbody></table>
-    </div>
+    <div class="client-list" id="cli-lista"></div>
   </div>
 
   <!-- DESPESAS -->
@@ -3147,33 +3169,47 @@ function rRecebimentos(){
 }
 
 function rClientes(){
+  const el = document.getElementById('cli-lista');
+  if(!el) return;
   if(!D.clientes.length){
-    document.getElementById('tb-cli').innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:40px 20px">
-      <div class="empty-ico" id="empty-cli-ico" style="font-size:2.4rem;margin-bottom:10px">👤</div>
+    el.innerHTML = `<div class="empty" style="padding:40px 20px">
+      <div class="empty-ico" id="empty-cli-ico" style="font-size:2.4rem;margin-bottom:10px">${iconSvg('user')}</div>
       <div style="font-weight:700;margin-bottom:6px">Nenhum cliente ainda</div>
       <div style="margin-bottom:16px">Os clientes aparecem aqui automaticamente quando você agenda um serviço!</div>
       <button class="btn btn-org" onclick="abreSrv()">+ Novo serviço</button>
-    </div></td></tr>`;
+    </div>`;
     return;
   }
-  document.getElementById('tb-cli').innerHTML = D.clientes.map((c,i)=>{
-    const gasto = D.servicos.filter(s=>s.cli===c.nm&&s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val),0);
-    const ult   = [...D.servicos].filter(s=>s.cli===c.nm).sort((a,b)=>(b.dt||'').localeCompare(a.dt||''))[0];
-    const semWpp = !c.wpp;
-    return `<tr>
-      <td><strong>${c.nm}</strong></td>
-      <td>${c.wpp
-        ? `<a href="https://wa.me/55${c.wpp.replace(/\D/g,'')}" target="_blank" style="color:var(--grn);font-weight:600;text-decoration:none">📱 ${c.wpp}</a>`
-        : `<span style="color:var(--org);font-size:.76rem;font-weight:600;cursor:pointer" onclick="editarWppCli(${i})">⚠️ Sem WhatsApp — cadastrar</span>`}
-      </td>
-      <td>${c.srv||'—'}</td>
-      <td><strong style="color:var(--grn)">${R$(gasto)}</strong></td>
-      <td>${ult?fd(ult.dt):'—'}</td>
-      <td style="display:flex;gap:5px">
-        <button class="btn btn-gho btn-sm" onclick="abrirEditCli(${i})">✏️</button>
-        <button class="btn btn-del btn-sm" onclick="delCli(${i})">🗑</button>
-      </td>
-    </tr>`;
+  el.innerHTML = D.clientes.map((c,i)=>{
+    const servicos = D.servicos.filter(s=>s.cli===c.nm);
+    const pagos = servicos.filter(s=>s.sts_pag==='Pago');
+    const pendentes = servicos.filter(s=>s.sts_pag!=='Pago' && s.sts!=='Cancelado');
+    const gasto = pagos.reduce((a,b)=>a+(+b.val||0),0);
+    const aberto = pendentes.reduce((a,b)=>a+(+b.val||0),0);
+    const ult = [...servicos].sort((a,b)=>(b.dt||'').localeCompare(a.dt||''))[0];
+    const contato = c.wpp
+      ? `<a class="client-contact" href="https://wa.me/55${c.wpp.replace(/\D/g,'')}" target="_blank" rel="noopener">${iconSvg('zap')} ${c.wpp}</a>`
+      : `<button class="btn btn-gho btn-sm" onclick="editarWppCli(${i})">Cadastrar WhatsApp</button>`;
+    return `<div class="client-card">
+      <div class="client-head">
+        <div>
+          <div class="client-name">${c.nm}</div>
+          <div class="client-sub">${c.srv||'Servico nao informado'}${c.end?` · ${c.end}`:''}</div>
+          <div style="margin-top:7px">${contato}</div>
+        </div>
+        <span class="pill">${servicos.length} servico${servicos.length===1?'':'s'}</span>
+      </div>
+      <div class="client-stats">
+        <div class="client-stat"><small>Total pago</small><strong style="color:var(--grn)">${R$(gasto)}</strong></div>
+        <div class="client-stat"><small>Em aberto</small><strong style="color:${aberto>0?'var(--org)':'var(--brn)'}">${R$(aberto)}</strong></div>
+        <div class="client-stat"><small>Ultimo</small><strong>${ult?fd(ult.dt):'--'}</strong></div>
+      </div>
+      <div class="client-actions">
+        <button class="btn btn-org btn-sm" onclick="novoServicoCliente(${i})">${iconSvg('wrench')} Novo servico</button>
+        <button class="btn btn-gho btn-sm" onclick="abrirEditCli(${i})">Editar</button>
+        <button class="btn btn-del btn-sm" onclick="delCli(${i})">Excluir</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -3214,43 +3250,51 @@ function rOrcamentos(){
   if(fsts) lista = lista.filter(o=>o.sts===fsts);
 
   const el = document.getElementById('orc-lista');
+  el.className = 'orc-list';
   if(!lista.length){
-    el.innerHTML='<div class="empty"><div class="empty-ico">📋</div>Nenhum orçamento encontrado</div>';
+    el.innerHTML=`<div class="empty"><div class="empty-ico">${iconSvg('clipboard')}</div>Nenhum orçamento encontrado</div>`;
     return;
   }
   el.innerHTML = lista.map(o=>{
     const i     = D.orcamentos.indexOf(o);
     const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+    const seq   = String(i+1).padStart(3,'0');
+    const podeConverter = o.sts !== 'Recusado';
     return `
     <div class="orc-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+      <div class="orc-head">
         <div>
-          <div style="font-size:.72rem;font-weight:600;color:var(--mut);margin-bottom:2px">Orçamento #${String(D.orcamentos.indexOf(o)+1).padStart(3,'0')} · ${fd(o.dt)}</div>
-          <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700">${o.cli||'—'}</div>
-          ${o.desc?`<div style="font-size:.78rem;color:var(--mut);margin-top:2px">${o.desc}</div>`:''}
+          <div class="orc-sub">Orcamento #${seq} · ${fd(o.dt)}</div>
+          <div class="orc-name">${o.cli||'--'}</div>
+          ${o.desc?`<div class="orc-sub">${o.desc}</div>`:''}
+          <div class="orc-meta">
+            <span>${iconSvg('clipboard')} ${o.sts||'Pendente'}</span>
+            ${o.valid?`<span>${iconSvg('bell')} Valido ate ${fd(o.valid)}</span>`:''}
+          </div>
         </div>
-        <select class="fi" style="width:120px;font-size:.76rem;padding:5px 8px;flex:none" onchange="mudarStsOrc(${i},this.value)">
-          <option ${o.sts==='Pendente'?'selected':''}>Pendente</option>
-          <option ${o.sts==='Enviado'?'selected':''}>Enviado</option>
-          <option ${o.sts==='Aprovado'?'selected':''}>Aprovado</option>
-          <option ${o.sts==='Recusado'?'selected':''}>Recusado</option>
-        </select>
+        <div class="orc-total">
+          <small>Total</small>
+          <strong>${R$(total)}</strong>
+          <select class="fi orc-status" onchange="mudarStsOrc(${i},this.value)">
+            <option ${o.sts==='Pendente'?'selected':''}>Pendente</option>
+            <option ${o.sts==='Enviado'?'selected':''}>Enviado</option>
+            <option ${o.sts==='Aprovado'?'selected':''}>Aprovado</option>
+            <option ${o.sts==='Recusado'?'selected':''}>Recusado</option>
+          </select>
+        </div>
       </div>
-      <div style="border-top:1px solid var(--bor);padding-top:9px;margin-bottom:9px">
-        ${(o.itens||[]).map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')}
+      <div class="orc-items">
+        ${(o.itens||[]).length
+          ? (o.itens||[]).map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')
+          : '<div class="orc-sub">Nenhum item informado</div>'}
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:2px solid var(--bor)">
-        <span style="font-weight:700">Total</span>
-        <span style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--grn)">${R$(total)}</span>
-      </div>
-      ${o.valid?`<div style="font-size:.73rem;color:var(--mut);margin-top:5px">⏳ Válido até: ${fd(o.valid)}</div>`:''}
-      ${o.obs?`<div style="font-size:.78rem;color:var(--mut);background:var(--bg);padding:7px 9px;border-radius:7px;margin-top:8px;border:1px solid var(--bor)">📌 ${o.obs}</div>`:''}
-      <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
-        <button class="btn btn-pdf btn-sm" onclick="pdfOrc(${i})">📄 PDF</button>
-        <button class="btn btn-gho btn-sm" onclick="editarOrc(${i})">✏️ Editar</button>
-        <button class="btn btn-wpp btn-sm" onclick="wppOrc(${i})">📱 WhatsApp</button>
-        <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">✅ Converter</button>
-        <button class="btn btn-del btn-sm" onclick="delOrc(${i})" style="margin-left:auto">🗑</button>
+      ${o.obs?`<div class="orc-note">${o.obs}</div>`:''}
+      <div class="orc-actions">
+        ${podeConverter?`<button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">${iconSvg('wrench')} Converter</button>`:''}
+        <button class="btn btn-pdf btn-sm" onclick="pdfOrc(${i})">PDF</button>
+        <button class="btn btn-wpp btn-sm" onclick="wppOrc(${i})">WhatsApp</button>
+        <button class="btn btn-gho btn-sm" onclick="editarOrc(${i})">Editar</button>
+        <button class="btn btn-del btn-sm" onclick="delOrc(${i})">Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -3343,6 +3387,18 @@ function abreSrv(){
   if(etapasBox) etapasBox.style.display = segsE.includes(seg) ? '' : 'none';
   atualizarDatalistTipo();
   abre('m-srv');
+}
+
+function novoServicoCliente(i){
+  const c = D.clientes[i];
+  if(!c) return abreSrv();
+  abreSrv();
+  const cli = document.getElementById('s-cli');
+  const tipo = document.getElementById('s-tipo');
+  const end = document.getElementById('s-end');
+  if(cli) cli.value = c.nm || '';
+  if(tipo && c.srv) tipo.value = c.srv;
+  if(end && c.end) end.value = c.end;
 }
 
 function calcSaldo(){
