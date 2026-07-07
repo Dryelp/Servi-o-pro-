@@ -166,17 +166,43 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .srv-card.sts-andamento{border-left:4px solid var(--pur)}
 .srv-card.sts-realizado{border-left:4px solid var(--grn)}
 .srv-card.sts-cancelado{border-left:4px solid var(--red);opacity:.6}
+.srv-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
 .srv-cli{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--brn)}
 .srv-tipo{font-size:.8rem;color:var(--mut);margin-top:2px}
-.srv-end{font-size:.76rem;color:var(--mut);margin-top:2px}
-.srv-prazo{font-size:.74rem;color:var(--org);font-weight:600;margin-top:3px}
-.srv-etapas{font-size:.74rem;color:var(--blu);font-weight:600;margin-top:3px}
+.srv-meta{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--mut);line-height:1.35;margin-top:3px}
+.srv-meta .ico{width:14px;height:14px;color:var(--org);flex:none}
+.srv-money{text-align:right;flex-shrink:0}
+.srv-money-main{font-family:'Fraunces',serif;font-size:1.18rem;font-weight:700;color:var(--grn)}
+.srv-profit{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.srv-chip{font-size:.68rem;font-weight:700;border-radius:999px;padding:3px 7px}
+.srv-chip.cost{background:var(--red-bg);color:var(--red)}
+.srv-chip.profit{background:var(--grn-bg);color:var(--grn)}
+.srv-info-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.srv-info-row .ico{width:14px;height:14px;color:var(--mut)}
+.srv-note{font-size:.79rem;color:var(--mut);background:var(--bg);padding:9px 10px;border-radius:9px;margin-bottom:10px;border:1px solid var(--bor);line-height:1.45}
+.srv-materials{font-size:.76rem;color:var(--mut);margin-bottom:10px;line-height:1.45}
 .srv-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding-top:11px;border-top:1px solid var(--bor)}
 .srv-primary-action{flex:1 1 160px;justify-content:center}
 .srv-secondary-action{opacity:.88}
 .srv-danger-action{margin-left:auto}
 .toast-action{margin-top:9px;display:flex;gap:8px;align-items:center}
 .toast-action .btn{background:#fff;color:var(--grn);justify-content:center;flex:1;padding:7px 10px}
+
+/* RECEBIMENTOS */
+.rec-list{display:grid;gap:10px}
+.rec-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:14px;box-shadow:var(--shd);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+.rec-card.pendente{border-left:4px solid var(--org)}
+.rec-card.pago{border-left:4px solid var(--grn)}
+.rec-card.cancelado{border-left:4px solid var(--red);opacity:.72}
+.rec-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--brn)}
+.rec-sub{font-size:.78rem;color:var(--mut);margin-top:2px;line-height:1.4}
+.rec-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.rec-meta span{font-size:.72rem;color:var(--mut);display:inline-flex;align-items:center;gap:4px}
+.rec-meta .ico{width:13px;height:13px}
+.rec-side{text-align:right;min-width:112px}
+.rec-value{font-family:'Fraunces',serif;font-size:1.22rem;font-weight:700;color:var(--grn);margin-bottom:6px}
+.rec-actions{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--bor)}
+.rec-actions .btn{flex:1 1 120px;justify-content:center}
 
 /* MATERIAIS */
 .mat-lista{border:1.5px solid var(--bor);border-radius:9px;overflow:hidden;margin-bottom:10px;min-height:38px}
@@ -307,6 +333,11 @@ input:checked+.slider:before{transform:translateX(19px)}
   .mb .mn-dot.show{display:block}
   .dash-grid{grid-template-columns:1fr!important}
   .module-grid{grid-template-columns:1fr}
+  .srv-card-head{flex-direction:column}
+  .srv-money{text-align:left;width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .srv-profit{justify-content:flex-start}
+  .rec-card{grid-template-columns:1fr}
+  .rec-side{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px}
   /* Oculta colunas menos importantes no mobile */
   .hide-mob{display:none!important}
   table{font-size:.78rem}
@@ -696,10 +727,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="sc" style="--sc-c:var(--org)"><div class="sc-lbl">Falta receber</div><div class="sc-val sc-val-sm" id="r-pend">R$ 0,00</div></div>
       <div class="sc" style="--sc-c:var(--brn)"><div class="sc-lbl">Total em serviços</div><div class="sc-val sc-val-sm" id="r-tot">R$ 0,00</div></div>
     </div>
-    <div class="tw">
-      <table><thead><tr><th class="hide-mob">Data</th><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Forma</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
-      <tbody id="tb-rec"></tbody></table>
-    </div>
+    <div class="rec-list" id="rec-page-lista"></div>
   </div>
 
   <!-- CLIENTES -->
@@ -3010,13 +3038,13 @@ function rServicos(){
   if(!lista.length){
     if(!D.servicos.length){
     el.innerHTML=`<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">⚡</div>
+      <div class="empty-ico" id="empty-srv-ico" style="font-size:2.8rem;margin-bottom:12px">${iconSvg('zap')}</div>
       <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum serviço ainda</div>
       <div style="margin-bottom:18px">Cadastre seu primeiro serviço e comece a faturar!</div>
       <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
     </div>`;
   } else {
-    el.innerHTML='<div class="empty"><div class="empty-ico">🔧</div>Nenhum serviço encontrado</div>';
+    el.innerHTML='<div class="empty"><div class="empty-ico">'+iconSvg('wrench')+'</div>Nenhum serviço encontrado</div>';
   }
     return;
   }
@@ -3036,39 +3064,38 @@ function rServicos(){
 
     return `
     <div class="srv-card ${isAnd?'sts-andamento':''} ${isReal?'sts-realizado':''} ${isCan?'sts-cancelado':''}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
+      <div class="srv-card-head">
         <div>
           <div class="srv-cli">${srv.cli||'—'}</div>
           <div class="srv-tipo">${srv.tipo||'—'}${srv.qtd?' · '+srv.qtd+' unid.':''}</div>
-          ${srv.end?`<div class="srv-end">📍 ${srv.end}</div>`:''}
-          ${srv.prazo?`<div class="srv-prazo">📅 Entrega: ${fd(srv.prazo)}</div>`:''}
-          ${srv.entrada?`<div class="srv-etapas">💰 Entrada: ${R$(srv.entrada)} · Saldo: ${R$(srv.saldo||0)}</div>`:''}
+          ${srv.end?`<div class="srv-meta">${iconSvg('home')} ${srv.end}</div>`:''}
+          ${srv.prazo?`<div class="srv-meta">${iconSvg('clipboard')} Entrega: ${fd(srv.prazo)}</div>`:''}
+          ${srv.entrada?`<div class="srv-meta">${iconSvg('wallet')} Entrada: ${R$(srv.entrada)} · Saldo: ${R$(srv.saldo||0)}</div>`:''}
         </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--grn)">${R$(srv.val)}</div>
-          ${isReal&&custo>0?`<div style="font-size:.73rem;color:var(--red)">Custo: ${R$(custo)}</div>`:''}
-          ${isReal&&custo>0?`<div style="font-size:.73rem;font-weight:700;color:var(--grn)">Lucro: ${R$(lucro)}</div>`:''}
+        <div class="srv-money">
+          <div class="srv-money-main">${R$(srv.val)}</div>
+          ${isReal&&custo>0?`<div class="srv-profit"><span class="srv-chip cost">Custo ${R$(custo)}</span><span class="srv-chip profit">Lucro ${R$(lucro)}</span></div>`:''}
         </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
-        <span style="font-size:.78rem;color:var(--mut)">📅 ${fd(srv.dt)}${srv.hr?' às '+srv.hr:''}</span>
+      <div class="srv-info-row">
+        <span class="srv-meta" style="margin-top:0">${iconSvg('clipboard')} ${fd(srv.dt)}${srv.hr?' às '+srv.hr:''}</span>
         ${bdg(srv.sts_srv)}
         ${srv.sts_pag ? bdg(srv.sts_pag) : ''}
-        ${srv.pag?`<span style="font-size:.75rem;color:var(--mut)">· ${srv.pag}</span>`:''}
+        ${srv.pag?`<span class="srv-meta" style="margin-top:0">${iconSvg('wallet')} ${srv.pag}</span>`:''}
       </div>
-      ${isReal&&srv.desc_feito?`<div style="font-size:.79rem;color:var(--mut);background:var(--bg);padding:8px 10px;border-radius:7px;margin-bottom:10px;border:1px solid var(--bor)">📝 ${srv.desc_feito}</div>`:''}
+      ${isReal&&srv.desc_feito?`<div class="srv-note">${srv.desc_feito}</div>`:''}
       ${isReal&&(srv.materiais||[]).length>0?`
-        <div style="font-size:.76rem;color:var(--mut);margin-bottom:10px">
-          💸 Materiais: ${(srv.materiais||[]).map(m=>`${m.desc} (${R$(m.val)})`).join(', ')}
+        <div class="srv-materials">
+          Materiais: ${(srv.materiais||[]).map(m=>`${m.desc} (${R$(m.val)})`).join(', ')}
         </div>`:''}
       <div class="srv-card-actions">
         ${acaoPrincipal}
-        ${isReal?`<button class="btn btn-pdf btn-sm srv-secondary-action" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
+        ${isReal?`<button class="btn btn-pdf btn-sm srv-secondary-action" onclick="abrirRelSrv(${i})">Relatório</button>`:''}
         <button class="btn btn-wpp btn-sm srv-secondary-action" onclick="abrirWpp(${i})">WhatsApp</button>
-        ${isAg?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarSrv(${i})">❌ Cancelar</button>`:''}
-        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
-        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm srv-secondary-action" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
-        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm srv-secondary-action\" onclick=\"pedirAvaliacao('+i+')\">⭐ Avaliação</button>' : ''}
+        ${isAg?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarSrv(${i})">Cancelar</button>`:''}
+        ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarPag(${i})">Cancelar pagto</button>`:''}
+        ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm srv-secondary-action" onclick="marcarPendente(${i})">Pendente</button>`:''}
+        ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm srv-secondary-action\" onclick=\"pedirAvaliacao('+i+')\">Avaliação</button>' : ''}
         <button class="btn btn-del btn-sm srv-danger-action" onclick="delSrv(${i})">Excluir</button>
       </div>
     </div>`;
@@ -3086,28 +3113,37 @@ function rRecebimentos(){
   document.getElementById('r-tot').textContent  = R$(tRec+tPend);
 
   const s = [...reais].sort((a,b)=>(b.dt||'').localeCompare(a.dt||''));
-  document.getElementById('tb-rec').innerHTML = s.length
+  const el = document.getElementById('rec-page-lista');
+  el.innerHTML = s.length
     ? s.map(srv=>{
         const i = D.servicos.indexOf(srv);
-        return `<tr>
-          <td class="hide-mob">${fd(srv.dt)}</td>
-          <td><strong>${srv.cli||'—'}</strong></td>
-          <td class="hide-mob">${srv.tipo||'—'}</td>
-          <td class="hide-mob">${srv.pag||'—'}</td>
-          <td><strong>${R$(srv.val)}</strong></td>
-          <td>${bdg(srv.sts_pag||'Pendente')}</td>
-          <td>
-            <div style="display:flex;gap:5px;flex-wrap:wrap">
-              ${srv.sts_pag==='Pendente'?`
-                <button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">✅ Pago</button>
-                <button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">❌</button>`:''}
-              ${srv.sts_pag==='Pago'?`<button class="btn btn-pdf btn-sm" onclick="pdfRecibo(${i})">🧾 Recibo</button><button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
-              ${srv.sts_pag==='Cancelado'?`<span style="font-size:.75rem;color:var(--red)">Cancelado</span>`:''}
+        const status = srv.sts_pag || 'Pendente';
+        const cls = status === 'Pago' ? 'pago' : status === 'Cancelado' ? 'cancelado' : 'pendente';
+        return `<div class="rec-card ${cls}">
+          <div>
+            <div class="rec-name">${srv.cli||'—'}</div>
+            <div class="rec-sub">${srv.tipo||'Serviço realizado'}</div>
+            <div class="rec-meta">
+              <span>${iconSvg('clipboard')} ${fd(srv.dt)}</span>
+              <span>${iconSvg('wallet')} ${srv.pag||'Forma não informada'}</span>
             </div>
-          </td>
-        </tr>`;
+          </div>
+          <div class="rec-side">
+            <div class="rec-value">${R$(srv.val)}</div>
+            ${bdg(status)}
+          </div>
+          <div class="rec-actions">
+            ${status==='Pendente'?`
+              <button class="btn btn-ok btn-sm" onclick="marcarPago(${i})">Marcar recebido</button>
+              <button class="btn btn-del btn-sm" onclick="cancelarPag(${i})">Cancelar cobrança</button>`:''}
+            ${status==='Pago'?`
+              <button class="btn btn-pdf btn-sm" onclick="pdfRecibo(${i})">Gerar recibo</button>
+              <button class="btn btn-gho btn-sm" onclick="marcarPendente(${i})">Voltar para pendente</button>`:''}
+            ${status==='Cancelado'?`<span style="font-size:.78rem;color:var(--red);font-weight:700">Cobrança cancelada</span>`:''}
+          </div>
+        </div>`;
       }).join('')
-    : '<tr><td colspan="7" class="empty">Nenhum serviço realizado ainda</td></tr>';
+    : '<div class="empty">Nenhum serviço realizado ainda</div>';
 }
 
 function rClientes(){
