@@ -1,6 +1,6 @@
-const CACHE = 'autonomopro-v16';
+const CACHE = 'autonomopro-v17';
 // Atualizar este número a cada novo deploy para forçar atualização nos dispositivos
-const FILES = ['./index.html','./manifest.json','./icon-192.png','./icon-512.png'];
+const FILES = ['./index.html','./orcamento.html','./manifest.json','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));

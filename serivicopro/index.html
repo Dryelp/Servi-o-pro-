@@ -2352,7 +2352,9 @@ async function carregarDadosSupabase(){
     const { data: orcs } = await SUPA.from('orcamentos').select('*').eq('user_id', USER_ID).order('dt', {ascending:false});
     D.orcamentos = (orcs||[]).map(o=>({
       dt: o.dt, cli: o.cli, desc: o.descricao||'', valid: o.valid,
-      obs: o.obs||'', itens: o.itens||[], sts: o.sts, _dbid: o.id
+      obs: o.obs||'', itens: o.itens||[], sts: o.sts, _dbid: o.id,
+      approval_token: o.approval_token||'', public_response: o.public_response||'',
+      public_responded_at: o.public_responded_at||''
     }));
 
     // Despesas
@@ -2448,6 +2450,7 @@ async function sbDeletarCliente(dbid){
 
 async function sbSalvarOrcamento(orc){
   if(!USER_ID) return null;
+  if(!orc.approval_token) orc.approval_token = gerarTokenOrcamento();
   const payload = {
     user_id: USER_ID,
     dt:       orc.dt,
@@ -2456,7 +2459,10 @@ async function sbSalvarOrcamento(orc){
     valid:    orc.valid||null,
     obs:      orc.obs||null,
     itens:    orc.itens||[],
-    sts:      orc.sts
+    sts:      orc.sts,
+    approval_token: orc.approval_token,
+    public_response: orc.public_response||null,
+    public_responded_at: orc.public_responded_at||null
   };
   try {
     if(orc._dbid){
@@ -2473,10 +2479,10 @@ async function sbSalvarOrcamento(orc){
       const { data, error } = await SUPA
         .from('orcamentos')
         .insert(payload)
-        .select('id')
+        .select('id, approval_token')
         .single();
       if(error){ console.error('ORC insert err:', error.message); return null; }
-      return { id: data.id, ...payload };
+      return { id: data.id, approval_token: data.approval_token, ...payload };
     }
   } catch(e){
     console.error('sbSalvarOrcamento catch:', e.message);
@@ -2524,6 +2530,20 @@ function gerarId(){
   const novo   = ultimo + 1;
   localStorage.setItem('sp4_id_seq', novo);
   return novo;
+}
+
+function gerarTokenOrcamento(){
+  if(window.crypto && crypto.getRandomValues){
+    const bytes = new Uint8Array(18);
+    crypto.getRandomValues(bytes);
+    return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+}
+
+function linkPublicoOrc(o){
+  if(!o?.approval_token) return '';
+  return `${window.location.origin}/orcamento/${o.approval_token}`;
 }
 
 function hj(){
@@ -2809,6 +2829,7 @@ function calcularPrioridades(){
   const pend = D.servicos.filter(s=>s.sts_srv==='Realizado' && s.sts_pag==='Pendente');
   const atrasados = pend.filter(s=>s.dt && diasEntre(s.dt,hoje)>0);
   const orcPend = D.orcamentos.filter(o=>['Pendente','Enviado'].includes(o.sts));
+  const orcAprovPub = D.orcamentos.filter(o=>o.public_response==='approved' && o.sts==='Aprovado');
 
   if(servHoje.length){
     const primeiro = servHoje[0];
@@ -2854,7 +2875,16 @@ function calcularPrioridades(){
     });
   }
 
-  if(orcPend.length){
+  if(orcAprovPub.length){
+    const p = orcAprovPub[0];
+    itens.push({
+      tipo:'resumo', nivel:'high',
+      title:`${orcAprovPub.length} orcamento(s) aprovado(s) pelo cliente`,
+      msg:`${p.cli||'Cliente'} aprovou pelo link. Falta converter em servico.`,
+      key:`prio-orc-aprov-${hoje}`,
+      action:"ir('orcamentos')"
+    });
+  } else if(orcPend.length){
     itens.push({
       tipo:'resumo',
       title:`${orcPend.length} orçamento(s) aguardando retorno`,
@@ -3260,6 +3290,8 @@ function rOrcamentos(){
     const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
     const seq   = String(i+1).padStart(3,'0');
     const podeConverter = o.sts !== 'Recusado';
+    const respondeuPublico = !!o.public_response;
+    const respTxt = o.public_response === 'approved' ? 'Aprovado pelo cliente' : o.public_response === 'rejected' ? 'Recusado pelo cliente' : '';
     return `
     <div class="orc-card">
       <div class="orc-head">
@@ -3270,6 +3302,7 @@ function rOrcamentos(){
           <div class="orc-meta">
             <span>${iconSvg('clipboard')} ${o.sts||'Pendente'}</span>
             ${o.valid?`<span>${iconSvg('bell')} Valido ate ${fd(o.valid)}</span>`:''}
+            ${respondeuPublico?`<span>${iconSvg(o.public_response==='approved'?'star':'eye-off')} ${respTxt}${o.public_responded_at?' em '+fd(o.public_responded_at.slice(0,10)):''}</span>`:''}
           </div>
         </div>
         <div class="orc-total">
@@ -3290,8 +3323,10 @@ function rOrcamentos(){
       </div>
       ${o.obs?`<div class="orc-note">${o.obs}</div>`:''}
       <div class="orc-actions">
-        ${podeConverter?`<button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">${iconSvg('wrench')} Converter</button>`:''}
+        ${podeConverter?`<button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">${iconSvg('wrench')} ${o.public_response==='approved'?'Converter aprovado':'Converter'}</button>`:''}
+        <button class="btn btn-brn btn-sm" onclick="wppLinkOrc(${i})">Enviar link</button>
         <button class="btn btn-pdf btn-sm" onclick="pdfOrc(${i})">PDF</button>
+        <button class="btn btn-gho btn-sm" onclick="copiarLinkOrc(${i})">Copiar link</button>
         <button class="btn btn-wpp btn-sm" onclick="wppOrc(${i})">WhatsApp</button>
         <button class="btn btn-gho btn-sm" onclick="editarOrc(${i})">Editar</button>
         <button class="btn btn-del btn-sm" onclick="delOrc(${i})">Excluir</button>
@@ -4394,7 +4429,10 @@ async function salvarOrc(){
     valid: document.getElementById('o-valid').value,
     obs:   document.getElementById('o-obs').value.trim(),
     itens: [...orcItens],
-    sts:   editIdx >= 0 ? D.orcamentos[editIdx].sts : 'Pendente'
+    sts:   editIdx >= 0 ? D.orcamentos[editIdx].sts : 'Pendente',
+    approval_token: editIdx >= 0 ? D.orcamentos[editIdx].approval_token : gerarTokenOrcamento(),
+    public_response: editIdx >= 0 ? D.orcamentos[editIdx].public_response : '',
+    public_responded_at: editIdx >= 0 ? D.orcamentos[editIdx].public_responded_at : ''
   };
   if(!o.cli){ resetBtnOrc(); return toast('⚠️ Informe o cliente'); }
 
@@ -4414,6 +4452,7 @@ async function salvarOrc(){
       return toast('⚠️ Erro ao salvar. Tente novamente.');
     }
     o._dbid = so.id;
+    o.approval_token = so.approval_token || o.approval_token;
     D.orcamentos.unshift(o);
     toast('✅ Orçamento salvo!');
   }
@@ -4724,6 +4763,48 @@ function wppOrc(i){
 // ══════════════════════════════════════════
 // RELATÓRIOS
 // ══════════════════════════════════════════
+async function garantirLinkOrc(i){
+  const o = D.orcamentos[i];
+  if(!o) return '';
+  if(!o.approval_token){
+    o.approval_token = gerarTokenOrcamento();
+    await sbSalvarOrcamento(o);
+  }
+  return linkPublicoOrc(o);
+}
+
+async function copiarLinkOrc(i){
+  const link = await garantirLinkOrc(i);
+  if(!link) return toast('Nao foi possivel gerar o link');
+  try{
+    await navigator.clipboard.writeText(link);
+    toast('Link de aprovacao copiado!');
+  }catch(e){
+    prompt('Copie o link de aprovacao:', link);
+  }
+}
+
+async function wppLinkOrc(i){
+  const o = D.orcamentos[i];
+  const link = await garantirLinkOrc(i);
+  if(!o || !link) return toast('Nao foi possivel gerar o link');
+  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const nome = D.perfil.nome || 'Prestador';
+  let msg = `Ola, ${o.cli||''}! Segue seu orcamento de ${nome}.\n\n`;
+  if(o.desc) msg += `${o.desc}\n`;
+  msg += `Total: ${R$(total)}\n`;
+  if(o.valid) msg += `Valido ate: ${fd(o.valid)}\n`;
+  msg += `\nVoce pode visualizar e aprovar por aqui:\n${link}`;
+  const cli = D.clientes.find(c=>c.nm===o.cli);
+  const tel = cli?.wpp?.replace(/\D/g,'')||'';
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  D.orcamentos[i].sts = 'Enviado';
+  await sbSalvarOrcamento(D.orcamentos[i]);
+  rOrcamentos();
+  toast('Abrindo WhatsApp com link de aprovacao...');
+}
+
 function relMesAtual(){ document.getElementById('rel-mes').value = hj().slice(0,7); renderRel(); }
 function relMesAnterior(){
   const [y,m] = document.getElementById('rel-mes').value.split('-').map(Number);

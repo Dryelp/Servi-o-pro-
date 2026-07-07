@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ea580c">
+<title>Orcamento - AutonomoPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--org:#ea580c;--org2:#c2410c;--org-bg:#fff7ed;--grn:#16a34a;--grn-bg:#dcfce7;--red:#dc2626;--red-bg:#fee2e2;--bg:#fafafa;--sur:#fff;--txt:#1a0f0a;--mut:#78716c;--bor:#e4e4e7;--shd:0 10px 30px rgba(28,18,11,.08)}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding:16px}
+.wrap{width:min(720px,100%);margin:0 auto}
+.card{background:var(--sur);border:1px solid var(--bor);border-radius:14px;box-shadow:var(--shd);overflow:hidden}
+.head{padding:22px 20px;border-bottom:1px solid var(--bor);display:flex;gap:14px;align-items:center}
+.logo{width:54px;height:54px;border-radius:12px;background:var(--org-bg);display:flex;align-items:center;justify-content:center;color:var(--org);font-weight:900;font-family:'Fraunces',serif;font-size:1.5rem;overflow:hidden;flex:none}
+.logo img{width:100%;height:100%;object-fit:cover}
+.brand{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:800;line-height:1.1}
+.sub{color:var(--mut);font-size:.84rem;margin-top:4px;line-height:1.45}
+.body{padding:20px}
+.label{font-size:.68rem;text-transform:uppercase;letter-spacing:.6px;font-weight:800;color:var(--mut);margin-bottom:5px}
+.client{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:800;margin-bottom:8px}
+.desc{color:var(--mut);font-size:.94rem;line-height:1.55;margin-bottom:16px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.pill{border:1px solid var(--bor);background:var(--bg);border-radius:999px;padding:6px 10px;font-size:.78rem;font-weight:700;color:var(--mut)}
+.items{border:1px solid var(--bor);border-radius:12px;overflow:hidden;margin:14px 0}
+.row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 14px;border-bottom:1px solid var(--bor);font-size:.9rem}
+.row:last-child{border-bottom:none}
+.row strong{white-space:nowrap}
+.total{margin:16px 0 18px;background:var(--grn);color:#fff;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.total small{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;font-weight:800;opacity:.85}
+.total strong{font-family:'Fraunces',serif;font-size:1.55rem}
+.obs{background:var(--org-bg);border:1px solid rgba(234,88,12,.18);border-radius:12px;padding:12px;color:#7c2d12;font-size:.88rem;line-height:1.5;margin-bottom:16px}
+.actions{display:grid;gap:10px;margin-top:18px}
+.btn{border:0;border-radius:12px;padding:14px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.96rem;font-weight:800;cursor:pointer;transition:.15s}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-ok{background:var(--grn);color:#fff}
+.btn-ok:hover{background:#15803d}
+.btn-no{background:var(--red-bg);color:var(--red)}
+.btn-no:hover{background:#fecaca}
+.status{padding:14px;border-radius:12px;background:var(--bg);border:1px solid var(--bor);font-size:.9rem;line-height:1.5;color:var(--mut);margin-top:14px;text-align:center}
+.status.ok{background:var(--grn-bg);border-color:#86efac;color:#14532d;font-weight:800}
+.status.no{background:var(--red-bg);border-color:#fecaca;color:#7f1d1d;font-weight:800}
+.foot{text-align:center;color:var(--mut);font-size:.75rem;margin-top:14px}
+.loading,.error{text-align:center;padding:42px 22px}
+.spin{width:34px;height:34px;border:4px solid var(--bor);border-top-color:var(--org);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:520px){body{padding:10px}.head{padding:18px 16px}.body{padding:16px}.brand{font-size:1.25rem}.client{font-size:1.35rem}.total{align-items:flex-start;flex-direction:column}.row{font-size:.84rem}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="card" id="app">
+    <div class="loading">
+      <div class="spin"></div>
+      <div class="sub">Carregando orcamento...</div>
+    </div>
+  </section>
+  <div class="foot">Gerado pelo AutonomoPro</div>
+</main>
+
+<script>
+const SUPA = supabase.createClient(
+  'https://dwuhhdxhxveucajhejrk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dWhoZHhoeHZldWNhamhlanJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MjU1NzgsImV4cCI6MjA4OTUwMTU3OH0.aCa2l7V9ScB5LuqGD1B3za0WIKqj7PmtJtIWk7AcyYQ'
+);
+
+let dados = null;
+let token = '';
+
+function R$(v){ return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fd(d){
+  if(!d) return '--';
+  const [y,m,day] = String(d).slice(0,10).split('-');
+  return day && m && y ? `${day}/${m}/${y}` : String(d);
+}
+function esc(s){
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function tokenDaUrl(){
+  const qs = new URLSearchParams(location.search);
+  return qs.get('t') || location.pathname.split('/').filter(Boolean).pop() || '';
+}
+function totalOrc(o){ return (o.itens||[]).reduce((a,b)=>a+(+b.val||0),0); }
+
+function render(){
+  const app = document.getElementById('app');
+  if(!dados){
+    app.innerHTML = `<div class="error"><div class="client">Link invalido</div><div class="sub">Este orcamento nao foi encontrado ou o link esta incorreto.</div></div>`;
+    return;
+  }
+  const p = dados.prestador || {};
+  const resp = dados.public_response;
+  const bloqueado = resp === 'approved' || resp === 'rejected';
+  const itens = dados.itens || [];
+  const logo = p.logo_url ? `<img src="${esc(p.logo_url)}" alt="">` : 'AP';
+  app.innerHTML = `
+    <div class="head">
+      <div class="logo">${logo}</div>
+      <div>
+        <div class="brand">${esc(p.nome||'AutonomoPro')}</div>
+        <div class="sub">${esc(p.tipo||'Prestador de servico')}${p.wpp?' · '+esc(p.wpp):''}</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="label">Orcamento para</div>
+      <div class="client">${esc(dados.cli||'Cliente')}</div>
+      ${dados.descricao?`<div class="desc">${esc(dados.descricao)}</div>`:''}
+      <div class="meta">
+        <span class="pill">Data: ${fd(dados.dt)}</span>
+        ${dados.valid?`<span class="pill">Valido ate: ${fd(dados.valid)}</span>`:''}
+        <span class="pill">Status: ${esc(dados.sts||'Pendente')}</span>
+      </div>
+      <div class="items">
+        ${itens.length ? itens.map(it=>`<div class="row"><span>${esc(it.desc)}</span><strong>${R$(it.val)}</strong></div>`).join('') : '<div class="row"><span>Nenhum item informado</span><strong>--</strong></div>'}
+      </div>
+      <div class="total"><div><small>Total do orcamento</small><strong>${R$(totalOrc(dados))}</strong></div></div>
+      ${dados.obs?`<div class="obs">${esc(dados.obs)}</div>`:''}
+      ${bloqueado ? statusFinal(resp) : `
+        <div class="actions">
+          <button class="btn btn-ok" onclick="responder('approved')">Aprovar orcamento</button>
+          <button class="btn btn-no" onclick="responder('rejected')">Recusar</button>
+        </div>
+        <div class="status">Ao aprovar, o profissional sera avisado e confirmara o agendamento do servico.</div>
+      `}
+    </div>`;
+}
+
+function statusFinal(resp){
+  if(resp === 'approved') return '<div class="status ok">Orcamento aprovado. O profissional vai confirmar o agendamento.</div>';
+  return '<div class="status no">Orcamento recusado. Obrigado pelo retorno.</div>';
+}
+
+async function carregar(){
+  token = tokenDaUrl();
+  if(!token){ render(); return; }
+  const { data, error } = await SUPA.rpc('get_public_orcamento', { p_token: token });
+  if(error || !data){ dados = null; render(); return; }
+  dados = data;
+  render();
+}
+
+async function responder(resp){
+  document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  const { data, error } = await SUPA.rpc('respond_public_orcamento', { p_token: token, p_response: resp });
+  if(error || !data || !data.ok){
+    alert('Nao foi possivel enviar sua resposta. Tente novamente.');
+    document.querySelectorAll('.btn').forEach(b=>b.disabled=false);
+    return;
+  }
+  dados.public_response = data.public_response;
+  dados.public_responded_at = data.public_responded_at;
+  dados.sts = data.sts;
+  render();
+}
+
+carregar();
+</script>
+</body>
+</html>
