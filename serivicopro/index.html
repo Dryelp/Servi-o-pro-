@@ -34,7 +34,10 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 /* SIDEBAR */
 .sidebar{width:252px;background:var(--brn);position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;overflow:hidden}
 .logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px;flex-shrink:0}
-.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.logo-ico{width:40px;height:40px;background:var(--org);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2);color:#fff}
+.ico{width:1em;height:1em;display:inline-block;vertical-align:-.15em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ico-box{width:34px;height:34px;border-radius:10px;background:var(--org-bg);color:var(--org);display:flex;align-items:center;justify-content:center;flex:none}
+.ico-box .ico{width:18px;height:18px}
 .logo-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:#fff}
 .logo-sub{font-size:.65rem;color:rgba(255,255,255,.28);margin-top:1px}
 .nav{flex:1;padding:10px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:1px;scroll-behavior:smooth}
@@ -42,7 +45,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .nb{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:500;color:rgba(255,255,255,.42);transition:all .14s;border:none;background:none;width:100%;text-align:left}
 .nb:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.78)}
 .nb.on{background:var(--org);color:#fff;font-weight:600}
-.nb .ni{font-size:.9rem;width:18px;text-align:center;flex-shrink:0}
+.nb .ni{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nb .ni .ico{width:17px;height:17px}
 .notif-badge{background:#ef4444;color:#fff;font-size:.58rem;font-weight:700;padding:2px 5px;border-radius:10px;margin-left:auto;display:none;animation:pulse 2s infinite}
 .sfoot{padding:12px 18px;border-top:1px solid rgba(255,255,255,.07);font-size:.68rem;color:rgba(255,255,255,.22);flex-shrink:0}
 
@@ -67,6 +71,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .btn-sm{padding:5px 10px;font-size:.76rem}
 .btn-ok{background:var(--grn-bg);color:var(--grn);border:1px solid rgba(26,107,60,.2)}
 .btn-del{background:var(--red-bg);color:var(--red);border:1px solid rgba(184,50,50,.15)}
+.btn .ico{width:16px;height:16px;flex:none}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
@@ -223,6 +228,13 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bor)}
 .toggle-row:last-child{border-bottom:none}
 .tl{font-size:.86rem;font-weight:600}.ts{font-size:.73rem;color:var(--mut);margin-top:2px}
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.module-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg);border:1.5px solid var(--bor);border-radius:12px;padding:13px;transition:border-color .16s,background .16s}
+.module-card:hover{border-color:rgba(234,88,12,.45);background:#fff}
+.module-info{display:flex;align-items:center;gap:11px;min-width:0}
+.module-info .tl{font-size:.84rem}
+.module-info .ts{font-size:.72rem;line-height:1.35}
+.module-card .switch{margin-left:6px}
 .switch{position:relative;width:42px;height:23px;flex-shrink:0}
 .switch input{opacity:0;width:0;height:0;position:absolute}
 .slider{position:absolute;cursor:pointer;inset:0;background:#ddd;border-radius:23px;transition:.28s}
@@ -248,7 +260,8 @@ input:checked+.slider:before{transform:translateX(19px)}
 
 /* CFG */
 .cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px}
-.cfg-t{font-family:'Fraunces',serif;font-size:.97rem;font-weight:600;color:var(--brn);margin-bottom:13px;display:flex;align-items:center;gap:6px}
+.cfg-t{font-family:'Fraunces',serif;font-size:.97rem;font-weight:600;color:var(--brn);margin-bottom:13px;display:flex;align-items:center;gap:8px}
+.cfg-t .ico{width:18px;height:18px;color:var(--org)}
 
 /* RELATÓRIO DETALHADO */
 .rel-oculto{display:none!important}
@@ -267,7 +280,8 @@ input:checked+.slider:before{transform:translateX(19px)}
 .mob-more-menu{display:none;position:fixed;bottom:62px;left:0;right:0;background:var(--brn);border-top:1px solid rgba(255,255,255,.08);z-index:299;padding:9px;gap:6px}
 .mob-more-menu.open{display:flex;flex-wrap:wrap}
 .mob-more-btn{flex:1;min-width:calc(33.3% - 6px);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:9px;background:rgba(255,255,255,.06);border:none;cursor:pointer;font-size:.68rem;font-weight:600;color:rgba(255,255,255,.55);font-family:'Plus Jakarta Sans',sans-serif}
-.mob-more-btn .mi{font-size:1.1rem}
+.mob-more-btn .mi{width:19px;height:19px;display:flex;align-items:center;justify-content:center}
+.mob-more-btn .mi .ico{width:18px;height:18px}
 .mob-more-btn:hover,.mob-more-btn.on{background:var(--org);color:#fff}
 
 @media(max-width:900px){
@@ -288,10 +302,11 @@ input:checked+.slider:before{transform:translateX(19px)}
   .tb-right .btn{flex:1;justify-content:center}
   .mob-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--brn);border-top:1px solid rgba(255,255,255,.08);z-index:300;padding:3px 0 env(safe-area-inset-bottom,3px)}
   .mb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;cursor:pointer;font-size:.58rem;font-weight:600;color:rgba(255,255,255,.38);border:none;background:none;position:relative;font-family:'Plus Jakarta Sans',sans-serif}
-  .mb .mi{font-size:1.15rem}.mb.on{color:var(--org2)}
+  .mb .mi{width:21px;height:21px;display:flex;align-items:center;justify-content:center}.mb .mi .ico{width:20px;height:20px}.mb.on{color:var(--org2)}
   .mb .mn-dot{position:absolute;top:4px;right:calc(50% - 14px);width:6px;height:6px;background:#ef4444;border-radius:50%;border:1.5px solid var(--brn);display:none}
   .mb .mn-dot.show{display:block}
   .dash-grid{grid-template-columns:1fr!important}
+  .module-grid{grid-template-columns:1fr}
   /* Oculta colunas menos importantes no mobile */
   .hide-mob{display:none!important}
   table{font-size:.78rem}
@@ -523,27 +538,27 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-ico">⚡</div>
+    <div class="logo-ico" data-ico="zap"></div>
     <div><div class="logo-name" id="logo-nome">AutônomoPro</div><div class="logo-sub" id="sb-tipo">Gestão de Serviços</div></div>
   </div>
   <nav class="nav">
     <div class="nav-sec">Principal</div>
-    <button class="nb on" onclick="ir('dashboard',this)"><span class="ni">🏠</span>Início</button>
-    <button class="nb" onclick="ir('servicos',this)"><span class="ni">🔧</span>Serviços</button>
+    <button class="nb on" onclick="ir('dashboard',this)"><span class="ni" data-ico="home"></span>Início</button>
+    <button class="nb" onclick="ir('servicos',this)"><span class="ni" data-ico="wrench"></span>Serviços</button>
     <div class="nav-sec">Financeiro</div>
-    <button class="nb" onclick="ir('recebimentos',this)"><span class="ni">💵</span>Recebimentos</button>
-    <button class="nb" onclick="ir('despesas',this)"><span class="ni">💸</span>Despesas</button>
-    <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico">👤</span>Clientes</button>
-    <button class="nb" id="nav-produtos" style="display:none" onclick="ir('produtos',this)"><span class="ni">🛍️</span>Produtos</button>
-    <button class="nb" id="nav-materiais" style="display:none" onclick="ir('materiais',this)"><span class="ni">📦</span>Materiais</button>
-    <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni">👷</span>Ajudantes</button>
+    <button class="nb" onclick="ir('recebimentos',this)"><span class="ni" data-ico="wallet"></span>Recebimentos</button>
+    <button class="nb" onclick="ir('despesas',this)"><span class="ni" data-ico="receipt"></span>Despesas</button>
+    <button class="nb" onclick="ir('clientes',this)"><span class="ni" id="nav-cli-ico" data-ico="user"></span>Clientes</button>
+    <button class="nb" id="nav-produtos" style="display:none" onclick="ir('produtos',this)"><span class="ni" data-ico="shopping-bag"></span>Produtos</button>
+    <button class="nb" id="nav-materiais" style="display:none" onclick="ir('materiais',this)"><span class="ni" data-ico="package"></span>Materiais</button>
+    <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni" data-ico="users"></span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
-    <button class="nb" onclick="ir('orcamentos',this)"><span class="ni">📋</span>Orçamentos</button>
+    <button class="nb" onclick="ir('orcamentos',this)"><span class="ni" data-ico="clipboard"></span>Orçamentos</button>
     <div class="nav-sec">Análise</div>
-    <button class="nb" onclick="ir('relatorio',this)"><span class="ni">📊</span>Relatórios</button>
-    <button class="nb" onclick="ir('notificacoes',this)"><span class="ni">🔔</span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
+    <button class="nb" onclick="ir('relatorio',this)"><span class="ni" data-ico="bar-chart"></span>Relatórios</button>
+    <button class="nb" onclick="ir('notificacoes',this)"><span class="ni" data-ico="bell"></span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
     <div class="nav-sec">Conta</div>
-    <button class="nb" onclick="ir('perfil',this)"><span class="ni">👤</span>Meu Perfil</button>
+    <button class="nb" onclick="ir('perfil',this)"><span class="ni" data-ico="user"></span>Meu Perfil</button>
   </nav>
   <div class="sfoot">AutônomoPro v5.0<br><span id="sb-nome" style="color:rgba(255,255,255,.35)">Dados na nuvem</span></div>
 </aside>
@@ -560,8 +575,8 @@ input:checked+.slider:before{transform:translateX(19px)}
           <div class="pg-sub" id="data-hoje"></div>
         </div>
         <div class="tb-right dash-actions">
-          <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores">👁 Ocultar</button>
-          <button class="btn btn-gho" onclick="ir('perfil')">👤 Perfil</button>
+          <button class="btn btn-gho" id="btn-ocultar" onclick="toggleOcultar()" title="Ocultar valores"><span data-ico="eye"></span>Ocultar</button>
+          <button class="btn btn-gho" onclick="ir('perfil')"><span data-ico="user"></span>Perfil</button>
           <button class="btn btn-org" onclick="abreSrv()">+ Novo Serviço</button>
         </div>
       </div>
@@ -626,7 +641,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div class="pb" id="dash-hoje"></div>
       </div>
       <div class="panel">
-        <div class="ph"><div class="pt">📊 Receita semanal</div></div>
+        <div class="ph"><div class="pt"><span data-ico="bar-chart"></span> Receita semanal</div></div>
         <div class="pb">
           <div class="chart-bars" id="chart"></div>
           <div style="display:flex;gap:4px;margin-top:6px" id="chart-lbl"></div>
@@ -644,7 +659,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="tw">
-      <div class="th"><div class="pt">🔧 Últimos serviços</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
+      <div class="th"><div class="pt"><span data-ico="wrench"></span> Últimos serviços</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
       <table><thead><tr><th>Cliente</th><th class="hide-mob">Serviço</th><th class="hide-mob">Data</th><th>Valor</th><th>Status</th><th class="hide-mob">Pagamento</th></tr></thead>
       <tbody id="tb-dash"></tbody></table>
     </div>
@@ -768,7 +783,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="cfg-sec" style="margin-bottom:18px">
-      <div class="cfg-t">⚙️ Configurar alertas</div>
+      <div class="cfg-t"><span data-ico="bell"></span> Configurar alertas</div>
       <div class="toggle-row"><div><div class="tl">Lembrete de agendamento</div><div class="ts">1 hora antes do serviço</div></div><label class="switch"><input type="checkbox" id="tog-ag" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
       <div class="toggle-row"><div><div class="tl">Resumo diário</div><div class="ts">Todo dia às 8h</div></div><label class="switch"><input type="checkbox" id="tog-res" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
       <div class="toggle-row"><div><div class="tl">Cobrança pendente</div><div class="ts">Avisar sobre pagamentos em aberto às 9h</div></div><label class="switch"><input type="checkbox" id="tog-cob" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
@@ -789,7 +804,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
     </div>
     <div class="cfg-sec">
-      <div class="cfg-t">👤 Informações pessoais</div>
+      <div class="cfg-t"><span data-ico="user"></span> Informações pessoais</div>
 
       <div class="fg">
         <label class="fl">Logo da empresa <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label>
@@ -826,7 +841,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%">🚪 Sair da conta</button>
     </div>
     <div class="cfg-sec">
-      <div class="cfg-t">🛠️ Meus serviços</div>
+      <div class="cfg-t"><span data-ico="wrench"></span> Meus serviços</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:12px;line-height:1.6">Cadastre os tipos de serviço que você presta. Vão aparecer como sugestão ao criar um novo serviço.</p>
       <div id="meus-srvs-lista" style="margin-bottom:10px"></div>
       <div style="display:flex;gap:8px">
@@ -835,58 +850,70 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="cfg-sec">
-      <div class="cfg-t">⚙️ Módulos</div>
-      <p style="font-size:.82rem;color:var(--mut);margin-bottom:16px;line-height:1.6">Ative apenas o que você usa. O app se adapta ao seu negócio.</p>
+      <div class="cfg-t"><span data-ico="sliders"></span> Recursos ativos</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:16px;line-height:1.6">Deixe ligado só o que faz parte da rotina. Os recursos desligados somem do menu e deixam o app mais leve para usar.</p>
 
-      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Vendas e Estoque</div>
-      <div class="toggle-row" style="margin-bottom:14px">
-        <div>
-          <div class="tl">🛍️ Produtos e estoque</div>
-          <div class="ts">Controle estoque, custo e vendas de produtos</div>
+      <div class="module-grid">
+      <div class="module-card">
+        <div class="module-info">
+          <div class="ico-box"><span data-ico="shopping-bag"></span></div>
+          <div>
+            <div class="tl">Produtos e vendas</div>
+            <div class="ts">Controle estoque, custo e vendas de produtos</div>
+          </div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-produtos" onchange="salvarModulo('produtos',this.checked)"><span class="slider"></span></label>
       </div>
 
-      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Estoque</div>
-      <div class="toggle-row" style="margin-bottom:14px">
-        <div>
-          <div class="tl">📦 Estoque de materiais</div>
-          <div class="ts">Controle materiais e desconte ao finalizar serviço</div>
+      <div class="module-card">
+        <div class="module-info">
+          <div class="ico-box"><span data-ico="package"></span></div>
+          <div>
+            <div class="tl">Materiais e estoque</div>
+            <div class="ts">Controle materiais e desconte ao finalizar serviço</div>
+          </div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-materiais" onchange="salvarModulo('materiais',this.checked)"><span class="slider"></span></label>
       </div>
 
-      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Equipe</div>
-      <div class="toggle-row" style="margin-bottom:14px">
-        <div>
-          <div class="tl">👷 Comissão de ajudantes</div>
-          <div class="ts">Controle dias trabalhados e valores a pagar</div>
+      <div class="module-card">
+        <div class="module-info">
+          <div class="ico-box"><span data-ico="users"></span></div>
+          <div>
+            <div class="tl">Ajudantes e comissões</div>
+            <div class="ts">Controle dias trabalhados e valores a pagar</div>
+          </div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-ajudantes" onchange="salvarModulo('ajudantes',this.checked)"><span class="slider"></span></label>
       </div>
 
-      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Documentos</div>
-      <div class="toggle-row" style="margin-bottom:14px">
-        <div>
-          <div class="tl">🧾 Contrato digital</div>
-          <div class="ts">Gera contrato em PDF com dados do serviço</div>
+      <div class="module-card">
+        <div class="module-info">
+          <div class="ico-box"><span data-ico="file-text"></span></div>
+          <div>
+            <div class="tl">Contrato digital</div>
+            <div class="ts">Gera contrato em PDF com dados do serviço</div>
+          </div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-contrato" onchange="salvarModulo('contrato',this.checked)"><span class="slider"></span></label>
       </div>
 
-      <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Relacionamento</div>
-      <div class="toggle-row" style="margin-bottom:6px">
-        <div>
-          <div class="tl">⭐ Avaliações de clientes</div>
-          <div class="ts">Receba avaliações via link pelo WhatsApp</div>
+      <div class="module-card">
+        <div class="module-info">
+          <div class="ico-box"><span data-ico="star"></span></div>
+          <div>
+            <div class="tl">Avaliações de clientes</div>
+            <div class="ts">Receba avaliações via link pelo WhatsApp</div>
+          </div>
         </div>
         <label class="switch"><input type="checkbox" id="mod-avaliacoes" onchange="salvarModulo('avaliacoes',this.checked)"><span class="slider"></span></label>
+      </div>
       </div>
     </div>
 
     <!-- Minha Assinatura -->
     <div class="cfg-sec" id="sec-assinatura">
-      <div class="cfg-t">⚡ Minha Assinatura</div>
+      <div class="cfg-t"><span data-ico="zap"></span> Minha Assinatura</div>
       <div id="assin-free" style="display:none">
         <div style="background:var(--bg);border:1.5px solid var(--bor);border-radius:14px;padding:16px;margin-bottom:14px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -964,7 +991,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="cfg-sec">
-      <div class="cfg-t">🎯 Meta mensal</div>
+      <div class="cfg-t"><span data-ico="bar-chart"></span> Meta mensal</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Defina quanto quer faturar por mês. Vamos te mostrar o progresso em tempo real no dashboard.</p>
       <div class="fg"><label class="fl">Meta de faturamento (R$)</label>
         <input class="fi" type="number" id="edit-meta" placeholder="Ex: 3000" min="0" step="100" oninput="atualizarPreviewMeta()">
@@ -973,14 +1000,14 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Sua meta</div>
         <div id="meta-preview-txt" style="font-size:.92rem;font-weight:600;color:var(--brn)"></div>
       </div>
-      <button class="btn btn-org" onclick="salvarMeta()">🎯 Definir meta</button>
+      <button class="btn btn-org" onclick="salvarMeta()">Definir meta</button>
     </div>
   </div>
 
   <!-- MATERIAIS -->
   <div class="page" id="pg-materiais">
     <div class="topbar">
-      <div><div class="pg-title">📦 Materiais</div><div class="pg-sub">Controle seu estoque de materiais</div></div>
+      <div><div class="pg-title">Materiais</div><div class="pg-sub">Controle seu estoque de materiais</div></div>
       <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoMaterial()">+ Novo material</button></div>
     </div>
     <div id="materiais-lista"></div>
@@ -989,7 +1016,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- PRODUTOS -->
   <div class="page" id="pg-produtos">
     <div class="topbar">
-      <div><div class="pg-title">🛍️ Produtos</div><div class="pg-sub">Controle seu estoque e vendas</div></div>
+      <div><div class="pg-title">Produtos</div><div class="pg-sub">Controle seu estoque e vendas</div></div>
       <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoProduto()">+ Novo produto</button></div>
     </div>
     <div id="produtos-lista"></div>
@@ -1068,7 +1095,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- AJUDANTES -->
   <div class="page" id="pg-ajudantes">
     <div class="topbar">
-      <div><div class="pg-title">👷 Ajudantes</div><div class="pg-sub">Controle comissões e pagamentos</div></div>
+      <div><div class="pg-title">Ajudantes</div><div class="pg-sub">Controle comissões e pagamentos</div></div>
       <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoAjudante()">+ Novo ajudante</button></div>
     </div>
     <div id="ajudantes-lista"></div>
@@ -1079,21 +1106,21 @@ input:checked+.slider:before{transform:translateX(19px)}
 
 <!-- MOBILE BAR -->
 <div class="mob-bar">
-  <button class="mb on" onclick="ir('dashboard',this)"><span class="mi">🏠</span>Início</button>
-  <button class="mb" onclick="ir('servicos',this)"><span class="mi">🔧</span>Serviços</button>
-  <button class="mb" onclick="ir('orcamentos',this)"><span class="mi">📋</span>Orçam.</button>
-  <button class="mb" onclick="ir('recebimentos',this)"><span class="mi">💵</span>Receb.</button>
-  <button class="mb" id="mb-mais" onclick="toggleMais()"><span class="mi">☰</span>Mais<span class="mn-dot" id="mob-dot"></span></button>
+  <button class="mb on" onclick="ir('dashboard',this)"><span class="mi" data-ico="home"></span>Início</button>
+  <button class="mb" onclick="ir('servicos',this)"><span class="mi" data-ico="wrench"></span>Serviços</button>
+  <button class="mb" onclick="ir('orcamentos',this)"><span class="mi" data-ico="clipboard"></span>Orçam.</button>
+  <button class="mb" onclick="ir('recebimentos',this)"><span class="mi" data-ico="wallet"></span>Receb.</button>
+  <button class="mb" id="mb-mais" onclick="toggleMais()"><span class="mi" data-ico="menu"></span>Mais<span class="mn-dot" id="mob-dot"></span></button>
 </div>
 <div class="mob-more-menu" id="mob-more">
-  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico">👤</span>Clientes</button>
-  <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir('produtos');fecharMais()"><span class="mi">🛍️</span>Produtos</button>
-  <button class="mob-more-btn" id="mob-materiais" style="display:none" onclick="ir('materiais');fecharMais()"><span class="mi">📦</span>Materiais</button>
-  <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir('ajudantes');fecharMais()"><span class="mi">👷</span>Ajudantes</button>
-  <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi">💸</span>Despesas</button>
-  <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi">📊</span>Relatórios</button>
-  <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi">🔔</span>Notificações</button>
-  <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi">👤</span>Perfil</button>
+  <button class="mob-more-btn" onclick="ir('clientes');fecharMais()"><span class="mi" id="mob-cli-ico" data-ico="user"></span>Clientes</button>
+  <button class="mob-more-btn" id="mob-produtos" style="display:none" onclick="ir('produtos');fecharMais()"><span class="mi" data-ico="shopping-bag"></span>Produtos</button>
+  <button class="mob-more-btn" id="mob-materiais" style="display:none" onclick="ir('materiais');fecharMais()"><span class="mi" data-ico="package"></span>Materiais</button>
+  <button class="mob-more-btn" id="mob-ajudantes" style="display:none" onclick="ir('ajudantes');fecharMais()"><span class="mi" data-ico="users"></span>Ajudantes</button>
+  <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi" data-ico="receipt"></span>Despesas</button>
+  <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi" data-ico="bar-chart"></span>Relatórios</button>
+  <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi" data-ico="bell"></span>Notificações</button>
+  <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi" data-ico="user"></span>Perfil</button>
 </div>
 
 <!-- ═══ MODAIS ═══ -->
@@ -1620,9 +1647,9 @@ const PLACEHOLDERS_SEG = {
 };
 
 const ICONES_CLI_SEG = {
-  construcao: '👷', frete:'🚛', confeitaria:'🍰',
-  cerimonial: '💍', artesanato:'✂️', embalagens:'🎁',
-  beleza:     '💅', fotografia:'📷', geral:'👤'
+  construcao: 'users', frete:'package', confeitaria:'shopping-bag',
+  cerimonial: 'star', artesanato:'wrench', embalagens:'package',
+  beleza:     'user', fotografia:'eye', geral:'user'
 };
 
 function aplicarSegmento(seg){
@@ -1631,20 +1658,20 @@ function aplicarSegmento(seg){
 
   // Ícone universal no logo
   const logoIco = document.querySelector('.logo-ico');
-  if(logoIco) logoIco.textContent = '⚡';
+  if(logoIco) logoIco.setAttribute('data-ico','zap');
   const welcomeIco = document.getElementById('welcome-ico');
-  if(welcomeIco) welcomeIco.textContent = '⚡';
+  if(welcomeIco) welcomeIco.innerHTML = iconSvg('zap');
 
   // Ícone de cliente
-  const icoC = ICONES_CLI_SEG[key] || '👤';
+  const icoC = ICONES_CLI_SEG[key] || 'user';
   ['nav-cli-ico','mob-cli-ico','empty-cli-ico','modal-cli-ico'].forEach(id=>{
     const el = document.getElementById(id);
-    if(el) el.textContent = icoC;
+    if(el){ el.setAttribute('data-ico', icoC); el.dataset.icoHydrated = ''; }
   });
 
   // Ícone tela vazia de serviços
   const emptySrv = document.getElementById('empty-srv-ico');
-  if(emptySrv) emptySrv.textContent = '⚡';
+  if(emptySrv) emptySrv.innerHTML = iconSvg('zap');
 
   // Placeholder tipo de serviço
   const tipoInp = document.getElementById('s-tipo');
@@ -1661,6 +1688,41 @@ function aplicarSegmento(seg){
           : (L.genero === 'f' ? '+ Nova ' : '+ Novo ') + (L.servico || 'Serviço');
     });
   }
+  hydrateIcons();
+}
+
+const ICONS = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5 5L4 17l3 3 5.7-5.7a4 4 0 0 0 5-5l-3 3-2-2 3-3Z"/>',
+  wallet:'<path d="M4 7h15a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h13"/><path d="M16 13h4"/>',
+  receipt:'<path d="M6 3h12v18l-2-1-2 1-2-1-2 1-2-1-2 1V3Z"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  user:'<path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  package:'<path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  'shopping-bag':'<path d="M6 7h12l1 14H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/>',
+  clipboard:'<path d="M9 4h6v4H9z"/><path d="M8 6H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/>',
+  'bar-chart':'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
+  zap:'<path d="M13 2 4 14h7l-1 8 10-13h-7l0-7Z"/>',
+  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  'eye-off':'<path d="m3 3 18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c6 0 10 8 10 8a16 16 0 0 1-3.1 4.2"/><path d="M6.5 6.5C3.8 8.3 2 12 2 12s4 8 10 8a10.5 10.5 0 0 0 4.2-.9"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+  sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>',
+  'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/>',
+  star:'<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>'
+};
+
+function iconSvg(name){
+  return `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.zap}</svg>`;
+}
+
+function hydrateIcons(root){
+  (root || document).querySelectorAll('[data-ico]').forEach(el=>{
+    const name = el.getAttribute('data-ico') || 'zap';
+    if(el.dataset.icoHydrated === name) return;
+    el.innerHTML = iconSvg(name);
+    el.dataset.icoHydrated = name;
+  });
 }
 
 // ══════════════════════════════════════════
@@ -1708,6 +1770,7 @@ function atualizarApp(){
 }
 
 window.onload = async () => {
+  hydrateIcons();
   document.getElementById('data-hoje').textContent =
     new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('s-dt').value = hj();
@@ -2659,7 +2722,7 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
 
 function dataLocal(iso){
   if(!iso) return null;
@@ -2850,7 +2913,7 @@ function rDash(){
   document.getElementById('v-pend-h').textContent = oculto ? '' : pends.length+' pendentes';
   // Atualiza botão
   const btnOc = document.getElementById('btn-ocultar');
-  if(btnOc) btnOc.innerHTML = oculto ? '👁 Mostrar' : '👁 Ocultar';
+  if(btnOc) btnOc.innerHTML = (oculto ? iconSvg('eye') + 'Mostrar' : iconSvg('eye-off') + 'Ocultar');
 
   const hoje = hj();
   const agHj = D.servicos.filter(s=>s.dt===hoje);
@@ -2966,10 +3029,10 @@ function rServicos(){
     const isReal = srv.sts_srv === 'Realizado';
     const isCan  = srv.sts_srv === 'Cancelado';
     let acaoPrincipal = '';
-    if(isAg) acaoPrincipal = `<button class="btn btn-grn btn-sm srv-primary-action" onclick="iniciarSrv(${i})">▶️ Iniciar serviço</button>`;
-    else if(isAnd) acaoPrincipal = `<button class="btn btn-org btn-sm srv-primary-action" onclick="abrirFinalizar(${i})">⏹️ Finalizar serviço</button>`;
-    else if(isReal && srv.sts_pag === 'Pendente') acaoPrincipal = `<button class="btn btn-ok btn-sm srv-primary-action" onclick="marcarPago(${i})">✅ Marcar como pago</button>`;
-    else if(isReal && srv.sts_pag === 'Pago') acaoPrincipal = `<button class="btn btn-pdf btn-sm srv-primary-action" onclick="pdfRecibo(${i})">🧾 Gerar recibo</button>`;
+    if(isAg) acaoPrincipal = `<button class="btn btn-grn btn-sm srv-primary-action" onclick="iniciarSrv(${i})">Iniciar serviço</button>`;
+    else if(isAnd) acaoPrincipal = `<button class="btn btn-org btn-sm srv-primary-action" onclick="abrirFinalizar(${i})">Finalizar serviço</button>`;
+    else if(isReal && srv.sts_pag === 'Pendente') acaoPrincipal = `<button class="btn btn-ok btn-sm srv-primary-action" onclick="marcarPago(${i})">Marcar como pago</button>`;
+    else if(isReal && srv.sts_pag === 'Pago') acaoPrincipal = `<button class="btn btn-pdf btn-sm srv-primary-action" onclick="pdfRecibo(${i})">Gerar recibo</button>`;
 
     return `
     <div class="srv-card ${isAnd?'sts-andamento':''} ${isReal?'sts-realizado':''} ${isCan?'sts-cancelado':''}">
@@ -3001,12 +3064,12 @@ function rServicos(){
       <div class="srv-card-actions">
         ${acaoPrincipal}
         ${isReal?`<button class="btn btn-pdf btn-sm srv-secondary-action" onclick="abrirRelSrv(${i})">📄 Relatório</button>`:''}
-        <button class="btn btn-wpp btn-sm srv-secondary-action" onclick="abrirWpp(${i})">📱 WhatsApp</button>
+        <button class="btn btn-wpp btn-sm srv-secondary-action" onclick="abrirWpp(${i})">WhatsApp</button>
         ${isAg?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarSrv(${i})">❌ Cancelar</button>`:''}
         ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarPag(${i})">❌ Cancelar pagto</button>`:''}
         ${isReal&&srv.sts_pag==='Pago'?`<button class="btn btn-gho btn-sm srv-secondary-action" onclick="marcarPendente(${i})">⏳ Pendente</button>`:''}
         ${isReal && D.perfil.modulos && D.perfil.modulos.avaliacoes ? '<button class=\"btn btn-ok btn-sm srv-secondary-action\" onclick=\"pedirAvaliacao('+i+')\">⭐ Avaliação</button>' : ''}
-        <button class="btn btn-del btn-sm srv-danger-action" onclick="delSrv(${i})">🗑</button>
+        <button class="btn btn-del btn-sm srv-danger-action" onclick="delSrv(${i})">Excluir</button>
       </div>
     </div>`;
   }).join('');
