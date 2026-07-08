@@ -6243,15 +6243,15 @@ function envNotif(title,body,tag){
 }
 
 function testarNotif(){
-  const msg = `Teste enviado às ${new Date().toLocaleTimeString('pt-BR')}. As notificações estão funcionando corretamente.`;
+  const msg = `Tudo certo. Você receberá lembretes de agenda, cobranças e orçamentos por aqui.`;
   if(!('Notification' in window)){
-    addNotif('sistema','Teste de notificação',msg,'teste-local-'+Date.now());
+    addNotif('sistema','Notificações configuradas',msg,'teste-local-'+Date.now());
     toast('Notificação interna registrada');
     return;
   }
   if(Notification.permission==='granted'){
-    envNotif('Teste AutônomoPro',msg,'teste-'+Date.now());
-    addNotif('sistema','Teste de notificação',msg);
+    envNotif('AutônomoPro ativado',msg,'teste-'+Date.now());
+    addNotif('sistema','Notificações configuradas',msg);
     toast('Notificação enviada!');
   } else {
     toast('⚠️ Ative as notificações primeiro');

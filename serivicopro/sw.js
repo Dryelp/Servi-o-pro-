@@ -1,6 +1,30 @@
-const CACHE = 'autonomopro-v21';
-// Atualizar este número a cada novo deploy para forçar atualização nos dispositivos
-const FILES = ['./index.html','./orcamento.html','./manifest.json','./icon-192.png','./icon-512.png'];
+const CACHE = 'autonomopro-v22';
+const FILES = [
+  './index.html',
+  './orcamento.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './badge-96.png'
+];
+
+const NOTIF_ICON = './icon-192.png';
+const NOTIF_BADGE = './badge-96.png';
+
+function notificationOptions(data = {}) {
+  return {
+    body: data.body || '',
+    icon: data.icon || NOTIF_ICON,
+    badge: data.badge || NOTIF_BADGE,
+    vibrate: data.vibrate || [80, 40, 80],
+    tag: data.tag || 'autonomopro',
+    renotify: false,
+    requireInteraction: !!data.requireInteraction,
+    timestamp: Date.now(),
+    data: { url: data.url || './' },
+    actions: data.actions || [{ action: 'open', title: 'Abrir AutônomoPro' }]
+  };
+}
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
@@ -15,7 +39,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network first — tenta buscar versão nova, cai no cache só se offline
   e.respondWith(
     fetch(e.request)
       .then(res => {
@@ -27,38 +50,32 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// Push notification handler
 self.addEventListener('push', e => {
-  const data = e.data ? e.data.json() : { title: 'AutônomoPro', body: 'Nova notificação' };
-  e.waitUntil(self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: './icon-192.png',
-    badge: './icon-192.png',
-    vibrate: [200, 100, 200],
-    tag: data.tag || 'autonomopro',
-    requireInteraction: data.requireInteraction || false
-  }));
+  const data = e.data ? e.data.json() : {
+    title: 'AutônomoPro',
+    body: 'Você tem uma nova atualização.'
+  };
+  e.waitUntil(
+    self.registration.showNotification(data.title || 'AutônomoPro', notificationOptions(data))
+  );
 });
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.openWindow('./'));
+  const targetUrl = e.notification.data?.url || './';
+  e.waitUntil(clients.openWindow(targetUrl));
 });
 
-// Background sync for notifications
 self.addEventListener('message', e => {
-  // Comando de atualização forçada
-  if(e.data && e.data.type === 'SKIP_WAITING'){
+  if (e.data && e.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
     return;
   }
   if (e.data && e.data.type === 'NOTIFY') {
-    self.registration.showNotification(e.data.title, {
+    self.registration.showNotification(e.data.title || 'AutônomoPro', notificationOptions({
       body: e.data.body,
-      icon: './icon-192.png',
-      badge: './icon-192.png',
-      vibrate: [200, 100, 200],
-      tag: e.data.tag || 'ap-' + Date.now()
-    });
+      tag: e.data.tag || 'ap-' + Date.now(),
+      url: e.data.url || './'
+    }));
   }
 });
