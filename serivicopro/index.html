@@ -304,11 +304,24 @@ input:checked+.slider:before{transform:translateX(19px)}
 .notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap}
 .priority-list{display:grid;gap:9px}
 .priority-item{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--bor);border-radius:11px;padding:12px}
+.priority-item{cursor:pointer;transition:border-color .16s,background .16s,transform .16s}
+.priority-item:hover{border-color:rgba(234,88,12,.45);background:#fff;transform:translateY(-1px)}
 .priority-item strong{display:block;font-size:.86rem;color:var(--brn);margin-bottom:2px}
 .priority-item span{display:block;font-size:.76rem;color:var(--mut);line-height:1.38}
 .priority-dot{width:9px;height:9px;border-radius:99px;margin-top:5px;flex:none;background:var(--org)}
 .priority-item.high .priority-dot{background:var(--red)}
 .priority-item.ok .priority-dot{background:var(--grn)}
+.dash-workbench{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.dash-workbench .panel{min-height:100%}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick-actions .btn{justify-content:center;padding:10px 12px}
+.client-insight{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
+.client-contact{display:inline-flex;align-items:center;gap:5px;color:#15803d;text-decoration:none;font-weight:800;font-size:.78rem}
+.client-contact .ico{width:14px;height:14px}
+.orc-card.public-approved{border-color:rgba(22,163,74,.45);box-shadow:0 8px 24px rgba(22,163,74,.08)}
+.orc-next{background:var(--grn-bg);border:1px solid rgba(22,163,74,.18);border-radius:11px;padding:11px 12px;margin:10px 0;color:#14532d;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.backup-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.backup-actions .btn{justify-content:center}
 
 /* EXPENSES */
 .expense-list{display:grid;gap:9px}
@@ -354,6 +367,8 @@ input:checked+.slider:before{transform:translateX(19px)}
   .dash-status-list{grid-template-columns:1fr;gap:8px}
   .dash-status-card{min-height:64px;padding:11px 13px}
   .dash-status-num{font-size:1.65rem}
+  .dash-workbench{grid-template-columns:1fr;gap:10px}
+  .quick-actions{grid-template-columns:1fr 1fr}
   .dash-money{grid-template-columns:1fr 1fr;gap:10px}
   .dash-money-main{grid-column:1/-1;padding:18px 16px}
   .dash-money-main .sc-val{font-size:1.9rem}
@@ -375,6 +390,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   .rec-side{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px}
   .expense-card{grid-template-columns:1fr}
   .expense-value{text-align:left}
+  .backup-actions{grid-template-columns:1fr}
   /* Oculta colunas menos importantes no mobile */
   .hide-mob{display:none!important}
   table{font-size:.78rem}
@@ -650,6 +666,24 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="dash-alert" id="dash-alerta"></div>
+
+    <div class="dash-workbench">
+      <div class="panel">
+        <div class="ph"><div class="pt"><span data-ico="bell"></span> Proximas acoes</div><button class="btn btn-gho btn-sm" onclick="ir('notificacoes')">Ver central</button></div>
+        <div class="pb"><div class="priority-list" id="dash-priority-list"></div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="pt"><span data-ico="zap"></span> Atalhos de venda</div></div>
+        <div class="pb">
+          <div class="quick-actions">
+            <button class="btn btn-org" onclick="abrirNovoOrc()">Novo orcamento</button>
+            <button class="btn btn-gho" onclick="abreSrv()">Novo servico</button>
+            <button class="btn btn-gho" onclick="ir('clientes')">Clientes</button>
+            <button class="btn btn-gho" onclick="abrirAReceber()">Cobrar pendentes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="dash-status-list" id="dash-status-cards">
       <div class="dash-status-card" onclick="irFiltrado('Agendado')" style="--status-c:var(--org)">
@@ -1063,6 +1097,16 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div id="meta-preview-txt" style="font-size:.92rem;font-weight:600;color:var(--brn)"></div>
       </div>
       <button class="btn btn-org" onclick="salvarMeta()">Definir meta</button>
+    </div>
+
+    <div class="cfg-sec">
+      <div class="cfg-t"><span data-ico="clipboard"></span> Dados e backup</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Exporte informacoes importantes quando precisar prestar contas, trocar de aparelho ou guardar uma copia simples.</p>
+      <div class="backup-actions">
+        <button class="btn btn-gho btn-sm" onclick="exportarCSV('clientes')">Clientes CSV</button>
+        <button class="btn btn-gho btn-sm" onclick="exportarCSV('servicos')">Servicos CSV</button>
+        <button class="btn btn-gho btn-sm" onclick="exportarCSV('financeiro')">Financeiro CSV</button>
+      </div>
     </div>
   </div>
 
@@ -2842,6 +2886,18 @@ function calcularPrioridades(){
   const atrasados = pend.filter(s=>s.dt && diasEntre(s.dt,hoje)>0);
   const orcPend = D.orcamentos.filter(o=>['Pendente','Enviado'].includes(o.sts));
   const orcAprovPub = D.orcamentos.filter(o=>o.public_response==='approved' && o.sts==='Aprovado');
+  const orcVencendo = orcPend.filter(o=>o.valid && diasEntre(hoje,o.valid)>=0 && diasEntre(hoje,o.valid)<=2);
+
+  if(orcAprovPub.length){
+    const p = orcAprovPub[0];
+    itens.push({
+      tipo:'resumo', nivel:'high',
+      title:`${orcAprovPub.length} orcamento(s) aprovado(s) pelo cliente`,
+      msg:`${p.cli||'Cliente'} aprovou pelo link. Falta converter em servico.`,
+      key:`prio-orc-aprov-${hoje}`,
+      action:"ir('orcamentos')"
+    });
+  }
 
   if(servHoje.length){
     const primeiro = servHoje[0];
@@ -2887,13 +2943,13 @@ function calcularPrioridades(){
     });
   }
 
-  if(orcAprovPub.length){
-    const p = orcAprovPub[0];
+  if(orcVencendo.length){
+    const p = orcVencendo[0];
     itens.push({
       tipo:'resumo', nivel:'high',
-      title:`${orcAprovPub.length} orcamento(s) aprovado(s) pelo cliente`,
-      msg:`${p.cli||'Cliente'} aprovou pelo link. Falta converter em servico.`,
-      key:`prio-orc-aprov-${hoje}`,
+      title:`${orcVencendo.length} orcamento(s) perto de vencer`,
+      msg:`${p.cli||'Cliente'} vence em ${fd(p.valid)}. Vale chamar no WhatsApp.`,
+      key:`prio-orc-venc-${hoje}`,
       action:"ir('orcamentos')"
     });
   } else if(orcPend.length){
@@ -2919,9 +2975,7 @@ function calcularPrioridades(){
 }
 
 function renderPrioridades(){
-  const el = document.getElementById('priority-list');
-  if(!el) return;
-  el.innerHTML = calcularPrioridades().map(p=>`
+  const html = calcularPrioridades().map(p=>`
     <div class="priority-item ${p.nivel||''}" onclick="${p.action||"ir('notificacoes')"}">
       <div class="priority-dot"></div>
       <div>
@@ -2930,6 +2984,10 @@ function renderPrioridades(){
       </div>
     </div>
   `).join('');
+  ['priority-list','dash-priority-list'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
 }
 
 function rDash(){
@@ -3224,8 +3282,10 @@ function rClientes(){
   }
   el.innerHTML = D.clientes.map((c,i)=>{
     const servicos = D.servicos.filter(s=>s.cli===c.nm);
+    const orcs = D.orcamentos.filter(o=>o.cli===c.nm);
+    const orcsAbertos = orcs.filter(o=>['Pendente','Enviado'].includes(o.sts));
     const pagos = servicos.filter(s=>s.sts_pag==='Pago');
-    const pendentes = servicos.filter(s=>s.sts_pag!=='Pago' && s.sts!=='Cancelado');
+    const pendentes = servicos.filter(s=>s.sts_srv==='Realizado' && s.sts_pag==='Pendente');
     const gasto = pagos.reduce((a,b)=>a+(+b.val||0),0);
     const aberto = pendentes.reduce((a,b)=>a+(+b.val||0),0);
     const ult = [...servicos].sort((a,b)=>(b.dt||'').localeCompare(a.dt||''))[0];
@@ -3237,7 +3297,11 @@ function rClientes(){
         <div>
           <div class="client-name">${c.nm}</div>
           <div class="client-sub">${c.srv||'Servico nao informado'}${c.end?` · ${c.end}`:''}</div>
-          <div style="margin-top:7px">${contato}</div>
+          <div class="client-insight">
+            ${contato}
+            ${orcsAbertos.length?`<span class="pill">${orcsAbertos.length} orc. aberto${orcsAbertos.length===1?'':'s'}</span>`:''}
+            ${aberto>0?`<span class="pill" style="color:var(--org);border-color:rgba(234,88,12,.25);background:var(--org-bg)">cobrar ${R$(aberto)}</span>`:''}
+          </div>
         </div>
         <span class="pill">${servicos.length} servico${servicos.length===1?'':'s'}</span>
       </div>
@@ -3248,6 +3312,8 @@ function rClientes(){
       </div>
       <div class="client-actions">
         <button class="btn btn-org btn-sm" onclick="novoServicoCliente(${i})">${iconSvg('wrench')} Novo servico</button>
+        <button class="btn btn-gho btn-sm" onclick="novoOrcamentoCliente(${i})">${iconSvg('clipboard')} Orcamento</button>
+        ${aberto>0?`<button class="btn btn-ok btn-sm" onclick="cobrarCliente(${i})">${iconSvg('wallet')} Cobrar</button>`:''}
         <button class="btn btn-gho btn-sm" onclick="abrirEditCli(${i})">Editar</button>
         <button class="btn btn-del btn-sm" onclick="delCli(${i})">Excluir</button>
       </div>
@@ -3305,7 +3371,7 @@ function rOrcamentos(){
     const respondeuPublico = !!o.public_response;
     const respTxt = o.public_response === 'approved' ? 'Aprovado pelo cliente' : o.public_response === 'rejected' ? 'Recusado pelo cliente' : '';
     return `
-    <div class="orc-card">
+    <div class="orc-card ${o.public_response==='approved'?'public-approved':''}">
       <div class="orc-head">
         <div>
           <div class="orc-sub">Orcamento #${seq} · ${fd(o.dt)}</div>
@@ -3328,6 +3394,11 @@ function rOrcamentos(){
           </select>
         </div>
       </div>
+      ${o.public_response==='approved'?`
+        <div class="orc-next">
+          <span>${iconSvg('star')} Cliente aprovou pelo link. Proxima acao: agendar o servico.</span>
+          <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})">Converter agora</button>
+        </div>`:''}
       <div class="orc-items">
         ${(o.itens||[]).length
           ? (o.itens||[]).map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')
@@ -3446,6 +3517,28 @@ function novoServicoCliente(i){
   if(cli) cli.value = c.nm || '';
   if(tipo && c.srv) tipo.value = c.srv;
   if(end && c.end) end.value = c.end;
+}
+
+function novoOrcamentoCliente(i){
+  const c = D.clientes[i];
+  abrirNovoOrc();
+  const cli = document.getElementById('o-cli');
+  const desc = document.getElementById('o-desc');
+  if(cli) cli.value = c?.nm || '';
+  if(desc && c?.srv) desc.value = c.srv;
+}
+
+function cobrarCliente(i){
+  const c = D.clientes[i];
+  if(!c) return;
+  const pendentes = D.servicos.filter(s=>s.cli===c.nm && s.sts_srv==='Realizado' && s.sts_pag==='Pendente');
+  const total = pendentes.reduce((a,b)=>a+(+b.val||0),0);
+  const tel = (c.wpp||'').replace(/\D/g,'');
+  const nome = D.perfil.nome || 'Prestador';
+  const msg = `Ola ${c.nm}! Tudo bem?\n\nPassando para lembrar do pagamento em aberto de ${R$(total)} referente aos servicos realizados.\n\nQualquer duvida fico a disposicao.\n\n${nome}`;
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  toast('Abrindo cobranca no WhatsApp...');
 }
 
 function calcSaldo(){
@@ -6243,6 +6336,49 @@ function limparTudo(){
 // ══════════════════════════════════════════
 // TOAST
 // ══════════════════════════════════════════
+function csvCell(v){
+  const s = String(v ?? '').replace(/"/g,'""');
+  return `"${s}"`;
+}
+
+function baixarArquivo(nome, conteudo, tipo){
+  const blob = new Blob([conteudo], {type: tipo || 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nome;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 500);
+}
+
+function exportarCSV(tipo){
+  let linhas = [];
+  if(tipo === 'clientes'){
+    linhas = [['nome','whatsapp','servico_padrao','endereco','total_pago','em_aberto','servicos']].concat(
+      D.clientes.map(c=>{
+        const servicos = D.servicos.filter(s=>s.cli===c.nm);
+        const totalPago = servicos.filter(s=>s.sts_pag==='Pago').reduce((a,b)=>a+(+b.val||0),0);
+        const aberto = servicos.filter(s=>s.sts_srv==='Realizado' && s.sts_pag==='Pendente').reduce((a,b)=>a+(+b.val||0),0);
+        return [c.nm,c.wpp,c.srv,c.end,totalPago,aberto,servicos.length];
+      })
+    );
+  } else if(tipo === 'servicos'){
+    linhas = [['data','hora','cliente','servico','endereco','valor','status_servico','status_pagamento','forma_pagamento']].concat(
+      D.servicos.map(s=>[s.dt,s.hr,s.cli,s.tipo,s.end,s.val,s.sts_srv,s.sts_pag,s.pag])
+    );
+  } else {
+    linhas = [['tipo','data','descricao','cliente_categoria','valor','status']].concat(
+      D.servicos.map(s=>['servico',s.dt,s.tipo,s.cli,s.val,s.sts_pag||s.sts_srv]),
+      (D.despesas||[]).map(d=>['despesa',d.dt,d.nm||d.desc,d.cat||d.categoria,d.val,'pago'])
+    );
+  }
+  const csv = '\ufeff' + linhas.map(l=>l.map(csvCell).join(';')).join('\n');
+  baixarArquivo(`autonomopro-${tipo}-${hj()}.csv`, csv, 'text/csv;charset=utf-8');
+  toast('Exportacao gerada!');
+}
+
 let tT;
 function toast(msg, dur){
   const el = document.getElementById('toast');
