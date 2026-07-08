@@ -310,19 +310,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 .priority-item.high .priority-dot{background:var(--red)}
 .priority-item.ok .priority-dot{background:var(--grn)}
 
-/* SELL-READY / EXPENSES */
-.ready-card{background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid rgba(234,88,12,.22);border-radius:14px;padding:18px;box-shadow:var(--shd);margin-bottom:14px}
-.ready-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
-.ready-title{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--brn)}
-.ready-sub{font-size:.78rem;color:var(--mut);margin-top:3px;line-height:1.45}
-.ready-score{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:800;color:var(--org);white-space:nowrap}
-.ready-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.ready-item{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,.72);border:1px solid rgba(234,88,12,.12);border-radius:10px;padding:10px}
-.ready-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;flex:none;background:var(--bor);color:var(--mut)}
-.ready-item.ok .ready-check{background:var(--grn);color:#fff}
-.ready-item strong{display:block;font-size:.78rem;color:var(--brn)}
-.ready-item span{display:block;font-size:.7rem;color:var(--mut);line-height:1.35;margin-top:1px}
-.ready-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* EXPENSES */
 .expense-list{display:grid;gap:9px}
 .expense-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:13px;box-shadow:var(--shd);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .expense-name{font-weight:800;font-size:.9rem;color:var(--brn)}
@@ -380,7 +368,6 @@ input:checked+.slider:before{transform:translateX(19px)}
   .dash-grid{grid-template-columns:1fr!important}
   #rel-cards{grid-template-columns:1fr 1fr!important}
   .module-grid{grid-template-columns:1fr}
-  .ready-grid{grid-template-columns:1fr}
   .srv-card-head{flex-direction:column}
   .srv-money{text-align:left;width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
   .srv-profit{justify-content:flex-start}
@@ -878,7 +865,6 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
       <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
     </div>
-    <div class="ready-card" id="perfil-pronto-card"></div>
     <div class="cfg-sec">
       <div class="cfg-t"><span data-ico="user"></span> Informações pessoais</div>
 
@@ -2664,44 +2650,6 @@ function uiPerfil(){
   atualizarDatalistTipo();
   renderModulos();
   renderAssinatura();
-  renderProntidaoPerfil();
-}
-
-function renderProntidaoPerfil(){
-  const el = document.getElementById('perfil-pronto-card');
-  if(!el) return;
-  const itens = [
-    {ok:!!D.perfil.nome, t:'Nome profissional', d:'Aparece no cabecalho dos documentos'},
-    {ok:!!D.perfil.wpp, t:'WhatsApp', d:'Facilita contato e rodape do PDF'},
-    {ok:!!D.perfil.tipo, t:'Segmento', d:'Adapta servicos, textos e sugestoes'},
-    {ok:!!D.perfil.logo_url, t:'Logo', d:'Deixa orcamento e recibo com marca'},
-    {ok:!!D.perfil.assinatura_data, t:'Assinatura', d:'Sai pronta nos recibos pagos'},
-    {ok:(D.perfil.meusSrvs||[]).length>0, t:'Servicos salvos', d:'Agiliza novos agendamentos'},
-    {ok:!!D.perfil.meta, t:'Meta mensal', d:'Mostra progresso no dashboard'},
-    {ok:D.orcamentos.length>0 || D.servicos.length>0, t:'Primeiro fluxo', d:'Crie um orcamento ou servico real'}
-  ];
-  const ok = itens.filter(i=>i.ok).length;
-  const pct = Math.round((ok/itens.length)*100);
-  const proximo = itens.find(i=>!i.ok);
-  el.innerHTML = `
-    <div class="ready-head">
-      <div>
-        <div class="ready-title">Pronto para vender</div>
-        <div class="ready-sub">${proximo ? 'Proximo passo: ' + proximo.t + '.' : 'Perfil completo para apresentar ao cliente.'}</div>
-      </div>
-      <div class="ready-score">${pct}%</div>
-    </div>
-    <div class="ready-grid">
-      ${itens.map(i=>`<div class="ready-item ${i.ok?'ok':''}">
-        <div class="ready-check">${i.ok?'✓':'!'}</div>
-        <div><strong>${i.t}</strong><span>${i.d}</span></div>
-      </div>`).join('')}
-    </div>
-    <div class="ready-actions">
-      <button class="btn btn-org btn-sm" onclick="abrirNovoOrc()">Criar orcamento</button>
-      <button class="btn btn-gho btn-sm" onclick="abreSrv()">Novo servico</button>
-      <button class="btn btn-gho btn-sm" onclick="ir('relatorio')">Ver relatorio</button>
-    </div>`;
 }
 
 function atualizarPreviewMeta(){
@@ -2856,7 +2804,7 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); renderProntidaoPerfil(); hydrateIcons(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
 
 function dataLocal(iso){
   if(!iso) return null;
