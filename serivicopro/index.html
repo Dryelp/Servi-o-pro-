@@ -298,6 +298,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 .notif-item:last-child{border-bottom:none}
 .notif-item.unread{background:var(--org-bg)}
 .notif-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.notif-ico .ico{width:17px;height:17px;color:var(--brn)}
 .notif-title{font-weight:600;font-size:.85rem;margin-bottom:2px}
 .notif-msg{font-size:.76rem;color:var(--mut);line-height:1.4}
 .notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap}
@@ -308,6 +309,26 @@ input:checked+.slider:before{transform:translateX(19px)}
 .priority-dot{width:9px;height:9px;border-radius:99px;margin-top:5px;flex:none;background:var(--org)}
 .priority-item.high .priority-dot{background:var(--red)}
 .priority-item.ok .priority-dot{background:var(--grn)}
+
+/* SELL-READY / EXPENSES */
+.ready-card{background:linear-gradient(135deg,#fff7ed,#fff);border:1px solid rgba(234,88,12,.22);border-radius:14px;padding:18px;box-shadow:var(--shd);margin-bottom:14px}
+.ready-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.ready-title{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--brn)}
+.ready-sub{font-size:.78rem;color:var(--mut);margin-top:3px;line-height:1.45}
+.ready-score{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:800;color:var(--org);white-space:nowrap}
+.ready-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.ready-item{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,.72);border:1px solid rgba(234,88,12,.12);border-radius:10px;padding:10px}
+.ready-check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;flex:none;background:var(--bor);color:var(--mut)}
+.ready-item.ok .ready-check{background:var(--grn);color:#fff}
+.ready-item strong{display:block;font-size:.78rem;color:var(--brn)}
+.ready-item span{display:block;font-size:.7rem;color:var(--mut);line-height:1.35;margin-top:1px}
+.ready-actions{display:flex;gap:8px;flex-wrap:wrap}
+.expense-list{display:grid;gap:9px}
+.expense-card{background:var(--sur);border:1px solid var(--bor);border-radius:12px;padding:13px;box-shadow:var(--shd);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
+.expense-name{font-weight:800;font-size:.9rem;color:var(--brn)}
+.expense-sub{font-size:.74rem;color:var(--mut);margin-top:3px;line-height:1.4}
+.expense-value{font-family:'Fraunces',serif;font-size:1.08rem;font-weight:800;color:var(--red);text-align:right}
+.expense-actions{grid-column:1/-1;display:flex;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--bor)}
 
 /* CFG */
 .cfg-sec{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rad);padding:20px;box-shadow:var(--shd);margin-bottom:14px}
@@ -357,12 +378,16 @@ input:checked+.slider:before{transform:translateX(19px)}
   .mb .mn-dot{position:absolute;top:4px;right:calc(50% - 14px);width:6px;height:6px;background:#ef4444;border-radius:50%;border:1.5px solid var(--brn);display:none}
   .mb .mn-dot.show{display:block}
   .dash-grid{grid-template-columns:1fr!important}
+  #rel-cards{grid-template-columns:1fr 1fr!important}
   .module-grid{grid-template-columns:1fr}
+  .ready-grid{grid-template-columns:1fr}
   .srv-card-head{flex-direction:column}
   .srv-money{text-align:left;width:100%;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
   .srv-profit{justify-content:flex-start}
   .rec-card{grid-template-columns:1fr}
   .rec-side{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .expense-card{grid-template-columns:1fr}
+  .expense-value{text-align:left}
   /* Oculta colunas menos importantes no mobile */
   .hide-mob{display:none!important}
   table{font-size:.78rem}
@@ -820,16 +845,16 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- NOTIFICAÇÕES -->
   <div class="page" id="pg-notificacoes">
     <div class="topbar">
-      <div><div class="pg-title">Notificações</div></div>
+      <div><div class="pg-title">Central de trabalho</div><div class="pg-sub">Pendências, próximos serviços e oportunidades para fechar</div></div>
       <div class="tb-right">
         <button class="btn btn-gho btn-sm" onclick="limparNotifs()">Limpar tudo</button>
-        <button class="btn btn-org" id="btn-ativar" onclick="ativarNotifs()">🔔 Ativar notificações</button>
+        <button class="btn btn-org" id="btn-ativar" onclick="ativarNotifs()">Ativar alertas</button>
       </div>
     </div>
     <div class="cfg-sec" style="margin-bottom:18px">
-      <div class="cfg-t">📌 Prioridades de hoje</div>
+      <div class="cfg-t"><span data-ico="bell"></span> Prioridades de hoje</div>
       <div class="priority-list" id="priority-list">
-        <div class="empty"><div class="empty-ico">✅</div>Tudo certo por agora</div>
+        <div class="empty"><div class="empty-ico"><span data-ico="bell"></span></div>Tudo certo por agora</div>
       </div>
     </div>
     <div class="cfg-sec" style="margin-bottom:18px">
@@ -846,13 +871,14 @@ input:checked+.slider:before{transform:translateX(19px)}
 
   <!-- PERFIL -->
   <div class="page" id="pg-perfil">
-    <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Suas informações pessoais</div></div></div>
+    <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Dados que aparecem em orçamentos, recibos e relatórios</div></div></div>
     <div class="cfg-sec" id="migracao-box" style="display:none">
       <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados antigos</div>
       <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Encontramos dados antigos salvos só neste aparelho. Migre para a nuvem para manter tudo junto na conta.</p>
       <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
       <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
     </div>
+    <div class="ready-card" id="perfil-pronto-card"></div>
     <div class="cfg-sec">
       <div class="cfg-t"><span data-ico="user"></span> Informações pessoais</div>
 
@@ -2638,6 +2664,44 @@ function uiPerfil(){
   atualizarDatalistTipo();
   renderModulos();
   renderAssinatura();
+  renderProntidaoPerfil();
+}
+
+function renderProntidaoPerfil(){
+  const el = document.getElementById('perfil-pronto-card');
+  if(!el) return;
+  const itens = [
+    {ok:!!D.perfil.nome, t:'Nome profissional', d:'Aparece no cabecalho dos documentos'},
+    {ok:!!D.perfil.wpp, t:'WhatsApp', d:'Facilita contato e rodape do PDF'},
+    {ok:!!D.perfil.tipo, t:'Segmento', d:'Adapta servicos, textos e sugestoes'},
+    {ok:!!D.perfil.logo_url, t:'Logo', d:'Deixa orcamento e recibo com marca'},
+    {ok:!!D.perfil.assinatura_data, t:'Assinatura', d:'Sai pronta nos recibos pagos'},
+    {ok:(D.perfil.meusSrvs||[]).length>0, t:'Servicos salvos', d:'Agiliza novos agendamentos'},
+    {ok:!!D.perfil.meta, t:'Meta mensal', d:'Mostra progresso no dashboard'},
+    {ok:D.orcamentos.length>0 || D.servicos.length>0, t:'Primeiro fluxo', d:'Crie um orcamento ou servico real'}
+  ];
+  const ok = itens.filter(i=>i.ok).length;
+  const pct = Math.round((ok/itens.length)*100);
+  const proximo = itens.find(i=>!i.ok);
+  el.innerHTML = `
+    <div class="ready-head">
+      <div>
+        <div class="ready-title">Pronto para vender</div>
+        <div class="ready-sub">${proximo ? 'Proximo passo: ' + proximo.t + '.' : 'Perfil completo para apresentar ao cliente.'}</div>
+      </div>
+      <div class="ready-score">${pct}%</div>
+    </div>
+    <div class="ready-grid">
+      ${itens.map(i=>`<div class="ready-item ${i.ok?'ok':''}">
+        <div class="ready-check">${i.ok?'✓':'!'}</div>
+        <div><strong>${i.t}</strong><span>${i.d}</span></div>
+      </div>`).join('')}
+    </div>
+    <div class="ready-actions">
+      <button class="btn btn-org btn-sm" onclick="abrirNovoOrc()">Criar orcamento</button>
+      <button class="btn btn-gho btn-sm" onclick="abreSrv()">Novo servico</button>
+      <button class="btn btn-gho btn-sm" onclick="ir('relatorio')">Ver relatorio</button>
+    </div>`;
 }
 
 function atualizarPreviewMeta(){
@@ -2792,7 +2856,7 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); renderProntidaoPerfil(); hydrateIcons(); }
 
 function dataLocal(iso){
   if(!iso) return null;
@@ -4365,23 +4429,18 @@ function rDespesas(){
     return;
   }
 
-  el.innerHTML = `<div class="tw"><table>
-    <thead><tr>
-      <th>Data</th><th>Descrição</th><th>Categoria</th>
-      <th>Forma</th><th>Valor</th><th>Parcela</th><th></th>
-    </tr></thead>
-    <tbody>
-      ${lista.map(d=>`<tr>
-        <td>${fd(d.dt)}</td>
-        <td><strong>${d.nm}</strong></td>
-        <td><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></td>
-        <td>${d.pag||'—'}</td>
-        <td style="color:var(--red);font-weight:700">${R$(d.val)}</td>
-        <td style="font-size:.76rem;color:var(--mut)">${d.parcela?`${d.parcela}/${d.totalParcelas}`:'—'}</td>
-        <td><button class="btn btn-del btn-sm" onclick="delDesp(${d._dbid||d.id})">🗑</button></td>
-      </tr>`).join('')}
-    </tbody>
-  </table></div>`;
+  el.innerHTML = `<div class="expense-list">
+    ${lista.map(d=>`
+      <div class="expense-card">
+        <div>
+          <div class="expense-name">${d.nm}</div>
+          <div class="expense-sub">${fd(d.dt)} · ${d.pag||'Forma nao informada'}${d.parcela?` · Parcela ${d.parcela}/${d.totalParcelas}`:''}</div>
+          <div style="margin-top:8px"><span class="badge ${d.cat==='Mão de obra'?'b-p':d.cat==='Combustível'?'b-o':'b-b'}">${d.cat}</span></div>
+        </div>
+        <div class="expense-value">${R$(d.val)}</div>
+        <div class="expense-actions"><button class="btn btn-del btn-sm" onclick="delDesp(${d._dbid||d.id})">Excluir</button></div>
+      </div>`).join('')}
+  </div>`;
 }
 
 // ══════════════════════════════════════════
@@ -6187,19 +6246,20 @@ function addNotif(tipo,title,msg,key){
 
 function renderNotifs(){
   const el     = document.getElementById('notif-list');
-  const icoMap = {resumo:'🌅',agenda:'⏰',cobranca:'💰',sistema:'⚙️'};
+  if(!el) return;
+  const icoMap = {resumo:'bar-chart',agenda:'bell',cobranca:'wallet',sistema:'sliders'};
   const corMap = {resumo:'#dbeafe',agenda:'#d8f3dc',cobranca:'#fff4eb',sistema:'#f5f0e8'};
   el.innerHTML = D.notifs.length
     ? D.notifs.map((n,i)=>`
         <div class="notif-item ${n.lida?'':'unread'}" onclick="lerNotif(${i})">
-          <div class="notif-ico" style="background:${corMap[n.tipo]||'#f5f0e8'}">${icoMap[n.tipo]||'🔔'}</div>
+          <div class="notif-ico" style="background:${corMap[n.tipo]||'#f5f0e8'}">${iconSvg(icoMap[n.tipo]||'bell')}</div>
           <div style="flex:1">
             <div class="notif-title">${n.title}</div>
             <div class="notif-msg">${n.msg}</div>
           </div>
           <div class="notif-time">${n.hora}</div>
         </div>`).join('')
-    : '<div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div>';
+    : `<div class="empty"><div class="empty-ico">${iconSvg('bell')}</div>Nenhuma notificação ainda</div>`;
 }
 
 function lerNotif(i){ D.notifs[i].lida=true; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); }
