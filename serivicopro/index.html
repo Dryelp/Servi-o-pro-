@@ -294,14 +294,18 @@ input:checked+.slider{background:var(--org)}
 input:checked+.slider:before{transform:translateX(19px)}
 
 /* NOTIF */
-.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 17px;border-bottom:1px solid var(--bor);cursor:pointer;transition:background .1s}
-.notif-item:last-child{border-bottom:none}
-.notif-item.unread{background:var(--org-bg)}
-.notif-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
-.notif-ico .ico{width:17px;height:17px;color:var(--brn)}
-.notif-title{font-weight:600;font-size:.85rem;margin-bottom:2px}
-.notif-msg{font-size:.76rem;color:var(--mut);line-height:1.4}
-.notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap}
+.notif-shell{background:linear-gradient(180deg,#fff 0%,#fff7ed 100%);border:1px solid rgba(234,88,12,.16)}
+.notif-list-inner{display:grid;gap:10px;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(250,250,250,.8))}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid rgba(228,228,231,.9);border-radius:14px;background:rgba(255,255,255,.92);cursor:pointer;transition:transform .16s,box-shadow .16s,border-color .16s,background .16s;box-shadow:0 8px 24px rgba(28,18,11,.06);position:relative;overflow:hidden}
+.notif-item:hover{transform:translateY(-1px);border-color:rgba(234,88,12,.28);box-shadow:0 12px 30px rgba(28,18,11,.1)}
+.notif-item.unread{background:#fff;border-color:rgba(234,88,12,.32)}
+.notif-item.unread::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:99px;background:var(--org)}
+.notif-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65)}
+.notif-ico .ico{width:18px;height:18px;color:var(--brn)}
+.notif-title{font-weight:800;font-size:.88rem;margin-bottom:3px;color:var(--brn);letter-spacing:-.01em}
+.notif-msg{font-size:.77rem;color:var(--mut);line-height:1.45}
+.notif-time{font-size:.68rem;color:var(--mut);white-space:nowrap;background:var(--bg);border:1px solid var(--bor);border-radius:999px;padding:4px 7px;font-weight:700}
+.notif-chip{display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--org)}
 .priority-list{display:grid;gap:9px}
 .priority-item{display:flex;align-items:flex-start;gap:10px;background:var(--bg);border:1px solid var(--bor);border-radius:11px;padding:12px}
 .priority-item{cursor:pointer;transition:border-color .16s,background .16s,transform .16s}
@@ -669,15 +673,15 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <div class="dash-workbench">
       <div class="panel">
-        <div class="ph"><div class="pt"><span data-ico="bell"></span> Proximas acoes</div><button class="btn btn-gho btn-sm" onclick="ir('notificacoes')">Ver central</button></div>
+        <div class="ph"><div class="pt"><span data-ico="bell"></span> Próximas ações</div><button class="btn btn-gho btn-sm" onclick="ir('notificacoes')">Ver central</button></div>
         <div class="pb"><div class="priority-list" id="dash-priority-list"></div></div>
       </div>
       <div class="panel">
         <div class="ph"><div class="pt"><span data-ico="zap"></span> Atalhos de venda</div></div>
         <div class="pb">
           <div class="quick-actions">
-            <button class="btn btn-org" onclick="abrirNovoOrc()">Novo orcamento</button>
-            <button class="btn btn-gho" onclick="abreSrv()">Novo servico</button>
+            <button class="btn btn-org" onclick="abrirNovoOrc()">Novo orçamento</button>
+            <button class="btn btn-gho" onclick="abreSrv()">Novo serviço</button>
             <button class="btn btn-gho" onclick="ir('clientes')">Clientes</button>
             <button class="btn btn-gho" onclick="abrirAReceber()">Cobrar pendentes</button>
           </div>
@@ -887,7 +891,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <button class="btn btn-gho btn-sm" onclick="testarNotif()">🧪 Testar notificação</button>
       </div>
     </div>
-    <div class="panel" id="notif-list"><div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div></div>
+    <div class="panel notif-shell" id="notif-list"><div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div></div>
   </div>
 
   <!-- PERFIL -->
@@ -1101,10 +1105,10 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <div class="cfg-sec">
       <div class="cfg-t"><span data-ico="clipboard"></span> Dados e backup</div>
-      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Exporte informacoes importantes quando precisar prestar contas, trocar de aparelho ou guardar uma copia simples.</p>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Exporte informações importantes quando precisar prestar contas, trocar de aparelho ou guardar uma cópia simples.</p>
       <div class="backup-actions">
         <button class="btn btn-gho btn-sm" onclick="exportarCSV('clientes')">Clientes CSV</button>
-        <button class="btn btn-gho btn-sm" onclick="exportarCSV('servicos')">Servicos CSV</button>
+        <button class="btn btn-gho btn-sm" onclick="exportarCSV('servicos')">Serviços CSV</button>
         <button class="btn btn-gho btn-sm" onclick="exportarCSV('financeiro')">Financeiro CSV</button>
       </div>
     </div>
@@ -1781,7 +1785,7 @@ function aplicarSegmento(seg){
 
   // Placeholder tipo de serviço
   const tipoInp = document.getElementById('s-tipo');
-  if(tipoInp) tipoInp.placeholder = PLACEHOLDERS_SEG[key] || 'Ex: Tipo de servico...';
+  if(tipoInp) tipoInp.placeholder = PLACEHOLDERS_SEG[key] || 'Ex.: tipo de serviço...';
 
   // Label "Clientes" no nav vira nome do segmento
   const L = seg.labels;
@@ -2892,8 +2896,8 @@ function calcularPrioridades(){
     const p = orcAprovPub[0];
     itens.push({
       tipo:'resumo', nivel:'high',
-      title:`${orcAprovPub.length} orcamento(s) aprovado(s) pelo cliente`,
-      msg:`${p.cli||'Cliente'} aprovou pelo link. Falta converter em servico.`,
+      title:`${orcAprovPub.length} ${orcAprovPub.length===1?'orçamento aprovado':'orçamentos aprovados'} pelo cliente`,
+      msg:`${p.cli||'Cliente'} aprovou pelo link. Converta em serviço para não perder a oportunidade.`,
       key:`prio-orc-aprov-${hoje}`,
       action:"ir('orcamentos')"
     });
@@ -2905,7 +2909,7 @@ function calcularPrioridades(){
     const tempo = min===null ? '' : (min>=0 ? ` começa em ${min} min` : ' já passou do horário');
     itens.push({
       tipo:'agenda', nivel: min!==null && min<=60 ? 'high' : '',
-      title:`${servHoje.length} serviço(s) para hoje`,
+      title:`${servHoje.length} ${servHoje.length===1?'serviço para hoje':'serviços para hoje'}`,
       msg:`Próximo: ${primeiro.cli||'Cliente'} ${primeiro.hr?'às '+primeiro.hr:''}${tempo}.`,
       key:`prio-hoje-${hoje}`,
       action:"ir('servicos')"
@@ -2916,7 +2920,7 @@ function calcularPrioridades(){
     const total = atrasados.reduce((a,b)=>a+(+b.val),0);
     itens.push({
       tipo:'cobranca', nivel:'high',
-      title:`${atrasados.length} cobrança(s) atrasada(s)`,
+      title:`${atrasados.length} ${atrasados.length===1?'cobrança atrasada':'cobranças atrasadas'}`,
       msg:`Total atrasado: ${R$(total)}. Vale priorizar cobrança pelo WhatsApp.`,
       key:`prio-atraso-${hoje}`,
       action:'abrirAReceber()'
@@ -2925,7 +2929,7 @@ function calcularPrioridades(){
     const total = pend.reduce((a,b)=>a+(+b.val),0);
     itens.push({
       tipo:'cobranca',
-      title:`${pend.length} pagamento(s) pendente(s)`,
+      title:`${pend.length} ${pend.length===1?'pagamento pendente':'pagamentos pendentes'}`,
       msg:`Ainda falta receber ${R$(total)}.`,
       key:`prio-pendente-${hoje}`,
       action:'abrirAReceber()'
@@ -2947,7 +2951,7 @@ function calcularPrioridades(){
     const p = orcVencendo[0];
     itens.push({
       tipo:'resumo', nivel:'high',
-      title:`${orcVencendo.length} orcamento(s) perto de vencer`,
+      title:`${orcVencendo.length} ${orcVencendo.length===1?'orçamento perto de vencer':'orçamentos perto de vencer'}`,
       msg:`${p.cli||'Cliente'} vence em ${fd(p.valid)}. Vale chamar no WhatsApp.`,
       key:`prio-orc-venc-${hoje}`,
       action:"ir('orcamentos')"
@@ -3296,23 +3300,23 @@ function rClientes(){
       <div class="client-head">
         <div>
           <div class="client-name">${c.nm}</div>
-          <div class="client-sub">${c.srv||'Servico nao informado'}${c.end?` · ${c.end}`:''}</div>
+          <div class="client-sub">${c.srv||'Serviço não informado'}${c.end?` · ${c.end}`:''}</div>
           <div class="client-insight">
             ${contato}
             ${orcsAbertos.length?`<span class="pill">${orcsAbertos.length} orc. aberto${orcsAbertos.length===1?'':'s'}</span>`:''}
             ${aberto>0?`<span class="pill" style="color:var(--org);border-color:rgba(234,88,12,.25);background:var(--org-bg)">cobrar ${R$(aberto)}</span>`:''}
           </div>
         </div>
-        <span class="pill">${servicos.length} servico${servicos.length===1?'':'s'}</span>
+        <span class="pill">${servicos.length} serviço${servicos.length===1?'':'s'}</span>
       </div>
       <div class="client-stats">
         <div class="client-stat"><small>Total pago</small><strong style="color:var(--grn)">${R$(gasto)}</strong></div>
         <div class="client-stat"><small>Em aberto</small><strong style="color:${aberto>0?'var(--org)':'var(--brn)'}">${R$(aberto)}</strong></div>
-        <div class="client-stat"><small>Ultimo</small><strong>${ult?fd(ult.dt):'--'}</strong></div>
+        <div class="client-stat"><small>Último</small><strong>${ult?fd(ult.dt):'--'}</strong></div>
       </div>
       <div class="client-actions">
-        <button class="btn btn-org btn-sm" onclick="novoServicoCliente(${i})">${iconSvg('wrench')} Novo servico</button>
-        <button class="btn btn-gho btn-sm" onclick="novoOrcamentoCliente(${i})">${iconSvg('clipboard')} Orcamento</button>
+        <button class="btn btn-org btn-sm" onclick="novoServicoCliente(${i})">${iconSvg('wrench')} Novo serviço</button>
+        <button class="btn btn-gho btn-sm" onclick="novoOrcamentoCliente(${i})">${iconSvg('clipboard')} Orçamento</button>
         ${aberto>0?`<button class="btn btn-ok btn-sm" onclick="cobrarCliente(${i})">${iconSvg('wallet')} Cobrar</button>`:''}
         <button class="btn btn-gho btn-sm" onclick="abrirEditCli(${i})">Editar</button>
         <button class="btn btn-del btn-sm" onclick="delCli(${i})">Excluir</button>
@@ -3374,12 +3378,12 @@ function rOrcamentos(){
     <div class="orc-card ${o.public_response==='approved'?'public-approved':''}">
       <div class="orc-head">
         <div>
-          <div class="orc-sub">Orcamento #${seq} · ${fd(o.dt)}</div>
+          <div class="orc-sub">Orçamento #${seq} · ${fd(o.dt)}</div>
           <div class="orc-name">${o.cli||'--'}</div>
           ${o.desc?`<div class="orc-sub">${o.desc}</div>`:''}
           <div class="orc-meta">
             <span>${iconSvg('clipboard')} ${o.sts||'Pendente'}</span>
-            ${o.valid?`<span>${iconSvg('bell')} Valido ate ${fd(o.valid)}</span>`:''}
+            ${o.valid?`<span>${iconSvg('bell')} Válido até ${fd(o.valid)}</span>`:''}
             ${respondeuPublico?`<span>${iconSvg(o.public_response==='approved'?'star':'eye-off')} ${respTxt}${o.public_responded_at?' em '+fd(o.public_responded_at.slice(0,10)):''}</span>`:''}
           </div>
         </div>
@@ -3396,7 +3400,7 @@ function rOrcamentos(){
       </div>
       ${o.public_response==='approved'?`
         <div class="orc-next">
-          <span>${iconSvg('star')} Cliente aprovou pelo link. Proxima acao: agendar o servico.</span>
+          <span>${iconSvg('star')} Cliente aprovou pelo link. Próxima ação: agendar o serviço.</span>
           <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})">Converter agora</button>
         </div>`:''}
       <div class="orc-items">
@@ -3469,7 +3473,7 @@ function renderMeusSrvs(){
   const lista = D.perfil.meusSrvs || [];
   if(!el) return;
   if(!lista.length){
-    el.innerHTML = '<div style="font-size:.8rem;color:var(--mut);margin-bottom:8px">Nenhum servico cadastrado ainda.</div>';
+    el.innerHTML = '<div style="font-size:.8rem;color:var(--mut);margin-bottom:8px">Nenhum serviço cadastrado ainda.</div>';
     return;
   }
   el.innerHTML = lista.map((s,i)=>`
@@ -3535,10 +3539,10 @@ function cobrarCliente(i){
   const total = pendentes.reduce((a,b)=>a+(+b.val||0),0);
   const tel = (c.wpp||'').replace(/\D/g,'');
   const nome = D.perfil.nome || 'Prestador';
-  const msg = `Ola ${c.nm}! Tudo bem?\n\nPassando para lembrar do pagamento em aberto de ${R$(total)} referente aos servicos realizados.\n\nQualquer duvida fico a disposicao.\n\n${nome}`;
+  const msg = `Olá, ${c.nm}! Tudo bem?\n\nEstou passando para lembrar do pagamento em aberto no valor de ${R$(total)}, referente aos serviços realizados.\n\nQualquer dúvida, fico à disposição.\n\n${nome}`;
   const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
-  toast('Abrindo cobranca no WhatsApp...');
+  toast('Abrindo cobrança no WhatsApp...');
 }
 
 function calcSaldo(){
@@ -3618,13 +3622,13 @@ async function iniciarSrv(i){
   D.servicos[i].inicio  = new Date().toISOString();
   render(); // render ANTES do await — usuário vê na hora
   toast('▶️ Serviço iniciado!');
-  addNotif('agenda','▶️ Serviço iniciado','Servico com ' + D.servicos[i].cli + ' iniciado agora.');
+  addNotif('agenda','Serviço iniciado','Serviço com ' + D.servicos[i].cli + ' iniciado agora.');
   // Salva no banco em background
   sbSalvarServico(D.servicos[i]).catch(e => console.error('iniciarSrv save:', e));
 }
 
 async function cancelarSrv(i){
-  if(!confirm('Cancelar este servico?')) return;
+  if(!confirm('Cancelar este serviço?')) return;
   D.servicos[i].sts_srv = 'Cancelado';
   render(); // UI imediata
   toast('Servico cancelado');
@@ -3635,7 +3639,7 @@ function abrirFinalizar(i){
   const seg = D.perfil.segmento || 'geral';
   const SEG = SEGMENTOS[seg];
   const lbl = document.getElementById('fin-mat-label');
-  if(lbl) lbl.textContent = SEG ? SEG.labels.materiais : 'Custos do servico';
+  if(lbl) lbl.textContent = SEG ? SEG.labels.materiais : 'Custos do serviço';
   document.getElementById('fin-idx').value = i;
   finMats = [];
   clr('fin-desc','fin-mat-desc','fin-mat-val');
@@ -3732,7 +3736,7 @@ async function finalizarSrv(){
 
   fecha('m-fin-srv'); render();
   toast('✅ Serviço finalizado!');
-  addNotif('sistema','✅ Serviço concluído',D.servicos[i].cli + ' - ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado! 💰':'Pagamento pendente ⏳'));
+  addNotif('sistema','Serviço concluído',D.servicos[i].cli + ' — ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado.':'Pagamento pendente.'));
   sbSalvarServico(D.servicos[i]);
 }
 
@@ -3771,7 +3775,7 @@ async function cancelarPag(i){
   toast('❌ Pagamento cancelado');
 }
 async function delSrv(i){
-  if(!confirm('Remover este servico?')) return;
+  if(!confirm('Remover este serviço?')) return;
   const dbid = D.servicos[i]._dbid;
   D.servicos.splice(i,1);
   await sbDeletarServico(dbid);
@@ -3794,7 +3798,7 @@ function enviarWpp(tipo){
     chegada:      `Olá ${s.cli}! Aqui é ${nome}. Acabei de chegar no local. Pode me receber! 📍`,
     atraso:       `Olá ${s.cli}! Aqui é ${nome}. Peço desculpas, vou me atrasar um pouco. Em breve estarei aí! ⏰`,
     concluido:    `Olá ${s.cli}! Serviço de *${s.tipo||'serviço'}* concluído com sucesso! ✅\n\nFoi um prazer atendê-lo. Qualquer dúvida, estou à disposição!\n\n_${nome}_`,
-    cobranca:     `Olá ${s.cli}! Tudo bem? 😊\n\nPassando para lembrar sobre o pagamento de *${R$(s.val)}* referente ao serviço de *${s.tipo||'serviço'}*.\n\nQuando puder, entre em contato! 💰\n\n_${nome}_`
+    cobranca:     `Olá, ${s.cli}! Tudo bem?\n\nEstou passando para lembrar sobre o pagamento de *${R$(s.val)}*, referente ao serviço de *${s.tipo||'serviço'}*.\n\nQuando puder, entre em contato.\n\n_${nome}_`
   };
   const msg = msgs[tipo]||'';
   const url = tel
@@ -4052,7 +4056,7 @@ async function pdfRelSrv(){
   doc.setDrawColor(...GRAY_B); doc.setLineWidth(0.4);
   doc.line(14, sY, 90, sY); doc.line(pw-90, sY, pw-14, sY);
   doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(...GRAY_T);
-  doc.text('Prestador de servico', 14, sY+5);
+  doc.text('Prestador de servi?o', 14, sY+5);
   doc.text('Cliente', pw-90, sY+5);
   doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...INK);
   doc.text(doc.splitTextToSize(nome, 76)[0], 14, sY+13);
@@ -4606,8 +4610,8 @@ async function converterOrcSrv(){
     D.clientes.push(nc);
   }
   fecha('m-conv-orc'); render();
-  toast('✅ Servico criado! Orcamento aprovado 🎉');
-  addNotif('sistema','✅ Orcamento convertido', o.cli + ' - servico agendado para ' + fd(dt));
+  toast('Serviço criado. Orçamento aprovado.');
+  addNotif('sistema','Orçamento convertido', o.cli + ' — serviço agendado para ' + fd(dt));
   ir('servicos');
 }
 function abrirNovoOrc(){
@@ -4636,7 +4640,7 @@ function editarOrc(i){
 }
 
 async function delOrc(i){
-  if(!confirm('Remover orcamento?')) return;
+  if(!confirm('Remover orçamento?')) return;
   const dbid = D.orcamentos[i]._dbid;
   D.orcamentos.splice(i,1);
   await sbDeletarOrcamento(dbid);
@@ -4708,7 +4712,7 @@ async function pdfOrc(i){
   doc.text(fd(o.dt), pw-14, 35, {align:'right'});
   if(o.valid){
     doc.setFontSize(7.5); doc.setTextColor(...GRAY_T);
-    doc.text('Valido ate: ' + fd(o.valid), pw-14, 41, {align:'right'});
+  doc.text('Válido até: ' + fd(o.valid), pw-14, 41, {align:'right'});
   }
 
   // Linha divisoria
@@ -4812,7 +4816,7 @@ async function pdfOrc(i){
   doc.setDrawColor(...GRAY_B); doc.setLineWidth(0.4);
   doc.line(14, sY, 90, sY); doc.line(pw-90, sY, pw-14, sY);
   doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(...GRAY_T);
-  doc.text('Prestador de servico', 14, sY+5);
+  doc.text('Prestador de servi?o', 14, sY+5);
   doc.text('Cliente', pw-90, sY+5);
   doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...INK);
   doc.text(doc.splitTextToSize(nome, 76)[0], 14, sY+13);
@@ -4831,7 +4835,7 @@ async function pdfOrc(i){
   doc.text('AutonomoPro', pw-14, ry, {align:'right'});
 
   doc.save('orcamento-' + NUM + '-' + (o.cli||'cliente').replace(/[^a-zA-Z0-9]/g,'-') + '.pdf');
-  toast('Orcamento gerado!');
+  toast('Orçamento gerado.');
 }
 
 function wppOrc(i){
@@ -4890,11 +4894,11 @@ async function wppLinkOrc(i){
   if(!o || !link) return toast('Nao foi possivel gerar o link');
   const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
   const nome = D.perfil.nome || 'Prestador';
-  let msg = `Ola, ${o.cli||''}! Segue seu orcamento de ${nome}.\n\n`;
+  let msg = `Olá, ${o.cli||''}! Segue o orçamento de ${nome}.\n\n`;
   if(o.desc) msg += `${o.desc}\n`;
   msg += `Total: ${R$(total)}\n`;
-  if(o.valid) msg += `Valido ate: ${fd(o.valid)}\n`;
-  msg += `\nVoce pode visualizar e aprovar por aqui:\n${link}`;
+  if(o.valid) msg += `Válido até: ${fd(o.valid)}\n`;
+  msg += `\nVocê pode visualizar e aprovar por aqui:\n${link}`;
   const cli = D.clientes.find(c=>c.nm===o.cli);
   const tel = cli?.wpp?.replace(/\D/g,'')||'';
   const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
@@ -5965,7 +5969,7 @@ function renderAssinatura(){
     if(uso) uso.innerHTML =
       '📋 Servicos: <strong>' + srvs + '/5</strong> este mes<br>' +
       '👤 Clientes: <strong>' + clis + '/10</strong> cadastrados<br>' +
-      '📄 Orcamentos: <strong>' + orcs + '/3</strong> este mes';
+      '📄 Orçamentos: <strong>' + orcs + '/3</strong> este mês';
   }
 }
 
@@ -6084,9 +6088,9 @@ function verificarLimite(tipo){
 
 function mostrarModalUpgrade(tipo, count){
   const msgs = {
-    servicos:  'Voce atingiu o limite de ' + LIMITES_FREE.servicos_mes + ' servicos/mes do plano Free.',
-    clientes:  'Voce atingiu o limite de ' + LIMITES_FREE.clientes + ' clientes do plano Free.',
-    orcamentos:'Voce atingiu o limite de ' + LIMITES_FREE.orcamentos + ' orcamentos/mes do plano Free.',
+    servicos:  'Você atingiu o limite de ' + LIMITES_FREE.servicos_mes + ' serviços/mês do plano Free.',
+    clientes:  'Você atingiu o limite de ' + LIMITES_FREE.clientes + ' clientes do plano Free.',
+    orcamentos:'Você atingiu o limite de ' + LIMITES_FREE.orcamentos + ' orçamentos/mês do plano Free.',
   };
   const el = document.getElementById('m-upgrade');
   if(!el) return;
@@ -6171,7 +6175,7 @@ async function ativarNotifs(){
     document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
     document.getElementById('btn-ativar').className='btn btn-ok';
     toast('🔔 Notificações ativadas!');
-    addNotif('sistema','✅ Notificações ativadas','Você receberá alertas automáticos.');
+    addNotif('sistema','Notificações ativadas','Você receberá alertas automáticos.');
   } else {
     toast('❌ Permissão negada');
   }
@@ -6204,9 +6208,9 @@ function verificarNotifs(){
     const agHj = D.servicos.filter(s=>s.dt===hoje&&s.sts_srv==='Agendado');
     if(agHj.length){
       const prim = [...agHj].sort((a,b)=>(a.hr||'').localeCompare(b.hr||''))[0];
-      const msg  = `${agHj.length} serviço(s) agendado(s) hoje. Primeiro às ${prim.hr||'?'}.`;
-      envNotif('🌅 Bom dia! Resumo do dia',msg,'resumo-'+hoje);
-      addNotif('resumo','🌅 Resumo do dia',msg,'resumo-'+hoje);
+      const msg  = `${agHj.length} ${agHj.length===1?'serviço agendado':'serviços agendados'} hoje. Primeiro compromisso às ${prim.hr||'?'}.`;
+      envNotif('Resumo do dia',msg,'resumo-'+hoje);
+      addNotif('resumo','Resumo do dia',msg,'resumo-'+hoje);
     }
   }
 
@@ -6214,18 +6218,18 @@ function verificarNotifs(){
     const em1h = new Date(agora.getTime()+3600000);
     const hr1  = `${String(em1h.getHours()).padStart(2,'0')}:${String(em1h.getMinutes()).padStart(2,'0')}`;
     D.servicos.filter(s=>s.dt===hoje&&s.hr===hr1&&s.sts_srv==='Agendado').forEach(s=>{
-      const msg = `Serviço com ${s.cli} às ${s.hr} - ${s.tipo}`;
-      envNotif('⏰ Serviço em 1 hora!',msg,'ag-'+s.dt+s.hr);
-      addNotif('agenda','⏰ Serviço em 1 hora!',msg,'ag-'+s.dt+s.hr);
+      const msg = `Serviço com ${s.cli} às ${s.hr}${s.tipo?' — '+s.tipo:''}.`;
+      envNotif('Serviço em 1 hora',msg,'ag-'+s.dt+s.hr);
+      addNotif('agenda','Serviço em 1 hora',msg,'ag-'+s.dt+s.hr);
     });
   }
 
   if(D.cfg.togCob && h==='09' && m==='00'){
     const pends = D.servicos.filter(s=>s.sts_srv==='Realizado'&&s.sts_pag==='Pendente');
     if(pends.length){
-      const msg = `${pends.length} pagamento(s) em aberto - ${R$(pends.reduce((a,b)=>a+(+b.val),0))}`;
-      envNotif('💰 Cobranças pendentes',msg,'cob-'+hoje);
-      addNotif('cobranca','💰 Cobranças pendentes',msg,'cob-'+hoje);
+      const msg = `${pends.length} ${pends.length===1?'pagamento em aberto':'pagamentos em aberto'} — ${R$(pends.reduce((a,b)=>a+(+b.val),0))}.`;
+      envNotif('Cobranças pendentes',msg,'cob-'+hoje);
+      addNotif('cobranca','Cobranças pendentes',msg,'cob-'+hoje);
     }
   }
 }
@@ -6239,16 +6243,16 @@ function envNotif(title,body,tag){
 }
 
 function testarNotif(){
-  const msg = `Teste às ${new Date().toLocaleTimeString('pt-BR')}. Tudo funcionando! ✅`;
+  const msg = `Teste enviado às ${new Date().toLocaleTimeString('pt-BR')}. As notificações estão funcionando corretamente.`;
   if(!('Notification' in window)){
-    addNotif('sistema','🧪 Teste',msg,'teste-local-'+Date.now());
+    addNotif('sistema','Teste de notificação',msg,'teste-local-'+Date.now());
     toast('Notificação interna registrada');
     return;
   }
   if(Notification.permission==='granted'){
-    envNotif('🧪 Teste AutônomoPro',msg,'teste-'+Date.now());
-    addNotif('sistema','🧪 Teste',msg);
-    toast('🔔 Notificação enviada!');
+    envNotif('Teste AutônomoPro',msg,'teste-'+Date.now());
+    addNotif('sistema','Teste de notificação',msg);
+    toast('Notificação enviada!');
   } else {
     toast('⚠️ Ative as notificações primeiro');
     ativarNotifs();
@@ -6289,17 +6293,19 @@ function renderNotifs(){
   const el     = document.getElementById('notif-list');
   if(!el) return;
   const icoMap = {resumo:'bar-chart',agenda:'bell',cobranca:'wallet',sistema:'sliders'};
-  const corMap = {resumo:'#dbeafe',agenda:'#d8f3dc',cobranca:'#fff4eb',sistema:'#f5f0e8'};
+  const corMap = {resumo:'#e0f2fe',agenda:'#dcfce7',cobranca:'#ffedd5',sistema:'#f5f0e8'};
+  const labelMap = {resumo:'Resumo',agenda:'Agenda',cobranca:'Financeiro',sistema:'Sistema'};
   el.innerHTML = D.notifs.length
-    ? D.notifs.map((n,i)=>`
+    ? `<div class="notif-list-inner">${D.notifs.map((n,i)=>`
         <div class="notif-item ${n.lida?'':'unread'}" onclick="lerNotif(${i})">
           <div class="notif-ico" style="background:${corMap[n.tipo]||'#f5f0e8'}">${iconSvg(icoMap[n.tipo]||'bell')}</div>
           <div style="flex:1">
+            <div class="notif-chip">${labelMap[n.tipo]||'Aviso'}</div>
             <div class="notif-title">${n.title}</div>
             <div class="notif-msg">${n.msg}</div>
           </div>
           <div class="notif-time">${n.hora}</div>
-        </div>`).join('')
+        </div>`).join('')}</div>`
     : `<div class="empty"><div class="empty-ico">${iconSvg('bell')}</div>Nenhuma notificação ainda</div>`;
 }
 
@@ -6376,7 +6382,7 @@ function exportarCSV(tipo){
   }
   const csv = '\ufeff' + linhas.map(l=>l.map(csvCell).join(';')).join('\n');
   baixarArquivo(`autonomopro-${tipo}-${hj()}.csv`, csv, 'text/csv;charset=utf-8');
-  toast('Exportacao gerada!');
+  toast('Exportação gerada.');
 }
 
 let tT;
