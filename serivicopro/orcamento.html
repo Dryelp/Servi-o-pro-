@@ -82,7 +82,9 @@ function tokenDaUrl(){
   const qs = new URLSearchParams(location.search);
   return qs.get('t') || location.pathname.split('/').filter(Boolean).pop() || '';
 }
-function totalOrc(o){ return (o.itens||[]).reduce((a,b)=>a+(+b.val||0),0); }
+function itensPublicos(o){ return (o.itens||[]).filter(it=>!it._meta); }
+function metaOrc(o){ return (o.itens||[]).find(it=>it._meta === 'orcamento') || {}; }
+function totalOrc(o){ return itensPublicos(o).reduce((a,b)=>a+(+b.val||0),0); }
 
 function render(){
   const app = document.getElementById('app');
@@ -93,7 +95,8 @@ function render(){
   const p = dados.prestador || {};
   const resp = dados.public_response;
   const bloqueado = resp === 'approved' || resp === 'rejected';
-  const itens = dados.itens || [];
+  const itens = itensPublicos(dados);
+  const meta = metaOrc(dados);
   const logo = p.logo_url ? `<img src="${esc(p.logo_url)}" alt="">` : 'AP';
   app.innerHTML = `
     <div class="head">
@@ -116,6 +119,7 @@ function render(){
         ${itens.length ? itens.map(it=>`<div class="row"><span>${esc(it.desc)}</span><strong>${R$(it.val)}</strong></div>`).join('') : '<div class="row"><span>Nenhum item informado</span><strong>--</strong></div>'}
       </div>
       <div class="total"><div><small>Total do orcamento</small><strong>${R$(totalOrc(dados))}</strong></div></div>
+      ${meta.garantia?`<div class="obs"><strong>Garantia:</strong> ${esc(meta.garantia)}</div>`:''}
       ${dados.obs?`<div class="obs">${esc(dados.obs)}</div>`:''}
       ${bloqueado ? statusFinal(resp) : `
         <div class="actions">

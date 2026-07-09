@@ -642,6 +642,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni" data-ico="users"></span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni" data-ico="clipboard"></span>Orçamentos</button>
+    <button class="nb" onclick="ir('divulgacao',this)"><span class="ni" data-ico="globe"></span>Divulgação</button>
     <div class="nav-sec">Análise</div>
     <button class="nb" onclick="ir('relatorio',this)"><span class="ni" data-ico="bar-chart"></span>Relatórios</button>
     <button class="nb" onclick="ir('notificacoes',this)"><span class="ni" data-ico="bell"></span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
@@ -842,10 +843,36 @@ input:checked+.slider:before{transform:translateX(19px)}
       <input class="search-inp" id="orc-search" placeholder="🔍 Buscar por cliente, descrição..." oninput="rOrcamentos()">
       <select class="fi" id="orc-filtro-sts" style="width:145px;flex:none" onchange="rOrcamentos()">
         <option value="">Todos status</option>
-        <option>Pendente</option><option>Enviado</option><option>Aprovado</option><option>Recusado</option>
+        <option>Pendente</option><option>Enviado</option><option>Aprovado</option><option>Convertido</option><option>Recusado</option>
       </select>
     </div>
     <div id="orc-lista"></div>
+  </div>
+
+  <!-- DIVULGACAO -->
+  <div class="page" id="pg-divulgacao">
+    <div class="topbar">
+      <div><div class="pg-title">Divulgação</div><div class="pg-sub">Textos prontos para posicionar o profissional com mais clareza</div></div>
+      <div class="tb-right"><button class="btn btn-org" onclick="copiarTextoGoogle()">Copiar texto para o Google</button></div>
+    </div>
+    <div class="grid2" style="align-items:start">
+      <div class="panel">
+        <div class="ph"><div class="pt"><span data-ico="globe"></span> Presença local</div></div>
+        <div id="div-checklist"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="pt"><span data-ico="file-text"></span> Descrição profissional</div></div>
+        <textarea class="fi" id="div-texto-google" rows="9" style="line-height:1.6" readonly></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-brn btn-sm" onclick="copiarTextoGoogle()">Copiar descrição</button>
+          <button class="btn btn-wpp btn-sm" onclick="compartilharDivulgacao()">Compartilhar no WhatsApp</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px">
+      <div class="ph"><div class="pt"><span data-ico="star"></span> Serviços e prova social</div></div>
+      <div id="div-servicos"></div>
+    </div>
   </div>
 
   <!-- RELATÓRIOS -->
@@ -1230,6 +1257,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi" data-ico="receipt"></span>Despesas</button>
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi" data-ico="bar-chart"></span>Relatórios</button>
   <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi" data-ico="bell"></span>Notificações</button>
+  <button class="mob-more-btn" onclick="ir('divulgacao');fecharMais()"><span class="mi" data-ico="globe"></span>Divulgação</button>
   <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi" data-ico="user"></span>Perfil</button>
 </div>
 
@@ -1405,6 +1433,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="lucro-row"><span style="color:var(--mut)">Valor cobrado</span><span id="fin-val-show" style="color:var(--grn);font-weight:700">R$ 0,00</span></div>
       <div class="lucro-row"><span style="color:var(--mut)">(−) Custos materiais</span><span id="fin-custo-show" style="color:var(--red);font-weight:700">R$ 0,00</span></div>
       <div class="lucro-row"><span>Lucro líquido</span><span id="fin-lucro-show" style="font-family:'Fraunces',serif;font-size:1.15rem;color:var(--grn)">R$ 0,00</span></div>
+      <div id="fin-margem-alerta" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,50,50,.16);font-size:.78rem;font-weight:700"></div>
     </div>
 
     <!-- Desconto de estoque — aparece só se módulo ativo -->
@@ -1609,6 +1638,11 @@ input:checked+.slider:before{transform:translateX(19px)}
         <span id="orc-total-prev" style="font-family:'Fraunces',serif;font-weight:700;color:var(--grn);font-size:1.15rem">R$ 0,00</span>
       </div>
     </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Garantia do serviço</label><input class="fi" id="o-garantia" placeholder="Ex: 90 dias para o serviço executado"></div>
+      <div class="fg"><label class="fl">Custo previsto interno (R$)</label><input class="fi" type="number" id="o-custo-prev" placeholder="0,00" min="0" step="0.01" oninput="renderOrcItens()"></div>
+    </div>
+    <div id="orc-margem-prev" style="display:none;margin:-4px 0 12px;padding:10px 12px;border-radius:10px;background:var(--grn-bg);border:1px solid rgba(26,107,60,.18);font-size:.84rem"></div>
     <div class="fg"><label class="fl">Observações</label><input class="fi" id="o-obs" placeholder="Prazo, condições, materiais inclusos..."></div>
     <div class="mf">
       <button class="btn btn-org" id="btn-salvar-orc" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
@@ -1819,6 +1853,7 @@ const ICONS = {
   menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>',
   'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
   star:'<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>'
 };
 
@@ -2728,7 +2763,7 @@ async function salvarMeta(){
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
-const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
+const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','divulgacao','relatorio','notificacoes','perfil'];
 let historicoIniciado = false;
 
 function ir(pg, el, opts){
@@ -2741,7 +2776,7 @@ function ir(pg, el, opts){
   if(el){
     el.classList.add('on');
   } else {
-    const navMap = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
+    const navMap = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','divulgacao','relatorio','notificacoes','perfil'];
     const ni = navMap.indexOf(pg);
     if(ni >= 0) document.querySelectorAll('.nb')[ni]?.classList.add('on');
     const mobMap = ['dashboard','servicos','orcamentos','recebimentos'];
@@ -2852,12 +2887,19 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderDivulgacao(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
 
 function dataLocal(iso){
   if(!iso) return null;
   const p = iso.split('-').map(Number);
   return new Date(p[0], (p[1]||1)-1, p[2]||1);
+}
+
+function garantiaServico(s){
+  return String(s?.prazo||'').startsWith('Garantia:') ? String(s.prazo).replace('Garantia:','').trim() : '';
+}
+function prazoEntregaServico(s){
+  return s?.prazo && !garantiaServico(s) ? s.prazo : '';
 }
 
 function diasEntre(a,b){
@@ -2895,7 +2937,7 @@ function calcularPrioridades(){
   if(orcAprovPub.length){
     const p = orcAprovPub[0];
     itens.push({
-      tipo:'resumo', nivel:'high',
+      tipo:'orcamento', nivel:'high',
       title:`${orcAprovPub.length} ${orcAprovPub.length===1?'orçamento aprovado':'orçamentos aprovados'} pelo cliente`,
       msg:`${p.cli||'Cliente'} aprovou pelo link. Converta em serviço para não perder a oportunidade.`,
       key:`prio-orc-aprov-${hoje}`,
@@ -2950,7 +2992,7 @@ function calcularPrioridades(){
   if(orcVencendo.length){
     const p = orcVencendo[0];
     itens.push({
-      tipo:'resumo', nivel:'high',
+      tipo:'orcamento', nivel:'high',
       title:`${orcVencendo.length} ${orcVencendo.length===1?'orçamento perto de vencer':'orçamentos perto de vencer'}`,
       msg:`${p.cli||'Cliente'} vence em ${fd(p.valid)}. Vale chamar no WhatsApp.`,
       key:`prio-orc-venc-${hoje}`,
@@ -2958,7 +3000,7 @@ function calcularPrioridades(){
     });
   } else if(orcPend.length){
     itens.push({
-      tipo:'resumo',
+      tipo:'orcamento',
       title:`${orcPend.length} orçamento(s) aguardando retorno`,
       msg:'Acompanhar orçamentos aumenta a chance de fechar serviço.',
       key:`prio-orc-${hoje}`,
@@ -3195,7 +3237,8 @@ function rServicos(){
           <div class="srv-cli">${srv.cli||'—'}</div>
           <div class="srv-tipo">${srv.tipo||'—'}${srv.qtd?' · '+srv.qtd+' unid.':''}</div>
           ${srv.end?`<div class="srv-meta">${iconSvg('home')} ${srv.end}</div>`:''}
-          ${srv.prazo?`<div class="srv-meta">${iconSvg('clipboard')} Entrega: ${fd(srv.prazo)}</div>`:''}
+          ${prazoEntregaServico(srv)?`<div class="srv-meta">${iconSvg('clipboard')} Entrega: ${fd(prazoEntregaServico(srv))}</div>`:''}
+          ${garantiaServico(srv)?`<div class="srv-meta">${iconSvg('star')} Garantia: ${garantiaServico(srv)}</div>`:''}
           ${srv.entrada?`<div class="srv-meta">${iconSvg('wallet')} Entrada: ${R$(srv.entrada)} · Saldo: ${R$(srv.saldo||0)}</div>`:''}
         </div>
         <div class="srv-money">
@@ -3217,6 +3260,7 @@ function rServicos(){
       <div class="srv-card-actions">
         ${acaoPrincipal}
         ${isReal?`<button class="btn btn-pdf btn-sm srv-secondary-action" onclick="abrirRelSrv(${i})">Relatório</button>`:''}
+        ${!isCan?`<button class="btn btn-gho btn-sm srv-secondary-action" onclick="repetirServico(${i})">Repetir</button>`:''}
         <button class="btn btn-wpp btn-sm srv-secondary-action" onclick="abrirWpp(${i})">WhatsApp</button>
         ${isAg?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarSrv(${i})">Cancelar</button>`:''}
         ${isReal&&srv.sts_pag==='Pendente'?`<button class="btn btn-del btn-sm srv-secondary-action" onclick="cancelarPag(${i})">Cancelar pagto</button>`:''}
@@ -3369,9 +3413,11 @@ function rOrcamentos(){
   }
   el.innerHTML = lista.map(o=>{
     const i     = D.orcamentos.indexOf(o);
-    const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+    const itensVisiveis = orcItensPublicos(o);
+    const meta  = orcMeta(o);
+    const total = totalOrcamento(o);
     const seq   = String(i+1).padStart(3,'0');
-    const podeConverter = o.sts !== 'Recusado';
+    const podeConverter = o.sts !== 'Recusado' && o.sts !== 'Convertido';
     const respondeuPublico = !!o.public_response;
     const respTxt = o.public_response === 'approved' ? 'Aprovado pelo cliente' : o.public_response === 'rejected' ? 'Recusado pelo cliente' : '';
     return `
@@ -3394,20 +3440,23 @@ function rOrcamentos(){
             <option ${o.sts==='Pendente'?'selected':''}>Pendente</option>
             <option ${o.sts==='Enviado'?'selected':''}>Enviado</option>
             <option ${o.sts==='Aprovado'?'selected':''}>Aprovado</option>
+            <option ${o.sts==='Convertido'?'selected':''}>Convertido</option>
             <option ${o.sts==='Recusado'?'selected':''}>Recusado</option>
           </select>
         </div>
       </div>
-      ${o.public_response==='approved'?`
+      ${o.public_response==='approved' && o.sts !== 'Convertido'?`
         <div class="orc-next">
           <span>${iconSvg('star')} Cliente aprovou pelo link. Próxima ação: agendar o serviço.</span>
           <button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})">Converter agora</button>
         </div>`:''}
       <div class="orc-items">
-        ${(o.itens||[]).length
-          ? (o.itens||[]).map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')
+        ${itensVisiveis.length
+          ? itensVisiveis.map(it=>`<div class="orc-item-row"><span>${it.desc}</span><strong>${R$(it.val)}</strong></div>`).join('')
           : '<div class="orc-sub">Nenhum item informado</div>'}
       </div>
+      ${meta.garantia?`<div class="orc-note"><strong>Garantia:</strong> ${meta.garantia}</div>`:''}
+      ${meta.custo_previsto?`<div class="orc-sub" style="margin-top:8px;color:${(total-(+meta.custo_previsto))<=0?'var(--red)':'var(--grn)'}">Margem interna prevista: ${R$(total-(+meta.custo_previsto))}</div>`:''}
       ${o.obs?`<div class="orc-note">${o.obs}</div>`:''}
       <div class="orc-actions">
         ${podeConverter?`<button class="btn btn-grn btn-sm" onclick="abrirConverterOrc(${i})" title="Converter em serviço">${iconSvg('wrench')} ${o.public_response==='approved'?'Converter aprovado':'Converter'}</button>`:''}
@@ -3635,6 +3684,28 @@ async function cancelarSrv(i){
   sbSalvarServico(D.servicos[i]).catch(e => console.error('cancelarSrv save:', e));
 }
 
+async function repetirServico(i){
+  const s = D.servicos[i];
+  const diasTxt = prompt('Repetir este serviço em quantos dias?', '30');
+  if(diasTxt === null) return;
+  const dias = Math.max(1, parseInt(diasTxt,10) || 30);
+  const base = s.dt ? new Date(s.dt + 'T12:00:00') : new Date();
+  base.setDate(base.getDate() + dias);
+  const dt = base.toISOString().slice(0,10);
+  const novo = {
+    dt, hr:s.hr||'', cli:s.cli, tipo:s.tipo, end:s.end||'', val:s.val||0,
+    prazo:s.prazo||null, qtd:s.qtd||null, entrada:null, saldo:null,
+    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], desc_feito:'',
+    inicio:null, fim:null
+  };
+  const ss = await sbSalvarServico(novo);
+  if(ss) novo._dbid = ss.id;
+  D.servicos.unshift(novo);
+  render();
+  toast('Serviço recorrente agendado para ' + fd(dt) + '.');
+  addNotif('agenda','Serviço recorrente criado',`${novo.cli} — ${novo.tipo} em ${fd(dt)}.`);
+}
+
 function abrirFinalizar(i){
   const seg = D.perfil.segmento || 'geral';
   const SEG = SEGMENTOS[seg];
@@ -3663,12 +3734,30 @@ function renderEstoqueFinalizar(){
   if(!el) return;
   el.innerHTML = (D.materiais||[]).map((m,i)=>`
     <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--bor)">
-      <input type="checkbox" id="est-chk-${i}" style="width:16px;height:16px;accent-color:var(--org)">
+      <input type="checkbox" id="est-chk-${i}" onchange="sincronizarEstoqueFinalizar(${i})" style="width:16px;height:16px;accent-color:var(--org)">
       <label for="est-chk-${i}" style="flex:1;font-size:.84rem;cursor:pointer">${m.nome} <span style="color:var(--mut)">(${m.quantidade} ${m.unidade})</span></label>
       <input type="number" id="est-qtd-${i}" placeholder="Qtd" min="0.1" step="0.1"
+        oninput="sincronizarEstoqueFinalizar(${i})"
         style="width:65px;padding:4px 7px;border:1.5px solid var(--bor);border-radius:6px;font-size:.82rem;background:var(--sur)">
     </div>
   `).join('');
+}
+
+function sincronizarEstoqueFinalizar(idx){
+  const m = D.materiais?.[idx];
+  if(!m) return;
+  const chk = document.getElementById('est-chk-'+idx);
+  const qtd = parseFloat(document.getElementById('est-qtd-'+idx)?.value) || 0;
+  const key = 'estoque-'+(m._dbid || idx);
+  finMats = finMats.filter(item => item.key !== key);
+  if(chk?.checked && qtd > 0){
+    finMats.push({
+      key,
+      desc: `${m.nome} (${qtd} ${m.unidade})`,
+      val: (+m.custo_unitario || 0) * qtd
+    });
+  }
+  renderFinMats();
 }
 
 function renderFinMats(idx){
@@ -3690,6 +3779,16 @@ function renderFinMats(idx){
   document.getElementById('fin-val-show').textContent   = R$(val);
   document.getElementById('fin-lucro-show').textContent = R$(lucro);
   document.getElementById('fin-lucro-show').style.color = lucro>=0 ? 'var(--grn)':'var(--red)';
+  const alerta = document.getElementById('fin-margem-alerta');
+  if(alerta){
+    const margem = val > 0 ? (lucro / val) * 100 : 0;
+    const ruim = lucro <= 0 || margem < 25;
+    alerta.style.display = tc > 0 && ruim ? '' : 'none';
+    alerta.style.color = lucro <= 0 ? 'var(--red)' : 'var(--org)';
+    alerta.textContent = lucro <= 0
+      ? 'Atenção: este serviço está sem lucro depois dos custos.'
+      : `Margem baixa (${margem.toFixed(0)}%). Considere revisar o preço em próximos orçamentos.`;
+  }
 }
 
 function addMat(){
@@ -3738,6 +3837,9 @@ async function finalizarSrv(){
   toast('✅ Serviço finalizado!');
   addNotif('sistema','Serviço concluído',D.servicos[i].cli + ' — ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado.':'Pagamento pendente.'));
   sbSalvarServico(D.servicos[i]);
+  if(D.perfil.modulos?.avaliacoes && confirm('Serviço concluído. Deseja pedir uma avaliação ao cliente agora?')){
+    pedirAvaliacao(i);
+  }
 }
 
 function pedirAvaliacao(i){
@@ -3746,7 +3848,7 @@ function pedirAvaliacao(i){
   const tel  = (cli?.wpp||'').replace(/[^0-9]/g,'');
   const link = window.location.origin + '/avaliar.html?uid=' + USER_ID + '&srv=' + (s._dbid||s.id);
   const nome = D.perfil.nome || 'AutonomoPro';
-  const msg  = `Olá, ${s.cli}! Obrigado pelo atendimento! Que tal deixar uma avaliação rápida? Leva menos de 10 segundos: ${link}`;
+  const msg  = `Olá, ${s.cli}! Obrigado pela confiança. Você pode deixar uma avaliação rápida sobre o serviço? Leva menos de 10 segundos: ${link}`;
   const url  = tel
     ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`
     : `https://wa.me/?text=${encodeURIComponent(msg)}`;
@@ -3848,6 +3950,7 @@ function abrirRelSrv(i){
         <div style="font-size:.75rem;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase">Serviço realizado</div>
         <div style="font-size:.9rem;font-weight:600;color:var(--org)">${s.tipo||'—'}</div>
         ${s.desc_feito?`<div style="font-size:.82rem;color:var(--txt);margin-top:5px;line-height:1.5">${s.desc_feito}</div>`:''}
+        ${garantiaServico(s)?`<div style="font-size:.82rem;color:var(--mut);margin-top:6px"><strong>Garantia:</strong> ${garantiaServico(s)}</div>`:''}
       </div>
       <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--grn-bg);border-radius:8px;border:1px solid rgba(26,107,60,.15)">
         <div>
@@ -4210,6 +4313,18 @@ async function pdfRecibo(i){
     doc.text(descLines, 20, y+8);
     y += boxH + 16;
   }
+  if(garantiaServico(s)){
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...GRAY_T);
+    doc.text('GARANTIA', 14, y);
+    y += 6;
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...DARK);
+    doc.text(doc.splitTextToSize(garantiaServico(s), pw-28), 14, y);
+    y += 14;
+  }
 
   var assY = Math.min(Math.max(y+26, 202), ph-48);
   if(D.perfil.assinatura_data){
@@ -4263,6 +4378,7 @@ function wppRelSrv(){
   if(s.end) msg += `📍 Local: ${s.end}\n`;
   msg += `\n🔧 *Serviço: ${s.tipo||'—'}*\n`;
   if(s.desc_feito) msg += `\n📝 O que foi feito:\n${s.desc_feito}\n`;
+  if(garantiaServico(s)) msg += `\n🛡️ Garantia: ${garantiaServico(s)}\n`;
   msg += `\n💰 *Valor: ${R$(s.val)}*\n`;
   msg += `💳 Pagamento: ${s.pag||'—'} · ${s.sts_pag||'—'}\n`;
   if(D.perfil.wpp) msg += `\n📱 ${D.perfil.wpp}`;
@@ -4491,6 +4607,31 @@ function rDespesas(){
 // ══════════════════════════════════════════
 // ORÇAMENTOS
 // ══════════════════════════════════════════
+function orcItensPublicos(o){
+  return (o?.itens || []).filter(it => !it._meta);
+}
+function orcMeta(o){
+  return (o?.itens || []).find(it => it._meta === 'orcamento') || {};
+}
+function totalOrcamento(o){
+  return orcItensPublicos(o).reduce((a,b)=>a+(+b.val||0),0);
+}
+function montarItensOrcamentoComMeta(){
+  const garantia = document.getElementById('o-garantia')?.value.trim() || '';
+  const custoPrevisto = parseFloat(document.getElementById('o-custo-prev')?.value) || 0;
+  const itens = [...orcItens];
+  if(garantia || custoPrevisto){
+    itens.push({_meta:'orcamento', val:0, garantia, custo_previsto:custoPrevisto});
+  }
+  return itens;
+}
+function margemOrcamentoAtual(){
+  const total = orcItens.reduce((a,b)=>a+(+b.val||0),0);
+  const custo = parseFloat(document.getElementById('o-custo-prev')?.value) || 0;
+  const lucro = total - custo;
+  const margem = total > 0 ? (lucro / total) * 100 : 0;
+  return {total,custo,lucro,margem};
+}
 function renderOrcItens(){
   const el = document.getElementById('orc-itens-lista');
   el.innerHTML = orcItens.length
@@ -4503,6 +4644,20 @@ function renderOrcItens(){
     : '<div style="padding:10px;text-align:center;font-size:.8rem;color:var(--mut)">Nenhum item adicionado</div>';
   const t = orcItens.reduce((a,b)=>a+(+b.val),0);
   document.getElementById('orc-total-prev').textContent = R$(t);
+  const box = document.getElementById('orc-margem-prev');
+  if(box){
+    const m = margemOrcamentoAtual();
+    if(m.custo > 0){
+      const ruim = m.lucro <= 0 || m.margem < 25;
+      box.style.display = '';
+      box.style.background = ruim ? 'var(--red-bg)' : 'var(--grn-bg)';
+      box.style.borderColor = ruim ? 'rgba(184,50,50,.18)' : 'rgba(26,107,60,.18)';
+      box.style.color = ruim ? 'var(--red)' : 'var(--grn)';
+      box.innerHTML = `<strong>Margem prevista:</strong> ${R$(m.lucro)} de lucro (${m.margem.toFixed(0)}%). ${ruim?'Revise o preço antes de enviar.':'Preço saudável para enviar.'}`;
+    } else {
+      box.style.display = 'none';
+    }
+  }
 }
 function addOrcItem(){
   const desc = document.getElementById('oi-desc').value.trim();
@@ -4532,7 +4687,7 @@ async function salvarOrc(){
     desc:  document.getElementById('o-desc').value.trim(),
     valid: document.getElementById('o-valid').value,
     obs:   document.getElementById('o-obs').value.trim(),
-    itens: [...orcItens],
+    itens: montarItensOrcamentoComMeta(),
     sts:   editIdx >= 0 ? D.orcamentos[editIdx].sts : 'Pendente',
     approval_token: editIdx >= 0 ? D.orcamentos[editIdx].approval_token : gerarTokenOrcamento(),
     public_response: editIdx >= 0 ? D.orcamentos[editIdx].public_response : '',
@@ -4568,21 +4723,25 @@ async function salvarOrc(){
 
   if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
   fecha('m-orc'); render();
-  clr('o-cli','o-desc','o-obs');
+  clr('o-cli','o-desc','o-obs','o-garantia','o-custo-prev');
   orcItens = [];
 }
 async function mudarStsOrc(i,sts){ D.orcamentos[i].sts=sts; await sbSalvarOrcamento(D.orcamentos[i]); rOrcamentos(); }
 
 function abrirConverterOrc(i){
   const o = D.orcamentos[i];
+  if(o.sts === 'Convertido') return toast('Este orçamento já foi convertido em serviço.');
   document.getElementById('conv-orc-idx').value = i;
   document.getElementById('conv-dt').value = hj();
   document.getElementById('conv-hr').value = '08:00';
-  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const itens = orcItensPublicos(o);
+  const total = totalOrcamento(o);
+  const meta = orcMeta(o);
   document.getElementById('conv-orc-preview').innerHTML = `
     <strong>${o.cli}</strong> — ${o.desc||'Serviço'}<br>
     <span style="color:var(--grn);font-weight:700">${R$(total)}</span>
-    <span style="color:var(--mut);font-size:.76rem"> · ${(o.itens||[]).length} item(ns)</span>
+    <span style="color:var(--mut);font-size:.76rem"> · ${itens.length} item(ns)</span>
+    ${meta.garantia?`<br><span style="color:var(--mut);font-size:.76rem">Garantia: ${meta.garantia}</span>`:''}
   `;
   document.getElementById('m-conv-orc').classList.add('open');
 }
@@ -4590,19 +4749,26 @@ function abrirConverterOrc(i){
 async function converterOrcSrv(){
   const i  = +document.getElementById('conv-orc-idx').value;
   const o  = D.orcamentos[i];
+  if(o.sts === 'Convertido') return toast('Este orçamento já foi convertido em serviço.');
   const dt = document.getElementById('conv-dt').value;
   const hr = document.getElementById('conv-hr').value;
   if(!dt) return toast('⚠️ Selecione a data');
-  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
-  const desc  = (o.itens||[]).map(it=>it.desc).join(', ');
+  const itens = orcItensPublicos(o);
+  const meta = orcMeta(o);
+  const total = totalOrcamento(o);
+  const desc  = itens.map(it=>it.desc).join(', ');
+  const cliExistente = D.clientes.find(c=>c.nm.toLowerCase()===o.cli.toLowerCase());
   const ns = { dt, hr, cli:o.cli, tipo:o.desc||desc, end:'', val:total,
-    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], desc_feito:'', inicio:null, fim:null };
+    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], desc_feito:'',
+    prazo: meta.garantia ? 'Garantia: ' + meta.garantia : null,
+    inicio:null, fim:null };
+  if(cliExistente?.end) ns.end = cliExistente.end;
   const ss = await sbSalvarServico(ns);
   if(ss) ns._dbid = ss.id;
   D.servicos.unshift(ns);
-  D.orcamentos[i].sts = 'Aprovado';
+  D.orcamentos[i].sts = 'Convertido';
   await sbSalvarOrcamento(D.orcamentos[i]);
-  const jaExiste = D.clientes.find(c=>c.nm.toLowerCase()===o.cli.toLowerCase());
+  const jaExiste = cliExistente;
   if(!jaExiste){
     const nc = {nm:o.cli, wpp:'', srv:o.desc||'', end:''};
     const sc = await sbSalvarCliente(nc);
@@ -4619,20 +4785,23 @@ function abrirNovoOrc(){
   document.getElementById('orc-edit-idx').value = '-1';
   const titulo = document.getElementById('m-orc-titulo');
   if(titulo) titulo.childNodes[0].textContent = '📋 Novo Orçamento ';
-  clr('o-cli','o-desc','o-obs');
+  clr('o-cli','o-desc','o-obs','o-garantia','o-custo-prev');
   renderOrcItens();
   abre('m-orc');
 }
 
 function editarOrc(i){
   const o = D.orcamentos[i];
-  orcItens = [...(o.itens||[])];
+  const meta = orcMeta(o);
+  orcItens = [...orcItensPublicos(o)];
   document.getElementById('orc-edit-idx').value = i;
   document.getElementById('o-cli').value   = o.cli||'';
   document.getElementById('o-dt').value    = o.dt||hj();
   document.getElementById('o-desc').value  = o.desc||'';
   document.getElementById('o-valid').value = o.valid||'';
   document.getElementById('o-obs').value   = o.obs||'';
+  document.getElementById('o-garantia').value = meta.garantia||'';
+  document.getElementById('o-custo-prev').value = meta.custo_previsto||'';
   renderOrcItens();
   const titulo = document.getElementById('m-orc-titulo');
   if(titulo) titulo.childNodes[0].textContent = '✏️ Editar Orçamento ';
@@ -4658,7 +4827,9 @@ async function pdfOrc(i){
   const tipo = D.perfil.tipo || '';
   const cnpj = D.perfil.cnpj || '';
   const wpp  = D.perfil.wpp  || '';
-  const total= (o.itens||[]).reduce((a,b)=>a+(+b.val), 0);
+  const itensVisiveis = orcItensPublicos(o);
+  const meta = orcMeta(o);
+  const total= totalOrcamento(o);
   const NUM  = String(i+1).padStart(3,'0');
 
   var DARK  = [15,15,20];   var ORANGE= [234,88,12];
@@ -4755,7 +4926,7 @@ async function pdfOrc(i){
   doc.text('VALOR', colValX, y+6, {align:'right'});
   y += 9;
 
-  (o.itens||[]).forEach(function(it, j){
+  itensVisiveis.forEach(function(it, j){
     // Calcular quantas linhas o texto vai ocupar
     doc.setFontSize(8.5); doc.setFont('helvetica','normal');
     var descLines = doc.splitTextToSize(String(it.desc||''), colDescW);
@@ -4810,6 +4981,13 @@ async function pdfOrc(i){
     doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(...INK);
     doc.text(obsL, 14, y); y += obsL.length*5+6;
   }
+  if(meta.garantia && y < 240){
+    doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
+    doc.text('GARANTIA', 14, y); y += 5;
+    var garL = doc.splitTextToSize(meta.garantia, pw-28);
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(...INK);
+    doc.text(garL, 14, y); y += garL.length*5+6;
+  }
 
   // ── Assinaturas ───────────────────────────────────────
   var sY = Math.max(y+10, ph-46);
@@ -4840,7 +5018,9 @@ async function pdfOrc(i){
 
 function wppOrc(i){
   const o     = D.orcamentos[i];
-  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const itens = orcItensPublicos(o);
+  const meta  = orcMeta(o);
+  const total = totalOrcamento(o);
   const nome  = D.perfil.nome || 'Prestador';
   let msg = `📋 *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
   const _ico = '⚡';
@@ -4849,9 +5029,10 @@ function wppOrc(i){
   msg += `📅 Data: ${fd(o.dt)}\n`;
   if(o.desc) msg += `📋 ${o.desc}\n`;
   msg += `\n*Itens:*\n`;
-  (o.itens||[]).forEach(it=>{ msg += `• ${it.desc}: ${R$(it.val)}\n`; });
+  itens.forEach(it=>{ msg += `• ${it.desc}: ${R$(it.val)}\n`; });
   msg += `\n*💰 Total: ${R$(total)}*\n`;
   if(o.valid) msg += `⏳ Válido até: ${fd(o.valid)}\n`;
+  if(meta.garantia) msg += `🛡️ Garantia: ${meta.garantia}\n`;
   if(o.obs)   msg += `\n📌 ${o.obs}`;
   if(D.perfil.wpp) msg += `\n\n📱 ${D.perfil.wpp}`;
   msg += `\n\n_Enviado via AutônomoPro_`;
@@ -4892,12 +5073,14 @@ async function wppLinkOrc(i){
   const o = D.orcamentos[i];
   const link = await garantirLinkOrc(i);
   if(!o || !link) return toast('Nao foi possivel gerar o link');
-  const total = (o.itens||[]).reduce((a,b)=>a+(+b.val),0);
+  const total = totalOrcamento(o);
+  const meta = orcMeta(o);
   const nome = D.perfil.nome || 'Prestador';
   let msg = `Olá, ${o.cli||''}! Segue o orçamento de ${nome}.\n\n`;
   if(o.desc) msg += `${o.desc}\n`;
   msg += `Total: ${R$(total)}\n`;
   if(o.valid) msg += `Válido até: ${fd(o.valid)}\n`;
+  if(meta.garantia) msg += `Garantia: ${meta.garantia}\n`;
   msg += `\nVocê pode visualizar e aprovar por aqui:\n${link}`;
   const cli = D.clientes.find(c=>c.nm===o.cli);
   const tel = cli?.wpp?.replace(/\D/g,'')||'';
@@ -4907,6 +5090,67 @@ async function wppLinkOrc(i){
   await sbSalvarOrcamento(D.orcamentos[i]);
   rOrcamentos();
   toast('Abrindo WhatsApp com link de aprovacao...');
+}
+
+function servicosDivulgacao(){
+  const base = (D.perfil.meusSrvs || []).filter(Boolean);
+  const feitos = [...new Set(D.servicos.map(s=>s.tipo).filter(Boolean))].slice(0,8);
+  return [...new Set([...base, ...feitos])].slice(0,10);
+}
+function gerarTextoGoogle(){
+  const nome = D.perfil.nome || 'Profissional autônomo';
+  const tipo = D.perfil.tipo || SEGMENTOS[D.perfil.segmento || 'geral']?.labels?.servicos || 'serviços';
+  const area = D.perfil.end_perfil || 'minha região';
+  const servs = servicosDivulgacao();
+  const lista = servs.length ? servs.join(', ') : 'orçamentos, atendimentos agendados e serviços sob demanda';
+  const wpp = D.perfil.wpp ? ` Atendimento pelo WhatsApp ${D.perfil.wpp}.` : '';
+  return `${nome} atua com ${tipo.toLowerCase()} em ${area}. Realiza ${lista}, com orçamento organizado, atendimento profissional e emissão de recibo quando necessário.${wpp}`;
+}
+function renderDivulgacao(){
+  const texto = document.getElementById('div-texto-google');
+  if(!texto) return;
+  texto.value = gerarTextoGoogle();
+  const checks = [
+    ['Nome profissional', !!D.perfil.nome],
+    ['WhatsApp para contato', !!D.perfil.wpp],
+    ['Segmento definido', !!D.perfil.segmento],
+    ['Área de atendimento', !!D.perfil.end_perfil],
+    ['Serviços cadastrados', servicosDivulgacao().length > 0],
+    ['Avaliações recebidas', (D.avaliacoes||[]).length > 0]
+  ];
+  const chk = document.getElementById('div-checklist');
+  if(chk){
+    chk.innerHTML = checks.map(([label,ok])=>`
+      <div class="toggle-row" style="align-items:center">
+        <div><div class="tl">${label}</div><div class="ts">${ok?'Pronto para usar na divulgação':'Complete no Perfil ou nos módulos do app'}</div></div>
+        <span class="badge ${ok?'b-g':'b-o'}">${ok?'OK':'Pendente'}</span>
+      </div>`).join('');
+  }
+  const servBox = document.getElementById('div-servicos');
+  if(servBox){
+    const avals = (D.avaliacoes||[]).slice(0,3);
+    const servs = servicosDivulgacao();
+    servBox.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${servs.length ? servs.map(s=>`<span class="pill">${s}</span>`).join('') : '<span style="color:var(--mut);font-size:.86rem">Cadastre serviços no Perfil para enriquecer a divulgação.</span>'}
+      </div>
+      ${avals.length ? avals.map(a=>`<div class="notif-item" style="cursor:default;margin-bottom:8px"><div class="notif-icon">${iconSvg('star')}</div><div><div class="notif-title">${a.cliente||'Cliente'} avaliou com ${a.estrelas || 5}/5</div><div class="notif-msg">${a.comentario||'Sem comentário escrito.'}</div></div></div>`).join('') : '<div class="empty" style="padding:24px">As avaliações aparecerão aqui quando o módulo estiver em uso.</div>'}
+    `;
+  }
+}
+async function copiarTextoGoogle(){
+  const txt = gerarTextoGoogle();
+  try{
+    await navigator.clipboard.writeText(txt);
+    toast('Texto de divulgação copiado.');
+  }catch(e){
+    prompt('Copie o texto de divulgação:', txt);
+  }
+}
+function compartilharDivulgacao(){
+  const msg = gerarTextoGoogle();
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  toast('Abrindo WhatsApp...');
 }
 
 function relMesAtual(){ document.getElementById('rel-mes').value = hj().slice(0,7); renderRel(); }
@@ -6200,7 +6444,7 @@ function verificarNotifs(){
   calcularPrioridades()
     .filter(p=>p.nivel==='high' || p.tipo==='cobranca' || p.tipo==='agenda')
     .forEach(p=>{
-      const criou = addNotif(p.tipo,p.title,p.msg,p.key);
+      const criou = addNotif(p.tipo,p.title,p.msg,p.key,p.action);
       if(criou && p.nivel==='high') envNotif(p.title,p.msg,p.key);
     });
 
@@ -6276,10 +6520,10 @@ function salvarNotifsLocal(){
   try{ localStorage.setItem(notifStorageKey(), JSON.stringify((D.notifs||[]).slice(0,80))); }catch(e){}
 }
 
-function addNotif(tipo,title,msg,key){
+function addNotif(tipo,title,msg,key,action){
   if(key && D.notifs.some(n=>n.key===key)) return false;
   D.notifs.unshift({
-    id: gerarId(), tipo, title, msg, key:key||'',
+    id: gerarId(), tipo, title, msg, key:key||'', action: action||'',
     hora: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
     data: hj(),
     lida: false
@@ -6292,9 +6536,9 @@ function addNotif(tipo,title,msg,key){
 function renderNotifs(){
   const el     = document.getElementById('notif-list');
   if(!el) return;
-  const icoMap = {resumo:'bar-chart',agenda:'bell',cobranca:'wallet',sistema:'sliders'};
-  const corMap = {resumo:'#e0f2fe',agenda:'#dcfce7',cobranca:'#ffedd5',sistema:'#f5f0e8'};
-  const labelMap = {resumo:'Resumo',agenda:'Agenda',cobranca:'Financeiro',sistema:'Sistema'};
+  const icoMap = {resumo:'bar-chart',agenda:'bell',cobranca:'wallet',orcamento:'clipboard',sistema:'sliders'};
+  const corMap = {resumo:'#e0f2fe',agenda:'#dcfce7',cobranca:'#ffedd5',orcamento:'#fef3c7',sistema:'#f5f0e8'};
+  const labelMap = {resumo:'Resumo',agenda:'Agenda',cobranca:'Financeiro',orcamento:'Orçamento',sistema:'Sistema'};
   el.innerHTML = D.notifs.length
     ? `<div class="notif-list-inner">${D.notifs.map((n,i)=>`
         <div class="notif-item ${n.lida?'':'unread'}" onclick="lerNotif(${i})">
@@ -6309,7 +6553,17 @@ function renderNotifs(){
     : `<div class="empty"><div class="empty-ico">${iconSvg('bell')}</div>Nenhuma notificação ainda</div>`;
 }
 
-function lerNotif(i){ D.notifs[i].lida=true; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); }
+function lerNotif(i){
+  const action = D.notifs[i]?.action;
+  D.notifs[i].lida=true; salvarNotifsLocal(); atualizarBadge(); renderNotifs();
+  executarAcaoNotif(action);
+}
+function executarAcaoNotif(action){
+  if(!action) return;
+  if(action.includes('abrirAReceber')) return abrirAReceber();
+  const m = action.match(/ir\('([^']+)'\)/);
+  if(m && NAV_PAGES.includes(m[1])) return ir(m[1]);
+}
 function limparNotifs(){ D.notifs=[]; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); toast('🗑 Notificações limpas'); }
 
 function atualizarBadge(){
