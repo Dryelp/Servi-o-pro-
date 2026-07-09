@@ -5092,15 +5092,36 @@ async function wppLinkOrc(i){
   toast('Abrindo WhatsApp com link de aprovacao...');
 }
 
+function limparServicoDivulgacao(txt){
+  return String(txt||'')
+    .replace(/\s+/g,' ')
+    .replace(/[,.]+$/,'')
+    .trim();
+}
 function servicosDivulgacao(){
-  const base = (D.perfil.meusSrvs || []).filter(Boolean);
-  const feitos = [...new Set(D.servicos.map(s=>s.tipo).filter(Boolean))].slice(0,8);
-  return [...new Set([...base, ...feitos])].slice(0,10);
+  const fonte = [
+    ...(D.perfil.meusSrvs || []),
+    ...D.servicos.map(s=>s.tipo).filter(Boolean)
+  ];
+  const vistos = new Set();
+  const lista = [];
+  fonte
+    .flatMap(s=>String(s||'').split(/[;\n]/))
+    .map(limparServicoDivulgacao)
+    .filter(s=>s.length >= 3)
+    .forEach(s=>{
+      const k = s.toLowerCase();
+      if(!vistos.has(k)){
+        vistos.add(k);
+        lista.push(s);
+      }
+    });
+  return lista.slice(0,6);
 }
 function gerarTextoGoogle(){
   const nome = D.perfil.nome || 'Profissional autônomo';
   const tipo = D.perfil.tipo || SEGMENTOS[D.perfil.segmento || 'geral']?.labels?.servicos || 'serviços';
-  const area = D.perfil.end_perfil || 'minha região';
+  const area = D.perfil.end_perfil || 'cidade e região de atendimento';
   const servs = servicosDivulgacao();
   const lista = servs.length ? servs.join(', ') : 'orçamentos, atendimentos agendados e serviços sob demanda';
   const wpp = D.perfil.wpp ? ` Atendimento pelo WhatsApp ${D.perfil.wpp}.` : '';
@@ -5111,19 +5132,19 @@ function renderDivulgacao(){
   if(!texto) return;
   texto.value = gerarTextoGoogle();
   const checks = [
-    ['Nome profissional', !!D.perfil.nome],
-    ['WhatsApp para contato', !!D.perfil.wpp],
-    ['Segmento definido', !!D.perfil.segmento],
-    ['Área de atendimento', !!D.perfil.end_perfil],
-    ['Serviços cadastrados', servicosDivulgacao().length > 0],
-    ['Avaliações recebidas', (D.avaliacoes||[]).length > 0]
+    {label:'Nome profissional', ok:!!D.perfil.nome, hintOk:'Aparece na descrição e nos documentos', hintBad:'Preencha o nome profissional no Perfil'},
+    {label:'WhatsApp para contato', ok:!!D.perfil.wpp, hintOk:'Facilita contato de novos clientes', hintBad:'Cadastre o WhatsApp no Perfil'},
+    {label:'Segmento definido', ok:!!D.perfil.segmento, hintOk:'Ajuda o texto a usar termos do seu ramo', hintBad:'Escolha o segmento no Perfil'},
+    {label:'Cidade ou região atendida', ok:!!D.perfil.end_perfil, optional:true, hintOk:'O texto fica mais forte para buscas locais', hintBad:'Opcional: informe cidade, bairros ou região no endereço do Perfil'},
+    {label:'Serviços principais', ok:servicosDivulgacao().length > 0, hintOk:'Usados no texto de divulgação', hintBad:'Cadastre serviços no Perfil ou registre serviços reais'},
+    {label:'Avaliações recebidas', ok:(D.avaliacoes||[]).length > 0, optional:true, hintOk:'Ajuda a passar confiança', hintBad:'Opcional: peça avaliações após concluir serviços'}
   ];
   const chk = document.getElementById('div-checklist');
   if(chk){
-    chk.innerHTML = checks.map(([label,ok])=>`
+    chk.innerHTML = checks.map(item=>`
       <div class="toggle-row" style="align-items:center">
-        <div><div class="tl">${label}</div><div class="ts">${ok?'Pronto para usar na divulgação':'Complete no Perfil ou nos módulos do app'}</div></div>
-        <span class="badge ${ok?'b-g':'b-o'}">${ok?'OK':'Pendente'}</span>
+        <div><div class="tl">${item.label}</div><div class="ts">${item.ok?item.hintOk:item.hintBad}</div></div>
+        <span class="badge ${item.ok?'b-g':'b-o'}">${item.ok?'OK':(item.optional?'Recomendado':'Pendente')}</span>
       </div>`).join('');
   }
   const servBox = document.getElementById('div-servicos');
