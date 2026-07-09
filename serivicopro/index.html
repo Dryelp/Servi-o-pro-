@@ -642,7 +642,6 @@ input:checked+.slider:before{transform:translateX(19px)}
     <button class="nb" id="nav-ajudantes" style="display:none" onclick="ir('ajudantes',this)"><span class="ni" data-ico="users"></span>Ajudantes</button>
     <div class="nav-sec">Vendas</div>
     <button class="nb" onclick="ir('orcamentos',this)"><span class="ni" data-ico="clipboard"></span>Orçamentos</button>
-    <button class="nb" onclick="ir('divulgacao',this)"><span class="ni" data-ico="globe"></span>Divulgação</button>
     <div class="nav-sec">Análise</div>
     <button class="nb" onclick="ir('relatorio',this)"><span class="ni" data-ico="bar-chart"></span>Relatórios</button>
     <button class="nb" onclick="ir('notificacoes',this)"><span class="ni" data-ico="bell"></span>Notificações<span class="notif-badge" id="badge-count">0</span></button>
@@ -847,32 +846,6 @@ input:checked+.slider:before{transform:translateX(19px)}
       </select>
     </div>
     <div id="orc-lista"></div>
-  </div>
-
-  <!-- DIVULGACAO -->
-  <div class="page" id="pg-divulgacao">
-    <div class="topbar">
-      <div><div class="pg-title">Divulgação</div><div class="pg-sub">Textos prontos para posicionar o profissional com mais clareza</div></div>
-      <div class="tb-right"><button class="btn btn-org" onclick="copiarTextoGoogle()">Copiar texto para o Google</button></div>
-    </div>
-    <div class="grid2" style="align-items:start">
-      <div class="panel">
-        <div class="ph"><div class="pt"><span data-ico="globe"></span> Presença local</div></div>
-        <div id="div-checklist"></div>
-      </div>
-      <div class="panel">
-        <div class="ph"><div class="pt"><span data-ico="file-text"></span> Descrição profissional</div></div>
-        <textarea class="fi" id="div-texto-google" rows="9" style="line-height:1.6" readonly></textarea>
-        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn btn-brn btn-sm" onclick="copiarTextoGoogle()">Copiar descrição</button>
-          <button class="btn btn-wpp btn-sm" onclick="compartilharDivulgacao()">Compartilhar no WhatsApp</button>
-        </div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:18px">
-      <div class="ph"><div class="pt"><span data-ico="star"></span> Serviços e prova social</div></div>
-      <div id="div-servicos"></div>
-    </div>
   </div>
 
   <!-- RELATÓRIOS -->
@@ -1257,7 +1230,6 @@ input:checked+.slider:before{transform:translateX(19px)}
   <button class="mob-more-btn" onclick="ir('despesas');fecharMais()"><span class="mi" data-ico="receipt"></span>Despesas</button>
   <button class="mob-more-btn" onclick="ir('relatorio');fecharMais()"><span class="mi" data-ico="bar-chart"></span>Relatórios</button>
   <button class="mob-more-btn" onclick="ir('notificacoes');fecharMais()"><span class="mi" data-ico="bell"></span>Notificações</button>
-  <button class="mob-more-btn" onclick="ir('divulgacao');fecharMais()"><span class="mi" data-ico="globe"></span>Divulgação</button>
   <button class="mob-more-btn" onclick="ir('perfil');fecharMais()"><span class="mi" data-ico="user"></span>Perfil</button>
 </div>
 
@@ -1853,7 +1825,6 @@ const ICONS = {
   menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>',
   'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/>',
-  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
   star:'<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>'
 };
 
@@ -2763,7 +2734,7 @@ async function salvarMeta(){
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
-const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','divulgacao','relatorio','notificacoes','perfil'];
+const NAV_PAGES = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
 let historicoIniciado = false;
 
 function ir(pg, el, opts){
@@ -2776,7 +2747,7 @@ function ir(pg, el, opts){
   if(el){
     el.classList.add('on');
   } else {
-    const navMap = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','divulgacao','relatorio','notificacoes','perfil'];
+    const navMap = ['dashboard','servicos','recebimentos','despesas','clientes','produtos','materiais','ajudantes','orcamentos','relatorio','notificacoes','perfil'];
     const ni = navMap.indexOf(pg);
     if(ni >= 0) document.querySelectorAll('.nb')[ni]?.classList.add('on');
     const mobMap = ['dashboard','servicos','orcamentos','recebimentos'];
@@ -2887,7 +2858,7 @@ function updDL(){
 // ══════════════════════════════════════════
 // RENDER
 // ══════════════════════════════════════════
-function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderDivulgacao(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
+function render(){ rDash(); rServicos(); rRecebimentos(); rClientes(); rOrcamentos(); renderPrioridades(); renderNotifs(); rDespesas(); hydrateIcons(); }
 
 function dataLocal(iso){
   if(!iso) return null;
@@ -5090,88 +5061,6 @@ async function wppLinkOrc(i){
   await sbSalvarOrcamento(D.orcamentos[i]);
   rOrcamentos();
   toast('Abrindo WhatsApp com link de aprovacao...');
-}
-
-function limparServicoDivulgacao(txt){
-  return String(txt||'')
-    .replace(/\s+/g,' ')
-    .replace(/[,.]+$/,'')
-    .trim();
-}
-function servicosDivulgacao(){
-  const fonte = [
-    ...(D.perfil.meusSrvs || []),
-    ...D.servicos.map(s=>s.tipo).filter(Boolean)
-  ];
-  const vistos = new Set();
-  const lista = [];
-  fonte
-    .flatMap(s=>String(s||'').split(/[;\n]/))
-    .map(limparServicoDivulgacao)
-    .filter(s=>s.length >= 3)
-    .forEach(s=>{
-      const k = s.toLowerCase();
-      if(!vistos.has(k)){
-        vistos.add(k);
-        lista.push(s);
-      }
-    });
-  return lista.slice(0,6);
-}
-function gerarTextoGoogle(){
-  const nome = D.perfil.nome || 'Profissional autônomo';
-  const tipo = D.perfil.tipo || SEGMENTOS[D.perfil.segmento || 'geral']?.labels?.servicos || 'serviços';
-  const area = D.perfil.end_perfil || 'cidade e região de atendimento';
-  const servs = servicosDivulgacao();
-  const lista = servs.length ? servs.join(', ') : 'orçamentos, atendimentos agendados e serviços sob demanda';
-  const wpp = D.perfil.wpp ? ` Atendimento pelo WhatsApp ${D.perfil.wpp}.` : '';
-  return `${nome} atua com ${tipo.toLowerCase()} em ${area}. Realiza ${lista}, com orçamento organizado, atendimento profissional e emissão de recibo quando necessário.${wpp}`;
-}
-function renderDivulgacao(){
-  const texto = document.getElementById('div-texto-google');
-  if(!texto) return;
-  texto.value = gerarTextoGoogle();
-  const checks = [
-    {label:'Nome profissional', ok:!!D.perfil.nome, hintOk:'Aparece na descrição e nos documentos', hintBad:'Preencha o nome profissional no Perfil'},
-    {label:'WhatsApp para contato', ok:!!D.perfil.wpp, hintOk:'Facilita contato de novos clientes', hintBad:'Cadastre o WhatsApp no Perfil'},
-    {label:'Segmento definido', ok:!!D.perfil.segmento, hintOk:'Ajuda o texto a usar termos do seu ramo', hintBad:'Escolha o segmento no Perfil'},
-    {label:'Cidade ou região atendida', ok:!!D.perfil.end_perfil, optional:true, hintOk:'O texto fica mais forte para buscas locais', hintBad:'Opcional: informe cidade, bairros ou região no endereço do Perfil'},
-    {label:'Serviços principais', ok:servicosDivulgacao().length > 0, hintOk:'Usados no texto de divulgação', hintBad:'Cadastre serviços no Perfil ou registre serviços reais'},
-    {label:'Avaliações recebidas', ok:(D.avaliacoes||[]).length > 0, optional:true, hintOk:'Ajuda a passar confiança', hintBad:'Opcional: peça avaliações após concluir serviços'}
-  ];
-  const chk = document.getElementById('div-checklist');
-  if(chk){
-    chk.innerHTML = checks.map(item=>`
-      <div class="toggle-row" style="align-items:center">
-        <div><div class="tl">${item.label}</div><div class="ts">${item.ok?item.hintOk:item.hintBad}</div></div>
-        <span class="badge ${item.ok?'b-g':'b-o'}">${item.ok?'OK':(item.optional?'Recomendado':'Pendente')}</span>
-      </div>`).join('');
-  }
-  const servBox = document.getElementById('div-servicos');
-  if(servBox){
-    const avals = (D.avaliacoes||[]).slice(0,3);
-    const servs = servicosDivulgacao();
-    servBox.innerHTML = `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-        ${servs.length ? servs.map(s=>`<span class="pill">${s}</span>`).join('') : '<span style="color:var(--mut);font-size:.86rem">Cadastre serviços no Perfil para enriquecer a divulgação.</span>'}
-      </div>
-      ${avals.length ? avals.map(a=>`<div class="notif-item" style="cursor:default;margin-bottom:8px"><div class="notif-icon">${iconSvg('star')}</div><div><div class="notif-title">${a.cliente||'Cliente'} avaliou com ${a.estrelas || 5}/5</div><div class="notif-msg">${a.comentario||'Sem comentário escrito.'}</div></div></div>`).join('') : '<div class="empty" style="padding:24px">As avaliações aparecerão aqui quando o módulo estiver em uso.</div>'}
-    `;
-  }
-}
-async function copiarTextoGoogle(){
-  const txt = gerarTextoGoogle();
-  try{
-    await navigator.clipboard.writeText(txt);
-    toast('Texto de divulgação copiado.');
-  }catch(e){
-    prompt('Copie o texto de divulgação:', txt);
-  }
-}
-function compartilharDivulgacao(){
-  const msg = gerarTextoGoogle();
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-  toast('Abrindo WhatsApp...');
 }
 
 function relMesAtual(){ document.getElementById('rel-mes').value = hj().slice(0,7); renderRel(); }
