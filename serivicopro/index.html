@@ -955,6 +955,29 @@ div:empty[style*="font-size:3rem"]{display:none!important}
       <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%"> Sair da conta</button>
     </div>
     <div class="cfg-sec">
+      <div class="cfg-t"><span data-ico="globe"></span> Vitrine pública V2</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Publique uma página simples e profissional para apresentar serviços, fotos, avaliações e contato por WhatsApp.</p>
+      <div class="toggle-row" style="margin-bottom:12px">
+        <div>
+          <div class="tl">Publicar vitrine</div>
+          <div class="ts">A página fica disponível em um link público.</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="site-publicado"><span class="slider"></span></label>
+      </div>
+      <div class="fg"><label class="fl">Link da página</label><input class="fi" id="site-slug" placeholder="ex: andryell-manutencoes" oninput="atualizarPreviewSitePublico()"></div>
+      <div class="fg"><label class="fl">Área de atendimento</label><input class="fi" id="site-area" placeholder="Ex: João Monlevade e região"></div>
+      <div class="fg"><label class="fl">Texto de apresentação</label><textarea class="fi" id="site-descricao" rows="4" placeholder="Conte de forma objetiva o que você faz, para quem atende e por que o cliente pode confiar."></textarea></div>
+      <div class="fg"><label class="fl">Chamada do botão</label><input class="fi" id="site-cta" placeholder="Solicitar orçamento"></div>
+      <div style="background:var(--bg);border:1px solid var(--bor);border-radius:12px;padding:12px;margin-bottom:12px">
+        <div style="font-size:.72rem;color:var(--mut);text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:4px">Link público</div>
+        <div id="site-link-preview" style="font-size:.86rem;font-weight:800;word-break:break-all;color:var(--txt)">Salve o perfil para gerar o link.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-gho btn-sm" style="flex:1;justify-content:center" onclick="copiarSitePublico()">Copiar link</button>
+        <button class="btn btn-org btn-sm" style="flex:1;justify-content:center" onclick="abrirSitePublico()">Abrir página</button>
+      </div>
+    </div>
+    <div class="cfg-sec">
       <div class="cfg-t"><span data-ico="wrench"></span> Meus serviços</div>
       <p style="font-size:.82rem;color:var(--mut);margin-bottom:12px;line-height:1.6">Cadastre os tipos de serviço que você presta. Vão aparecer como sugestão ao criar um novo serviço.</p>
       <div id="meus-srvs-lista" style="margin-bottom:10px"></div>
@@ -1682,7 +1705,7 @@ const D = {
   orcamentos: [],
   notifs:     [],
   despesas:   [],
-  perfil:     {nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',assinatura_data:'',meta:0},
+  perfil:     {nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',assinatura_data:'',meta:0,site_publicado:false,site_slug:'',site_area:'',site_descricao:'',site_cta:''},
   cfg:        {togAg:true,togRes:true,togCob:true}
 };
 let finMats  = [];
@@ -1864,6 +1887,7 @@ const ICONS = {
   menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   sliders:'<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>',
   'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h6"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 0 20"/><path d="M12 2a15.3 15.3 0 0 0 0 20"/>',
   star:'<path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>'
 };
 
@@ -2120,7 +2144,7 @@ async function fazerLogout(){
   await SUPA.auth.signOut();
   D.servicos=[]; D.clientes=[]; D.orcamentos=[];
   D.notifs=[]; D.despesas=[];
-  D.perfil={nome:'',tipo:'',wpp:'',assinatura_data:'',meta:0};
+  D.perfil={nome:'',tipo:'',wpp:'',cnpj:'',end_perfil:'',assinatura_data:'',meta:0,site_publicado:false,site_slug:'',site_area:'',site_descricao:'',site_cta:''};
   toast('Até logo! ');
 }
 
@@ -2430,6 +2454,11 @@ async function carregarDadosSupabase(){
         meta: perf.meta||0, segmento: perf.segmento||'geral',
         meusSrvs: perf.meus_srvs||[],
         modulos: perf.modulos||{},
+        site_publicado: !!perf.site_publicado,
+        site_slug: perf.site_slug||'',
+        site_area: perf.site_area||'',
+        site_descricao: perf.site_descricao||'',
+        site_cta: perf.site_cta||'',
         plano: perf.plano||'free',
         onboarding_completo: perf.onboarding_completo||false
       };
@@ -2494,8 +2523,20 @@ async function sbSalvarPerfil(){
       meta: D.perfil.meta||0,
       segmento: D.perfil.segmento||'geral',
       meus_srvs: D.perfil.meusSrvs||[],
-      modulos: D.perfil.modulos||{}
+      modulos: D.perfil.modulos||{},
+      site_publicado: !!D.perfil.site_publicado,
+      site_slug: D.perfil.site_slug||null,
+      site_area: D.perfil.site_area||null,
+      site_descricao: D.perfil.site_descricao||null,
+      site_cta: D.perfil.site_cta||null
     });
+    if(error){
+      console.error('Erro ao salvar perfil:', error);
+      if(error.code === '23505') toast('Este link de vitrine já está em uso. Escolha outro.');
+      else toast('Não foi possível salvar o perfil agora.');
+      return false;
+    }
+    return true;
   } catch(e){ console.error('Erro ao salvar perfil:', e); }
 }
 
@@ -2699,9 +2740,53 @@ async function atualizarPerfil(){
   D.perfil.tipo = document.getElementById('edit-tipo').value.trim();
   D.perfil.wpp  = document.getElementById('edit-wpp').value.trim();
   D.perfil.segmento = detectarSegmento(D.perfil.tipo);
+  D.perfil.site_publicado = !!document.getElementById('site-publicado')?.checked;
+  D.perfil.site_slug = slugSitePublico(document.getElementById('site-slug')?.value || D.perfil.nome || D.perfil.tipo || 'profissional');
+  D.perfil.site_area = document.getElementById('site-area')?.value.trim() || '';
+  D.perfil.site_descricao = document.getElementById('site-descricao')?.value.trim() || '';
+  D.perfil.site_cta = document.getElementById('site-cta')?.value.trim() || 'Solicitar orçamento';
   await sbSalvarPerfil();
   uiPerfil();
   toast(' Perfil atualizado!');
+}
+
+function slugSitePublico(valor){
+  return String(valor || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'')
+    .slice(0, 64) || 'profissional';
+}
+
+function linkSitePublico(){
+  const base = location.origin || 'https://autonomopro.vercel.app';
+  const slug = slugSitePublico(D.perfil.site_slug || D.perfil.nome || D.perfil.tipo || 'profissional');
+  return `${base}/p/${slug}`;
+}
+
+function atualizarPreviewSitePublico(){
+  const slugInput = document.getElementById('site-slug');
+  const preview = document.getElementById('site-link-preview');
+  if(!preview) return;
+  const slug = slugSitePublico(slugInput?.value || D.perfil.site_slug || D.perfil.nome || D.perfil.tipo || '');
+  preview.textContent = slug ? `${location.origin || 'https://autonomopro.vercel.app'}/p/${slug}` : 'Salve o perfil para gerar o link.';
+}
+
+async function copiarSitePublico(){
+  if(!D.perfil.site_slug) D.perfil.site_slug = slugSitePublico(D.perfil.nome || D.perfil.tipo || 'profissional');
+  const link = linkSitePublico();
+  try{
+    await navigator.clipboard.writeText(link);
+    toast('Link copiado!');
+  }catch(e){
+    prompt('Copie o link da vitrine:', link);
+  }
+}
+
+function abrirSitePublico(){
+  if(!D.perfil.site_slug) D.perfil.site_slug = slugSitePublico(D.perfil.nome || D.perfil.tipo || 'profissional');
+  window.open(linkSitePublico(), '_blank');
 }
 
 function uiPerfil(){
@@ -2740,6 +2825,12 @@ function uiPerfil(){
 
   const ee = document.getElementById('edit-end');   if(ee) ee.value = D.perfil.end_perfil||'';
   const em = document.getElementById('edit-meta'); if(em) em.value = D.perfil.meta || '';
+  const sp = document.getElementById('site-publicado'); if(sp) sp.checked = !!D.perfil.site_publicado;
+  const ss = document.getElementById('site-slug'); if(ss) ss.value = D.perfil.site_slug || slugSitePublico(D.perfil.nome || D.perfil.tipo || '');
+  const sa = document.getElementById('site-area'); if(sa) sa.value = D.perfil.site_area || '';
+  const sd = document.getElementById('site-descricao'); if(sd) sd.value = D.perfil.site_descricao || '';
+  const sc = document.getElementById('site-cta'); if(sc) sc.value = D.perfil.site_cta || 'Solicitar orçamento';
+  atualizarPreviewSitePublico();
   atualizarPreviewMeta();
   renderMeusSrvs();
   atualizarDatalistTipo();
