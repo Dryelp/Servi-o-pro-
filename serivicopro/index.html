@@ -1421,10 +1421,16 @@ div:empty[style*="font-size:3rem"]{display:none!important}
         <div class="photo-empty" style="grid-column:1/-1">Nenhuma foto adicionada</div>
       </div>
       <div class="photo-actions">
-        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('antes','camera')"><span data-ico="camera"></span>Câmera antes</button>
-        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('depois','camera')"><span data-ico="camera"></span>Câmera depois</button>
-        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('antes','galeria')"><span data-ico="image"></span>Galeria antes</button>
-        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('depois','galeria')"><span data-ico="image"></span>Galeria depois</button>
+        <button class="btn btn-gho btn-sm" onclick="abrirEscolhaFoto('antes')"><span data-ico="camera"></span>Adicionar antes</button>
+        <button class="btn btn-gho btn-sm" onclick="abrirEscolhaFoto('depois')"><span data-ico="image"></span>Adicionar depois</button>
+      </div>
+      <div id="foto-origem-sheet" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--bor);border-radius:10px;background:var(--bg)">
+        <div id="foto-origem-titulo" style="font-size:.76rem;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.35px;margin-bottom:8px">Adicionar foto</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-org btn-sm" onclick="selecionarFotoServico('camera')"><span data-ico="camera"></span>Abrir câmera</button>
+          <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('galeria')"><span data-ico="image"></span>Escolher da galeria</button>
+          <button class="btn btn-gho btn-sm" onclick="fecharEscolhaFoto()">Cancelar</button>
+        </div>
       </div>
       <input type="file" id="srv-photo-input" accept="image/*" style="display:none" onchange="uploadFotoServico(this)">
     </div>
@@ -3845,12 +3851,26 @@ function renderFinFotos(){
   hydrateIcons(el);
 }
 
-function selecionarFotoServico(tipo, origem){
+function abrirEscolhaFoto(tipo){
   fotoTipoAtual = tipo === 'antes' ? 'antes' : 'depois';
+  const sheet = document.getElementById('foto-origem-sheet');
+  const title = document.getElementById('foto-origem-titulo');
+  if(title) title.textContent = `Adicionar foto ${fotoTipoAtual === 'antes' ? 'antes' : 'depois'}`;
+  if(sheet) sheet.style.display = '';
+  hydrateIcons(sheet);
+}
+
+function fecharEscolhaFoto(){
+  const sheet = document.getElementById('foto-origem-sheet');
+  if(sheet) sheet.style.display = 'none';
+}
+
+function selecionarFotoServico(origem){
   const input = document.getElementById('srv-photo-input');
   if(!input) return;
   if(origem === 'camera') input.setAttribute('capture','environment');
   else input.removeAttribute('capture');
+  fecharEscolhaFoto();
   input.click();
 }
 
