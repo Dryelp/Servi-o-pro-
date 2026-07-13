@@ -1,7 +1,7 @@
 {
   "rewrites": [
     { "source": "/orcamento/:token", "destination": "/orcamento.html" },
-    { "source": "/p/:slug", "destination": "/api/public-site?slug=:slug" },
+    { "source": "/p/:slug", "destination": "/api/vitrine?slug=:slug" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
