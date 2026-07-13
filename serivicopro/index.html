@@ -955,14 +955,14 @@ div:empty[style*="font-size:3rem"]{display:none!important}
       <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%"> Sair da conta</button>
     </div>
     <div class="cfg-sec">
-      <div class="cfg-t"><span data-ico="globe"></span> Vitrine pública V2</div>
-      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Publique uma página simples e profissional para apresentar serviços, fotos, avaliações e contato por WhatsApp.</p>
+      <div class="cfg-t"><span data-ico="globe"></span> Página pública</div>
+      <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Crie uma página para clientes conhecerem seus serviços, verem fotos e chamarem no WhatsApp. Quando publicada, ela pode entrar no Google.</p>
       <div class="toggle-row" style="margin-bottom:12px">
         <div>
-          <div class="tl">Publicar vitrine</div>
-          <div class="ts">A página fica disponível em um link público.</div>
+          <div class="tl">Página publicada</div>
+          <div class="ts" id="site-status-text">O link público só funciona depois de salvar e publicar.</div>
         </div>
-        <label class="switch"><input type="checkbox" id="site-publicado"><span class="slider"></span></label>
+        <label class="switch"><input type="checkbox" id="site-publicado" onchange="salvarPublicacaoSite(this.checked)"><span class="slider"></span></label>
       </div>
       <div class="fg"><label class="fl">Link da página</label><input class="fi" id="site-slug" placeholder="ex: andryell-manutencoes" oninput="atualizarPreviewSitePublico()"></div>
       <div class="fg"><label class="fl">Área de atendimento</label><input class="fi" id="site-area" placeholder="Ex: João Monlevade e região"></div>
@@ -974,7 +974,7 @@ div:empty[style*="font-size:3rem"]{display:none!important}
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-gho btn-sm" style="flex:1;justify-content:center" onclick="copiarSitePublico()">Copiar link</button>
-        <button class="btn btn-org btn-sm" style="flex:1;justify-content:center" onclick="abrirSitePublico()">Abrir página</button>
+        <button class="btn btn-org btn-sm" style="flex:1;justify-content:center" onclick="publicarEAbrirSite()">Publicar e abrir</button>
       </div>
     </div>
     <div class="cfg-sec">
@@ -2733,6 +2733,14 @@ async function salvarPerfil(){
 }
 
 async function atualizarPerfil(){
+  coletarPerfilDoFormulario();
+  const ok = await sbSalvarPerfil();
+  if(ok === false) return;
+  uiPerfil();
+  toast(' Perfil atualizado!');
+}
+
+function coletarPerfilDoFormulario(){
   D.perfil.nome      = document.getElementById('edit-nome').value.trim();
   D.perfil.cnpj      = document.getElementById('edit-cnpj')?.value.trim()||'';
   D.perfil.end_perfil= document.getElementById('edit-end')?.value.trim()||'';
@@ -2745,9 +2753,6 @@ async function atualizarPerfil(){
   D.perfil.site_area = document.getElementById('site-area')?.value.trim() || '';
   D.perfil.site_descricao = document.getElementById('site-descricao')?.value.trim() || '';
   D.perfil.site_cta = document.getElementById('site-cta')?.value.trim() || 'Solicitar orçamento';
-  await sbSalvarPerfil();
-  uiPerfil();
-  toast(' Perfil atualizado!');
 }
 
 function slugSitePublico(valor){
@@ -2774,7 +2779,10 @@ function atualizarPreviewSitePublico(){
 }
 
 async function copiarSitePublico(){
-  if(!D.perfil.site_slug) D.perfil.site_slug = slugSitePublico(D.perfil.nome || D.perfil.tipo || 'profissional');
+  coletarPerfilDoFormulario();
+  const ok = await sbSalvarPerfil();
+  if(ok === false) return;
+  uiPerfil();
   const link = linkSitePublico();
   try{
     await navigator.clipboard.writeText(link);
@@ -2784,8 +2792,25 @@ async function copiarSitePublico(){
   }
 }
 
-function abrirSitePublico(){
-  if(!D.perfil.site_slug) D.perfil.site_slug = slugSitePublico(D.perfil.nome || D.perfil.tipo || 'profissional');
+async function salvarPublicacaoSite(publicado){
+  coletarPerfilDoFormulario();
+  D.perfil.site_publicado = !!publicado;
+  const ok = await sbSalvarPerfil();
+  if(ok === false){
+    uiPerfil();
+    return;
+  }
+  uiPerfil();
+  toast(publicado ? 'Página publicada!' : 'Página retirada do ar.');
+}
+
+async function publicarEAbrirSite(){
+  coletarPerfilDoFormulario();
+  D.perfil.site_publicado = true;
+  const ok = await sbSalvarPerfil();
+  if(ok === false) return;
+  uiPerfil();
+  toast('Página publicada!');
   window.open(linkSitePublico(), '_blank');
 }
 
@@ -2830,6 +2855,10 @@ function uiPerfil(){
   const sa = document.getElementById('site-area'); if(sa) sa.value = D.perfil.site_area || '';
   const sd = document.getElementById('site-descricao'); if(sd) sd.value = D.perfil.site_descricao || '';
   const sc = document.getElementById('site-cta'); if(sc) sc.value = D.perfil.site_cta || 'Solicitar orçamento';
+  const st = document.getElementById('site-status-text');
+  if(st) st.textContent = D.perfil.site_publicado
+    ? 'Publicada. Clientes e buscadores podem acessar este link.'
+    : 'Rascunho. Use "Publicar e abrir" para colocar a página no ar.';
   atualizarPreviewSitePublico();
   atualizarPreviewMeta();
   renderMeusSrvs();
