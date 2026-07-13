@@ -17,14 +17,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --bg:#fafafa;--sur:#fff;--sur2:#f4f4f5;--bor:#e4e4e7;
-  --brn:#1a0f0a;--brn2:#2d1810;
+  --bg:#f7f7f8;--sur:#fff;--sur2:#f4f4f5;--bor:#e4e4e7;
+  --brn:#18181b;--brn2:#27272a;
   --org:#ea580c;--org2:#c2410c;--org-bg:#fff7ed;
   --grn:#16a34a;--grn-bg:#dcfce7;
   --red:#dc2626;--red-bg:#fee2e2;
   --blu:#2563eb;--blu-bg:#dbeafe;
   --pur:#7c3aed;--pur-bg:#ede9fe;
-  --txt:#1a0f0a;--mut:#78716c;
+  --txt:#18181b;--mut:#71717a;
   --rad:14px;--shd:0 1px 12px rgba(0,0,0,.06);--shd2:0 4px 24px rgba(0,0,0,.12);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -181,6 +181,14 @@ tbody td{padding:9px 14px;vertical-align:middle}
 .srv-info-row .ico{width:14px;height:14px;color:var(--mut)}
 .srv-note{font-size:.79rem;color:var(--mut);background:var(--bg);padding:9px 10px;border-radius:9px;margin-bottom:10px;border:1px solid var(--bor);line-height:1.45}
 .srv-materials{font-size:.76rem;color:var(--mut);margin-bottom:10px;line-height:1.45}
+.photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.photo-box{background:var(--sur);border:1px solid var(--bor);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.photo-box img{width:100%;height:96px;display:block;object-fit:cover;background:var(--sur2)}
+.photo-cap{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.35px;color:var(--mut)}
+.photo-cap strong{color:var(--brn)}
+.photo-empty{padding:14px;text-align:center;font-size:.8rem;color:var(--mut);background:var(--bg);border:1px dashed var(--bor);border-radius:10px}
+.photo-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.photo-actions .btn{flex:1 1 140px;justify-content:center}
 .srv-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding-top:11px;border-top:1px solid var(--bor)}
 .srv-primary-action{flex:1 1 160px;justify-content:center}
 .srv-secondary-action{opacity:.88}
@@ -346,6 +354,12 @@ input:checked+.slider:before{transform:translateX(19px)}
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:30px 14px;color:var(--mut);font-size:.84rem}
 .empty-ico{font-size:1.8rem;margin-bottom:7px}
+div:empty[style*="font-size:1.2rem"],
+div:empty[style*="font-size:1.3rem"],
+div:empty[style*="font-size:2rem"],
+div:empty[style*="font-size:2.4rem"],
+div:empty[style*="font-size:2.5rem"],
+div:empty[style*="font-size:3rem"]{display:none!important}
 .toast{position:fixed;bottom:22px;right:22px;background:var(--brn);color:#fff;padding:12px 18px;border-radius:12px;font-size:.84rem;font-weight:600;z-index:9999;display:none;box-shadow:0 8px 28px rgba(0,0,0,.2);max-width:320px;animation:slideIn .25s cubic-bezier(.34,1.56,.64,1);line-height:1.4}
 .toast.t-ok{background:#16a34a}
 .toast.t-err{background:#dc2626}
@@ -408,7 +422,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- BANNER ATUALIZAÇÃO -->
 <div id="update-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:var(--grn);color:#fff;padding:11px 18px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.2);flex-wrap:wrap">
   <div style="display:flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600">
-    🔄 Nova versão disponível!
+     Nova versão disponível!
   </div>
   <button onclick="atualizarApp()" style="background:#fff;color:var(--grn);border:none;border-radius:7px;padding:7px 14px;font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">
     Atualizar agora
@@ -418,7 +432,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- LOGIN -->
 <div class="welcome-overlay" id="tela-login" style="display:none">
   <div class="welcome-box" style="max-width:420px">
-    <div class="welcome-ico" id="login-ico">⚡</div>
+    <div class="welcome-ico" id="login-ico"><span style="display:inline-flex;width:54px;height:54px;border-radius:14px;background:var(--org);color:#fff;align-items:center;justify-content:center;font-size:1rem;font-weight:800">AP</span></div>
     <div class="welcome-title">AutônomoPro</div>
     <div class="welcome-sub" id="login-sub">Entre na sua conta para continuar</div>
 
@@ -428,7 +442,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <label class="fl">Senha</label>
         <div style="position:relative">
           <input class="fi" id="login-senha" type="password" placeholder="Sua senha" style="padding-right:40px">
-          <button onclick="toggleSenha('login-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('login-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">Mostrar</button>
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--mut);margin-bottom:4px;cursor:pointer">
@@ -447,11 +461,11 @@ input:checked+.slider:before{transform:translateX(19px)}
         <label class="fl">Senha</label>
         <div style="position:relative">
           <input class="fi" id="cad-senha" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
-          <button onclick="toggleSenha('cad-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('cad-senha',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">Mostrar</button>
         </div>
       </div>
       <div class="fg" style="text-align:left"><label class="fl">O que você faz?</label><input class="fi" id="cad-tipo" placeholder="Ex: Elétrica, frete, doces..."></div>
-      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerCadastro()">Criar conta grátis 🚀</button>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:4px" onclick="fazerCadastro()">Criar conta grátis </button>
       <button class="btn btn-gho" style="width:100%;justify-content:center;margin-top:8px" onclick="mostrarLogin()">Já tenho conta</button>
     </div>
 
@@ -467,13 +481,13 @@ input:checked+.slider:before{transform:translateX(19px)}
         <label class="fl">Nova senha</label>
         <div style="position:relative">
           <input class="fi" id="nova-senha-inp" type="password" placeholder="Mínimo 6 caracteres" style="padding-right:40px">
-          <button onclick="toggleSenha('nova-senha-inp',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">👁</button>
+          <button onclick="toggleSenha('nova-senha-inp',this)" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--mut)">Mostrar</button>
         </div>
       </div>
-      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="salvarNovaSenha()">✅ Salvar nova senha</button>
+      <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-top:8px" onclick="salvarNovaSenha()"> Salvar nova senha</button>
     </div>
     <div id="login-loading" style="display:none;text-align:center;padding:20px;color:var(--mut);font-size:.9rem">
-      ⏳ Aguarde...
+       Aguarde...
     </div>
   </div>
 </div>
@@ -482,22 +496,22 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Cancelar Assinatura -->
 <div class="overlay" id="m-cancelar-assin">
   <div class="modal" style="text-align:center">
-    <div style="font-size:2rem;margin-bottom:12px">😢</div>
+    <div style="font-size:2rem;margin-bottom:12px"></div>
     <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--brn);margin-bottom:8px">Cancelar assinatura?</div>
     <div style="font-size:.85rem;color:var(--mut);line-height:1.6;margin-bottom:20px">
       Você perderá acesso ao plano Pro ao fim do período pago.<br><br>
       Seus dados ficam salvos — se quiser voltar, é só assinar novamente.
     </div>
     <div style="background:var(--red-bg);border-radius:10px;padding:12px;margin-bottom:20px;font-size:.82rem;color:var(--red);text-align:left;line-height:1.8">
-      ❌ Limite de 10 serviços/mês<br>
-      ❌ Limite de 15 clientes<br>
-      ❌ Módulos desativados
+       Limite de 10 serviços/mês<br>
+       Limite de 15 clientes<br>
+       Módulos desativados
     </div>
     <button class="btn btn-gho" style="width:100%;justify-content:center;padding:12px;margin-bottom:8px;color:var(--red);border-color:rgba(220,38,38,.3)" onclick="confirmarCancelamento()">
       Confirmar cancelamento
     </button>
     <button class="btn btn-org" style="width:100%;justify-content:center;padding:12px" onclick="fecha('m-cancelar-assin')">
-      Manter meu Pro 👑
+      Manter meu Pro
     </button>
   </div>
 </div>
@@ -505,21 +519,21 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Upgrade Pro -->
 <div class="overlay" id="m-upgrade">
   <div class="modal" style="text-align:center">
-    <div style="font-size:2.5rem;margin-bottom:12px">🚀</div>
+    <div style="font-size:2.5rem;margin-bottom:12px"></div>
     <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--brn);margin-bottom:8px">Limite do plano Free</div>
     <div id="upgrade-msg" style="font-size:.88rem;color:var(--mut);margin-bottom:16px;line-height:1.6"></div>
     <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:20px;text-align:left">
-      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">⚡ Plano Pro — R$ 49,90/mês</div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px"> Plano Pro — R$ 49,90/mês</div>
       <div style="font-size:.84rem;color:var(--brn);line-height:2">
-        ✅ Serviços ilimitados (Free: 5/mês)<br>
-        ✅ Clientes ilimitados (Free: 10)<br>
-        ✅ Orçamentos ilimitados (Free: 3/mês)<br>
-        ✅ Todos os módulos extras<br>
-        ✅ Relatórios PDF completos<br>
-        ✅ Suporte prioritário via WhatsApp
+         Serviços ilimitados (Free: 5/mês)<br>
+         Clientes ilimitados (Free: 10)<br>
+         Orçamentos ilimitados (Free: 3/mês)<br>
+         Todos os módulos extras<br>
+         Relatórios PDF completos<br>
+         Suporte prioritário via WhatsApp
       </div>
     </div>
-    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="abrirWhatsAppPro();fecha('m-upgrade')">📱 Quero ser Pro — R$ 49,90/mês</button>
+    <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px;margin-bottom:8px" onclick="abrirWhatsAppPro();fecha('m-upgrade')"> Quero ser Pro — R$ 49,90/mês</button>
     <button class="btn btn-gho" style="width:100%;justify-content:center" onclick="fecha('m-upgrade')">Continuar no Free</button>
   </div>
 </div>
@@ -535,20 +549,20 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <!-- Passo 1 — Boas vindas -->
     <div id="ob-1" style="padding:32px 28px">
-      <div style="font-size:2.5rem;margin-bottom:12px">⚡</div>
+      <div style="font-size:2.5rem;margin-bottom:12px"></div>
       <div style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--brn);margin-bottom:8px">Bem-vindo ao<br>AutônomoPro!</div>
       <div style="font-size:.9rem;color:var(--mut);line-height:1.6;margin-bottom:28px">Gestão completa para autônomos de qualquer segmento. Vamos configurar tudo em menos de 1 minuto.</div>
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <div style="flex:1;background:var(--org-bg);border-radius:10px;padding:12px;text-align:center">
-          <div style="font-size:1.2rem">📋</div>
+          <div style="font-size:1.2rem"></div>
           <div style="font-size:.72rem;font-weight:600;color:var(--org);margin-top:4px">Serviços</div>
         </div>
         <div style="flex:1;background:var(--grn-bg);border-radius:10px;padding:12px;text-align:center">
-          <div style="font-size:1.2rem">💰</div>
+          <div style="font-size:1.2rem"></div>
           <div style="font-size:.72rem;font-weight:600;color:var(--grn);margin-top:4px">Financeiro</div>
         </div>
         <div style="flex:1;background:var(--blu-bg);border-radius:10px;padding:12px;text-align:center">
-          <div style="font-size:1.2rem">📄</div>
+          <div style="font-size:1.2rem"></div>
           <div style="font-size:.72rem;font-weight:600;color:var(--blu);margin-top:4px">PDF & WhatsApp</div>
         </div>
       </div>
@@ -562,28 +576,28 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div style="font-size:.85rem;color:var(--mut);margin-bottom:20px">O app vai se adaptar ao seu negócio.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px" id="ob-segmentos">
         <div class="ob-seg-btn" onclick="obSelecionarSeg('construcao',this)" data-seg="construcao" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">⚒️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Construção</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Construção</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('beleza',this)" data-seg="beleza" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">💅</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Beleza</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Beleza</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('confeitaria',this)" data-seg="confeitaria" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">🍰</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Confeitaria</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Confeitaria</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('fotografia',this)" data-seg="fotografia" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">📷</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Fotografia</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Fotografia</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('frete',this)" data-seg="frete" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">🚛</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Frete</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Frete</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('cerimonial',this)" data-seg="cerimonial" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">🎊</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Cerimonial</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Cerimonial</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('artesanato',this)" data-seg="artesanato" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">✂️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Artesanato</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Artesanato</div>
         </div>
         <div class="ob-seg-btn" onclick="obSelecionarSeg('geral',this)" data-seg="geral" style="background:var(--bg);border:2px solid var(--bor);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;text-align:center">
-          <div style="font-size:1.3rem">🛠️</div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Outro</div>
+          <div style="font-size:1.3rem"></div><div style="font-size:.78rem;font-weight:600;color:var(--brn);margin-top:4px">Outro</div>
         </div>
       </div>
       <button class="btn btn-org" id="ob-btn-2" style="width:100%;justify-content:center;padding:14px;opacity:.5" onclick="obAvancar(3)" disabled>Continuar →</button>
@@ -603,16 +617,16 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <!-- Passo 4 — Pronto! -->
     <div id="ob-4" style="padding:32px 28px;display:none;text-align:center">
-      <div style="font-size:3rem;margin-bottom:16px">🎉</div>
+      <div style="font-size:3rem;margin-bottom:16px"></div>
       <div style="font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--brn);margin-bottom:8px" id="ob-nome-final">Tudo pronto!</div>
       <div style="font-size:.88rem;color:var(--mut);line-height:1.6;margin-bottom:24px">Seu perfil foi configurado. Agora você pode começar a gerenciar seus serviços com facilidade.</div>
       <div style="background:var(--org-bg);border-radius:12px;padding:16px;margin-bottom:24px;text-align:left">
         <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">O que você pode fazer agora:</div>
         <div style="font-size:.84rem;color:var(--brn);line-height:2">
-          ⚡ Agendar seu primeiro serviço<br>
-          📋 Criar um orçamento profissional<br>
-          💰 Controlar seus recebimentos<br>
-          📊 Ver seus relatórios mensais
+           Agendar seu primeiro serviço<br>
+           Criar um orçamento profissional<br>
+           Controlar seus recebimentos<br>
+           Ver seus relatórios mensais
         </div>
       </div>
       <button class="btn btn-org" style="width:100%;justify-content:center;padding:14px;font-size:.95rem" onclick="obConcluir()">Começar a usar →</button>
@@ -743,7 +757,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <div style="display:grid;grid-template-columns:1.3fr .7fr;gap:14px;margin-bottom:18px" class="dash-grid">
       <div class="panel">
-        <div class="ph"><div class="pt">🗓 Serviços de Hoje</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
+        <div class="ph"><div class="pt"> Serviços de Hoje</div><button class="btn btn-gho btn-sm" onclick="ir('servicos')">Ver todos</button></div>
         <div class="pb" id="dash-hoje"></div>
       </div>
       <div class="panel">
@@ -758,7 +772,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <!-- FRASE META -->
     <div id="dash-meta-box" style="display:none;background:linear-gradient(135deg,var(--grn-bg),#c8eed9);border:1px solid rgba(26,107,60,.15);border-radius:12px;padding:13px 18px;margin-bottom:18px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">📈 Progresso do mês</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px"> Progresso do mês</div>
         <div id="dash-meta-txt" style="font-size:.9rem;font-weight:600;color:var(--brn)"></div>
       </div>
       <div id="dash-meta-pct" style="font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--grn)"></div>
@@ -780,7 +794,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="search-bar">
-      <input class="search-inp" id="srv-search" placeholder="🔍 Buscar por cliente ou serviço..." oninput="rServicos()">
+      <input class="search-inp" id="srv-search" placeholder=" Buscar por cliente ou serviço..." oninput="rServicos()">
       <select class="fi" id="srv-filtro" style="width:145px;flex:none" onchange="rServicos()">
         <option value="">Todos</option>
         <option value="Agendado">Agendados</option>
@@ -826,7 +840,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="sc" style="--sc-c:var(--pur)"><div class="sc-lbl">Outras despesas</div><div class="sc-val" id="desp-out">R$ 0,00</div></div>
     </div>
     <div class="search-bar">
-      <input class="search-inp" id="desp-search" placeholder="🔍 Buscar despesa..." oninput="rDespesas()">
+      <input class="search-inp" id="desp-search" placeholder=" Buscar despesa..." oninput="rDespesas()">
       <select class="fi" id="desp-mes" style="width:160px;flex:none" onchange="rDespesas()"></select>
     </div>
     <div id="desp-lista"></div>
@@ -839,7 +853,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="tb-right"><button class="btn btn-org" onclick="abrirNovoOrc()">+ Novo orçamento</button></div>
     </div>
     <div class="search-bar">
-      <input class="search-inp" id="orc-search" placeholder="🔍 Buscar por cliente, descrição..." oninput="rOrcamentos()">
+      <input class="search-inp" id="orc-search" placeholder=" Buscar por cliente, descrição..." oninput="rOrcamentos()">
       <select class="fi" id="orc-filtro-sts" style="width:145px;flex:none" onchange="rOrcamentos()">
         <option value="">Todos status</option>
         <option>Pendente</option><option>Enviado</option><option>Aprovado</option><option>Convertido</option><option>Recusado</option>
@@ -852,7 +866,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <div class="page" id="pg-relatorio">
     <div class="topbar">
       <div><div class="pg-title">Relatórios</div><div class="pg-sub">Análise financeira completa do período</div></div>
-      <div class="tb-right"><button class="btn btn-pdf" onclick="gerarPDFRel()">📄 Baixar PDF</button></div>
+      <div class="tb-right"><button class="btn btn-pdf" onclick="gerarPDFRel()"> Baixar PDF</button></div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
       <input class="fi" type="month" id="rel-mes" style="width:155px;flex:none" onchange="renderRel()">
@@ -860,8 +874,8 @@ input:checked+.slider:before{transform:translateX(19px)}
       <button class="btn btn-gho btn-sm" onclick="relMesAtual()">Mês atual</button>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:18px">
-      <button id="btn-rel-resumido" class="btn btn-brn btn-sm" onclick="setModoRel('resumido')">📄 Resumido</button>
-      <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel('detalhado')">📋 Detalhado</button>
+      <button id="btn-rel-resumido" class="btn btn-brn btn-sm" onclick="setModoRel('resumido')"> Resumido</button>
+      <button id="btn-rel-detalhado" class="btn btn-gho btn-sm" onclick="setModoRel('detalhado')"> Detalhado</button>
     </div>
     <div id="rel-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px"></div>
     <div id="rel-detalhado-body" class="rel-oculto"></div>
@@ -888,19 +902,19 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="toggle-row"><div><div class="tl">Resumo diário</div><div class="ts">Todo dia às 8h</div></div><label class="switch"><input type="checkbox" id="tog-res" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
       <div class="toggle-row"><div><div class="tl">Cobrança pendente</div><div class="ts">Avisar sobre pagamentos em aberto às 9h</div></div><label class="switch"><input type="checkbox" id="tog-cob" checked onchange="salvarCfg()"><span class="slider"></span></label></div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bor)">
-        <button class="btn btn-gho btn-sm" onclick="testarNotif()">🧪 Testar notificação</button>
+        <button class="btn btn-gho btn-sm" onclick="testarNotif()"> Testar notificação</button>
       </div>
     </div>
-    <div class="panel notif-shell" id="notif-list"><div class="empty"><div class="empty-ico">🔔</div>Nenhuma notificação ainda</div></div>
+    <div class="panel notif-shell" id="notif-list"><div class="empty"><div class="empty-ico"></div>Nenhuma notificação ainda</div></div>
   </div>
 
   <!-- PERFIL -->
   <div class="page" id="pg-perfil">
     <div class="topbar"><div><div class="pg-title">Meu Perfil</div><div class="pg-sub">Dados que aparecem em orçamentos, recibos e relatórios</div></div></div>
     <div class="cfg-sec" id="migracao-box" style="display:none">
-      <div class="cfg-t" style="color:var(--blu)">☁️ Migrar dados antigos</div>
+      <div class="cfg-t" style="color:var(--blu)"> Migrar dados antigos</div>
       <p style="font-size:.83rem;color:var(--mut);margin-bottom:14px;line-height:1.6">Encontramos dados antigos salvos só neste aparelho. Migre para a nuvem para manter tudo junto na conta.</p>
-      <button class="btn btn-org" onclick="migrarDadosLocais()">☁️ Migrar meus dados</button>
+      <button class="btn btn-org" onclick="migrarDadosLocais()"> Migrar meus dados</button>
       <button class="btn btn-gho" onclick="document.getElementById('migracao-box').style.display='none'" style="margin-top:8px">Ignorar</button>
     </div>
     <div class="cfg-sec">
@@ -911,10 +925,10 @@ input:checked+.slider:before{transform:translateX(19px)}
         <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
           <div style="width:72px;height:72px;border-radius:10px;border:2px dashed var(--bor);background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0" id="logo-preview-box">
             <img id="logo-preview-img" style="width:100%;height:100%;object-fit:contain;display:none">
-            <span id="logo-placeholder-ico" style="font-size:1.6rem">🏢</span>
+            <span id="logo-placeholder-ico" style="font-size:1.6rem"></span>
           </div>
           <div style="flex:1;display:flex;flex-direction:column;gap:6px">
-            <button class="btn btn-gho btn-sm" style="justify-content:center" onclick="document.getElementById('logo-file-input').click()">📷 Enviar logo</button>
+            <button class="btn btn-gho btn-sm" style="justify-content:center" onclick="document.getElementById('logo-file-input').click()"> Enviar logo</button>
             <button class="btn btn-del btn-sm" id="logo-btn-remover" style="justify-content:center;display:none" onclick="removerLogo()">Remover</button>
             <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none" onchange="uploadLogo(this)">
           </div>
@@ -927,7 +941,7 @@ input:checked+.slider:before{transform:translateX(19px)}
           <span style="font-size:.82rem;color:var(--mut)">Nenhuma assinatura cadastrada</span>
         </div>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <button class="btn btn-gho btn-sm" style="flex:1;justify-content:center" onclick="abrirAssinaturaDigital()">✍️ Cadastrar assinatura</button>
+          <button class="btn btn-gho btn-sm" style="flex:1;justify-content:center" onclick="abrirAssinaturaDigital()"> Cadastrar assinatura</button>
           <button class="btn btn-del btn-sm" id="assinatura-btn-remover" style="display:none;justify-content:center" onclick="removerAssinaturaDigital()">Remover</button>
         </div>
         <div style="font-size:.72rem;color:var(--mut);margin-top:6px">A assinatura aparece automaticamente nos recibos pagos.</div>
@@ -937,8 +951,8 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-wpp" placeholder="(11) 99999-9999"></div>
       <div class="fg"><label class="fl">CNPJ <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label><input class="fi" id="edit-cnpj" placeholder="00.000.000/0001-00" maxlength="18"></div>
       <div class="fg"><label class="fl">Endereço <span style="font-weight:400;color:var(--mut);text-transform:none">(opcional)</span></label><input class="fi" id="edit-end" placeholder="Rua, número, cidade..."></div>
-      <button class="btn btn-org" onclick="atualizarPerfil()">💾 Salvar alterações</button>
-      <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%">🚪 Sair da conta</button>
+      <button class="btn btn-org" onclick="atualizarPerfil()"> Salvar alterações</button>
+      <button class="btn btn-del" onclick="fazerLogout()" style="margin-top:8px;width:100%"> Sair da conta</button>
     </div>
     <div class="cfg-sec">
       <div class="cfg-t"><span data-ico="wrench"></span> Meus serviços</div>
@@ -1025,19 +1039,19 @@ input:checked+.slider:before{transform:translateX(19px)}
           </div>
           <div id="assin-uso" style="font-size:.82rem;color:var(--mut);line-height:1.9;margin-bottom:14px"></div>
           <button class="btn btn-org" style="width:100%;justify-content:center;padding:13px" onclick="abrirWhatsAppPro()">
-            🚀 Fazer upgrade — R$ 49,90/mês
+             Fazer upgrade — R$ 49,90/mês
           </button>
           <div style="font-size:.72rem;color:var(--mut);text-align:center;margin-top:8px">PIX · Cartão · Boleto · Cancele quando quiser</div>
         </div>
         <div style="background:var(--org-bg);border-radius:12px;padding:14px">
           <div style="font-size:.75rem;font-weight:700;color:var(--org);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Plano Pro inclui:</div>
           <div style="font-size:.83rem;color:var(--brn);line-height:2">
-            ✅ Serviços ilimitados<br>
-            ✅ Clientes ilimitados<br>
-            ✅ Orçamentos ilimitados<br>
-            ✅ Todos os módulos<br>
-            ✅ Relatórios completos<br>
-            ✅ Suporte prioritário
+             Serviços ilimitados<br>
+             Clientes ilimitados<br>
+             Orçamentos ilimitados<br>
+             Todos os módulos<br>
+             Relatórios completos<br>
+             Suporte prioritário
           </div>
         </div>
       </div>
@@ -1045,15 +1059,15 @@ input:checked+.slider:before{transform:translateX(19px)}
         <!-- Card Pro ativo -->
         <div style="background:linear-gradient(135deg,#1a0f0a,#2d1810);border-radius:14px;padding:20px;margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:#fff">👑 Plano Pro</div>
+            <div style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:#fff"> Plano Pro</div>
             <span style="background:var(--org);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px">ATIVO</span>
           </div>
           <div style="font-size:.8rem;color:rgba(255,255,255,.5)" id="assin-expira">Renovação automática mensal</div>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr;gap:6px">
-            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Serviços ilimitados</div>
-            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Clientes ilimitados</div>
-            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Todos os módulos</div>
-            <div style="font-size:.78rem;color:rgba(255,255,255,.6)">✅ Suporte prioritário</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)"> Serviços ilimitados</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)"> Clientes ilimitados</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)"> Todos os módulos</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6)"> Suporte prioritário</div>
           </div>
         </div>
 
@@ -1135,7 +1149,7 @@ input:checked+.slider:before{transform:translateX(19px)}
   <!-- Modal Novo Material -->
 <div class="overlay" id="m-material">
   <div class="modal">
-    <div class="mt" id="m-material-titulo">📦 Novo Material <button class="xbtn" onclick="fecha('m-material')">✕</button></div>
+    <div class="mt" id="m-material-titulo"> Novo Material <button class="xbtn" onclick="fecha('m-material')">✕</button></div>
     <input type="hidden" id="mat-edit-idx" value="-1">
     <div class="fg"><label class="fl">Nome do material</label><input class="fi" id="mat-nome" placeholder="Ex: Tinta 18L, parafuso, cimento..."></div>
     <div class="frow">
@@ -1153,7 +1167,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Estoque mínimo</label><input class="fi" type="number" id="mat-minimo" placeholder="1" min="0" step="0.1"></div>
     </div>
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarMaterial()">✅ Salvar</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarMaterial()"> Salvar</button>
       <button class="btn btn-gho" onclick="fecha('m-material')">Cancelar</button>
     </div>
   </div>
@@ -1162,7 +1176,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Novo Produto -->
 <div class="overlay" id="m-produto">
   <div class="modal">
-    <div class="mt">🛍️ Novo Produto <button class="xbtn" onclick="fecha('m-produto')">✕</button></div>
+    <div class="mt"> Novo Produto <button class="xbtn" onclick="fecha('m-produto')">✕</button></div>
     <input type="hidden" id="prod-edit-idx" value="-1">
     <div class="fg"><label class="fl">Nome do produto</label><input class="fi" id="prod-nome" placeholder="Ex: Livro personalizado, caderno..."></div>
     <div class="frow">
@@ -1177,7 +1191,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarProduto()">✅ Salvar produto</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarProduto()"> Salvar produto</button>
       <button class="btn btn-gho" onclick="fecha('m-produto')">Cancelar</button>
     </div>
   </div>
@@ -1186,7 +1200,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Vender Produto -->
 <div class="overlay" id="m-vender">
   <div class="modal">
-    <div class="mt">💰 Registrar venda <button class="xbtn" onclick="fecha('m-vender')">✕</button></div>
+    <div class="mt"> Registrar venda <button class="xbtn" onclick="fecha('m-vender')">✕</button></div>
     <input type="hidden" id="vender-idx">
     <div id="vender-info" style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.88rem;color:var(--mut)"></div>
     <div class="fg"><label class="fl">Quantidade vendida</label><input class="fi" type="number" id="vender-qtd" placeholder="1" min="1" value="1"></div>
@@ -1196,7 +1210,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       </select>
     </div>
     <div class="mf">
-      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="confirmarVenda()">✅ Confirmar venda</button>
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="confirmarVenda()"> Confirmar venda</button>
       <button class="btn btn-gho" onclick="fecha('m-vender')">Cancelar</button>
     </div>
   </div>
@@ -1238,7 +1252,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Converter Orçamento em Serviço -->
 <div class="overlay" id="m-conv-orc">
   <div class="modal">
-    <div class="mt">✅ Converter em Serviço <button class="xbtn" onclick="fecha('m-conv-orc')">✕</button></div>
+    <div class="mt"> Converter em Serviço <button class="xbtn" onclick="fecha('m-conv-orc')">✕</button></div>
     <input type="hidden" id="conv-orc-idx">
     <div style="background:var(--grn-bg);border:1px solid rgba(26,107,60,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:.84rem">
       <div id="conv-orc-preview" style="color:var(--brn)"></div>
@@ -1248,7 +1262,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="conv-hr"></div>
     </div>
     <div class="mf">
-      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="converterOrcSrv()">✅ Criar serviço agendado</button>
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="converterOrcSrv()"> Criar serviço agendado</button>
       <button class="btn btn-gho" onclick="fecha('m-conv-orc')">Cancelar</button>
     </div>
   </div>
@@ -1257,7 +1271,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Nova Despesa -->
 <div class="overlay" id="m-desp">
   <div class="modal">
-    <div class="mt">💸 Nova Despesa <button class="xbtn" onclick="fecha('m-desp')">✕</button></div>
+    <div class="mt"> Nova Despesa <button class="xbtn" onclick="fecha('m-desp')">✕</button></div>
     <input type="hidden" id="desp-edit-idx" value="-1">
 
     <div class="fg">
@@ -1268,10 +1282,10 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div class="fg">
       <label class="fl">Categoria</label>
       <select class="fs" id="desp-cat" onchange="toggleAjudante()">
-        <option value="Mão de obra" id="opt-mao-obra">👷 Mão de obra (ajudante)</option>
+        <option value="Mão de obra" id="opt-mao-obra"> Mão de obra (ajudante)</option>
         <option value="Combustível">⛽ Combustível</option>
-        <option value="Ferramenta">🔨 Ferramenta / Equipamento</option>
-        <option value="Outro">📦 Outro</option>
+        <option value="Ferramenta"> Ferramenta / Equipamento</option>
+        <option value="Outro"> Outro</option>
       </select>
     </div>
 
@@ -1318,7 +1332,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     </div>
 
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarDesp()">✅ Salvar despesa</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarDesp()"> Salvar despesa</button>
       <button class="btn btn-gho" onclick="fecha('m-desp')">Cancelar</button>
     </div>
   </div>
@@ -1327,7 +1341,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Novo Serviço -->
 <div class="overlay" id="m-srv">
   <div class="modal">
-    <div class="mt">🔧 Novo Serviço <button class="xbtn" onclick="fecha('m-srv')">✕</button></div>
+    <div class="mt"> Novo Serviço <button class="xbtn" onclick="fecha('m-srv')">✕</button></div>
     <div class="frow">
       <div class="fg"><label class="fl">Data</label><input class="fi" type="date" id="s-dt"></div>
       <div class="fg"><label class="fl">Horário</label><input class="fi" type="time" id="s-hr"></div>
@@ -1339,19 +1353,19 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <!-- Campo prazo de entrega — aparece pra encomendas -->
     <div class="fg" id="s-prazo-box" style="display:none">
-      <label class="fl">📅 Prazo de entrega</label>
+      <label class="fl"> Prazo de entrega</label>
       <input class="fi" type="date" id="s-prazo">
     </div>
 
     <!-- Campo quantidade — aparece pra encomendas -->
     <div class="fg" id="s-qtd-box" style="display:none">
-      <label class="fl">📦 Quantidade de itens</label>
+      <label class="fl"> Quantidade de itens</label>
       <input class="fi" type="number" id="s-qtd" placeholder="Ex: 50 brigadeiros, 10 caixas..." min="1">
     </div>
 
     <!-- Pagamento em etapas — aparece pra cerimonial e construção -->
     <div id="s-etapas-box" style="display:none;background:var(--sur2);border-radius:10px;padding:12px;margin-bottom:10px">
-      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">💰 Pagamento em etapas</div>
+      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px"> Pagamento em etapas</div>
       <div class="frow">
         <div class="fg"><label class="fl">Entrada (R$)</label><input class="fi" type="number" id="s-entrada" placeholder="0,00" min="0" step="0.01" oninput="calcSaldo()"></div>
         <div class="fg"><label class="fl">Saldo restante</label><input class="fi" id="s-saldo" readonly style="color:var(--org);font-weight:700"></div>
@@ -1363,7 +1377,7 @@ input:checked+.slider:before{transform:translateX(19px)}
         <input type="checkbox" id="srv-agendar-outro" style="width:15px;height:15px;accent-color:var(--org)">
         Agendar outro
       </label>
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()">✅ Agendar serviço</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarSrv()"> Agendar serviço</button>
       <button class="btn btn-gho" onclick="fecha('m-srv')">Cancelar</button>
     </div>
   </div>
@@ -1372,7 +1386,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Finalizar Serviço -->
 <div class="overlay" id="m-fin-srv">
   <div class="modal modal-lg">
-    <div class="mt">⏹️ Finalizar Serviço <button class="xbtn" onclick="fecha('m-fin-srv')">✕</button></div>
+    <div class="mt"> Finalizar Serviço <button class="xbtn" onclick="fecha('m-fin-srv')">✕</button></div>
     <input type="hidden" id="fin-idx">
     <datalist id="dl-materiais-fin"></datalist>
 
@@ -1401,6 +1415,18 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
 
+    <div class="fg">
+      <label class="fl">Fotos do serviço</label>
+      <div id="fin-fotos-lista" class="photo-grid">
+        <div class="photo-empty" style="grid-column:1/-1">Nenhuma foto adicionada</div>
+      </div>
+      <div class="photo-actions">
+        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('antes')"><span data-ico="camera"></span>Antes</button>
+        <button class="btn btn-gho btn-sm" onclick="selecionarFotoServico('depois')"><span data-ico="image"></span>Depois</button>
+      </div>
+      <input type="file" id="srv-photo-input" accept="image/png,image/jpeg,image/jpg,image/webp" style="display:none" onchange="uploadFotoServico(this)">
+    </div>
+
     <div class="lucro-box" id="fin-lucro-box">
       <div class="lucro-row"><span style="color:var(--mut)">Valor cobrado</span><span id="fin-val-show" style="color:var(--grn);font-weight:700">R$ 0,00</span></div>
       <div class="lucro-row"><span style="color:var(--mut)">(−) Custos materiais</span><span id="fin-custo-show" style="color:var(--red);font-weight:700">R$ 0,00</span></div>
@@ -1410,7 +1436,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 
     <!-- Desconto de estoque — aparece só se módulo ativo -->
     <div id="fin-estoque-box" style="display:none;margin-bottom:14px">
-      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📦 Descontar do estoque</div>
+      <div style="font-size:.73rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px"> Descontar do estoque</div>
       <div id="fin-estoque-lista" style="display:flex;flex-direction:column;gap:6px"></div>
       <div style="font-size:.75rem;color:var(--mut);margin-top:6px;font-style:italic">Marque os materiais usados neste serviço</div>
     </div>
@@ -1428,7 +1454,7 @@ input:checked+.slider:before{transform:translateX(19px)}
       </div>
     </div>
     <div class="mf">
-      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="finalizarSrv()">✅ Finalizar serviço</button>
+      <button class="btn btn-grn" style="flex:1;justify-content:center" onclick="finalizarSrv()"> Finalizar serviço</button>
       <button class="btn btn-gho" onclick="fecha('m-fin-srv')">Cancelar</button>
     </div>
   </div>
@@ -1437,7 +1463,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Recebidos -->
 <div class="overlay" id="m-recebidos">
   <div class="modal modal-lg">
-    <div class="mt">✅ Recebido este mês <button class="xbtn" onclick="fecha('m-recebidos')">✕</button></div>
+    <div class="mt"> Recebido este mês <button class="xbtn" onclick="fecha('m-recebidos')">✕</button></div>
     <div style="background:linear-gradient(135deg,var(--grn-bg),#c8eed9);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
       <div>
         <div style="font-size:.7rem;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total recebido</div>
@@ -1452,7 +1478,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="rec-lista" style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px"></div>
     <div class="mf" style="margin-top:14px;border-top:1px solid var(--bor);padding-top:14px">
       <button class="btn btn-gho" style="flex:1;justify-content:center" onclick="fecha('m-recebidos');ir('recebimentos')">Ver todos os recebimentos</button>
-      <button class="btn btn-gho" onclick="fecha('m-recebidos');ir('relatorio')">📊 Relatório</button>
+      <button class="btn btn-gho" onclick="fecha('m-recebidos');ir('relatorio')"> Relatório</button>
     </div>
   </div>
 </div>
@@ -1460,7 +1486,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal Custos -->
 <div class="overlay" id="m-custos">
   <div class="modal modal-lg">
-    <div class="mt">💸 Custos do mês <button class="xbtn" onclick="fecha('m-custos')">✕</button></div>
+    <div class="mt"> Custos do mês <button class="xbtn" onclick="fecha('m-custos')">✕</button></div>
     <div style="background:linear-gradient(135deg,var(--red-bg),#fdd);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
       <div>
         <div style="font-size:.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total de custos</div>
@@ -1482,7 +1508,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Modal A Receber -->
 <div class="overlay" id="m-areceber">
   <div class="modal modal-lg">
-    <div class="mt">💰 A Receber <button class="xbtn" onclick="fecha('m-areceber')">✕</button></div>
+    <div class="mt"> A Receber <button class="xbtn" onclick="fecha('m-areceber')">✕</button></div>
 
     <!-- Resumo -->
     <div style="background:linear-gradient(135deg,var(--org-bg),#ffe8d6);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
@@ -1509,15 +1535,15 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- WhatsApp mensagens -->
 <div class="overlay" id="m-wpp">
   <div class="modal">
-    <div class="mt">📱 Avisar Cliente <button class="xbtn" onclick="fecha('m-wpp')">✕</button></div>
+    <div class="mt"> Avisar Cliente <button class="xbtn" onclick="fecha('m-wpp')">✕</button></div>
     <input type="hidden" id="wpp-idx">
     <p style="font-size:.82rem;color:var(--mut);margin-bottom:14px">Escolha a mensagem para enviar:</p>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('deslocamento')">🚗 Estou a caminho!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('chegada')">📍 Cheguei no local!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('atraso')">⏰ Vou me atrasar</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('concluido')">✅ Serviço concluído!</button>
-      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('cobranca')">💰 Lembrete de pagamento</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('deslocamento')"> Estou a caminho!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('chegada')"> Cheguei no local!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('atraso')"> Vou me atrasar</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('concluido')"> Serviço concluído!</button>
+      <button class="btn btn-wpp" style="justify-content:flex-start" onclick="enviarWpp('cobranca')"> Lembrete de pagamento</button>
     </div>
   </div>
 </div>
@@ -1525,16 +1551,16 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Relatório do serviço -->
 <div class="overlay" id="m-rel-srv">
   <div class="modal modal-lg">
-    <div class="mt">📄 Relatório do Serviço <button class="xbtn" onclick="fecha('m-rel-srv')">✕</button></div>
+    <div class="mt"> Relatório do Serviço <button class="xbtn" onclick="fecha('m-rel-srv')">✕</button></div>
     <input type="hidden" id="rel-srv-idx">
     <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px;cursor:pointer;background:var(--org-bg);border:1.5px solid var(--org-bg);border-radius:9px;padding:10px 14px;font-size:.86rem;font-weight:600;color:var(--brn2)">
       <input type="checkbox" id="rel-srv-desp" onchange="abrirRelSrv(document.getElementById('rel-srv-idx').value)" style="accent-color:var(--org);width:16px;height:16px">
-      💸 Incluir despesas e custos no relatório
+       Incluir despesas e custos no relatório
     </label>
     <div id="rel-srv-preview"></div>
     <div class="mf">
-      <button class="btn btn-pdf" onclick="pdfRelSrv()">📄 Baixar PDF</button>
-      <button class="btn btn-wpp" onclick="wppRelSrv()">📱 Enviar WhatsApp</button>
+      <button class="btn btn-pdf" onclick="pdfRelSrv()"> Baixar PDF</button>
+      <button class="btn btn-wpp" onclick="wppRelSrv()"> Enviar WhatsApp</button>
       <button class="btn btn-gho" onclick="fecha('m-rel-srv')">Fechar</button>
     </div>
   </div>
@@ -1543,7 +1569,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Assinatura digital -->
 <div class="overlay" id="m-assinatura-digital">
   <div class="modal">
-    <div class="mt">✍️ Assinatura para recibos <button class="xbtn" onclick="fecha('m-assinatura-digital')">✕</button></div>
+    <div class="mt"> Assinatura para recibos <button class="xbtn" onclick="fecha('m-assinatura-digital')">✕</button></div>
     <canvas id="assinatura-canvas" class="signature-pad"></canvas>
     <div class="signature-hint">Assine com o dedo na área branca. Essa assinatura será inserida automaticamente nos recibos.</div>
     <div class="mf">
@@ -1556,13 +1582,13 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Cliente -->
 <div class="overlay" id="m-cli">
   <div class="modal">
-    <div class="mt"><span id="modal-cli-ico">👤</span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
+    <div class="mt"><span id="modal-cli-ico"></span> Novo Cliente <button class="xbtn" onclick="fecha('m-cli')">✕</button></div>
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="c-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="c-wpp" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="c-srv" placeholder="Ex: Tipo de serviço..."></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="c-end" placeholder="Endereço principal"></div>
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarCli()">✅ Salvar</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarCli()"> Salvar</button>
       <button class="btn btn-gho" onclick="fecha('m-cli')">Cancelar</button>
     </div>
   </div>
@@ -1571,14 +1597,14 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Editar Cliente -->
 <div class="overlay" id="m-edit-cli">
   <div class="modal">
-    <div class="mt">✏️ Editar Cliente <button class="xbtn" onclick="fecha('m-edit-cli')">✕</button></div>
+    <div class="mt">✏ Editar Cliente <button class="xbtn" onclick="fecha('m-edit-cli')">✕</button></div>
     <input type="hidden" id="edit-cli-idx">
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" id="edit-cli-nm" placeholder="Nome do cliente"></div>
     <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="edit-cli-wpp" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">Tipo de serviço</label><input class="fi" id="edit-cli-srv" placeholder="Ex: Tipo de serviço..."></div>
     <div class="fg"><label class="fl">Endereço</label><input class="fi" id="edit-cli-end" placeholder="Endereço principal"></div>
     <div class="mf">
-      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarEditCli()">✅ Salvar alterações</button>
+      <button class="btn btn-org" style="flex:1;justify-content:center" onclick="salvarEditCli()"> Salvar alterações</button>
       <button class="btn btn-gho" onclick="fecha('m-edit-cli')">Cancelar</button>
     </div>
   </div>
@@ -1587,7 +1613,7 @@ input:checked+.slider:before{transform:translateX(19px)}
 <!-- Orçamento -->
 <div class="overlay" id="m-orc">
   <div class="modal modal-lg">
-    <div class="mt" id="m-orc-titulo">📋 Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
+    <div class="mt" id="m-orc-titulo"> Novo Orçamento <button class="xbtn" onclick="fecha('m-orc')">✕</button></div>
     <input type="hidden" id="orc-edit-idx" value="-1">
     <div class="frow">
       <div class="fg"><label class="fl">Cliente</label><input class="fi" id="o-cli" placeholder="Nome do cliente" list="dl-o"><datalist id="dl-o"></datalist></div>
@@ -1617,7 +1643,7 @@ input:checked+.slider:before{transform:translateX(19px)}
     <div id="orc-margem-prev" style="display:none;margin:-4px 0 12px;padding:10px 12px;border-radius:10px;background:var(--grn-bg);border:1px solid rgba(26,107,60,.18);font-size:.84rem"></div>
     <div class="fg"><label class="fl">Observações</label><input class="fi" id="o-obs" placeholder="Prazo, condições, materiais inclusos..."></div>
     <div class="mf">
-      <button class="btn btn-org" id="btn-salvar-orc" style="flex:1;justify-content:center" onclick="salvarOrc()">✅ Salvar orçamento</button>
+      <button class="btn btn-org" id="btn-salvar-orc" style="flex:1;justify-content:center" onclick="salvarOrc()"> Salvar orçamento</button>
       <button class="btn btn-gho" onclick="fecha('m-orc')">Cancelar</button>
     </div>
   </div>
@@ -1652,6 +1678,8 @@ const D = {
   cfg:        {togAg:true,togRes:true,togCob:true}
 };
 let finMats  = [];
+let finFotos = [];
+let fotoTipoAtual = 'depois';
 let orcItens = [];
 
 // ══════════════════════════════════════════
@@ -1668,7 +1696,7 @@ const SEGMENTOS = {
                'hidraulica','hidráulica','pintura','manutencao','manutenção',
                'pedreiro','encanador','eletricista','carpinteiro','gesseiro',
                'soldador','serralheiro','marcador'],
-    icone: '⚒️',
+    icone: 'wrench',
     labels: {genero:'m',servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Agendado','Em andamento','Realizado','Cancelado']}
@@ -1676,7 +1704,7 @@ const SEGMENTOS = {
   frete: {
     keywords: ['frete','transporte','caminhao','caminhão','entrega',
                'motorista','mudanca','mudança','logistica','logística','mototaxista'],
-    icone: '🚛',
+    icone: 'package',
     labels: {genero:'m',servico:'Frete',servicos:'Fretes',cliente:'Contratante',
              clientes:'Contratantes',materiais:'Custos da viagem',
              status:['Agendado','Em rota','Entregue','Cancelado']}
@@ -1684,7 +1712,7 @@ const SEGMENTOS = {
   confeitaria: {
     keywords: ['doces','confeitaria','bolo','brigadeiro','candy',
                'doceira','chocolate','torta','cupcake','bem casado','salgado'],
-    icone: '🍰',
+    icone: 'shopping-bag',
     labels: {genero:'m',servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Ingredientes',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -1692,7 +1720,7 @@ const SEGMENTOS = {
   cerimonial: {
     keywords: ['cerimonial','cerimonia','eventos','casamento','formatura',
                'buffet','decoracao','decoração','aniversario','aniversário','debutante'],
-    icone: '🎊',
+    icone: 'star',
     labels: {genero:'m',servico:'Evento',servicos:'Eventos',cliente:'Contratante',
              clientes:'Contratantes',materiais:'Fornecedores',
              status:['Proposta enviada','Contrato assinado','Em preparacao','Realizado']}
@@ -1700,7 +1728,7 @@ const SEGMENTOS = {
   artesanato: {
     keywords: ['papelaria','artesanato','biblia','biblia','portaretrato',
                'scrapbook','personalizado','personalizada','feltro','croche','bordado','costura'],
-    icone: '✂️',
+    icone: 'wrench',
     labels: {genero:'f',servico:'Encomenda',servicos:'Encomendas',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -1708,7 +1736,7 @@ const SEGMENTOS = {
   embalagens: {
     keywords: ['embalagens','caixas','baloes','balões','lembranca','lembrança',
                'kit','presente','mimo','laco','laço','ribbon'],
-    icone: '🎁',
+    icone: 'package',
     labels: {genero:'m',servico:'Pedido',servicos:'Pedidos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Recebido','Em producao','Pronto','Entregue']}
@@ -1716,7 +1744,7 @@ const SEGMENTOS = {
   beleza: {
     keywords: ['cabelo','unha','estetica','estética','manicure','cabeleireiro',
                'makeup','maquiagem','sobrancelha','lash','depilacao','depilação','massagem','nail'],
-    icone: '💅',
+    icone: 'user',
     labels: {genero:'m',servico:'Atendimento',servicos:'Atendimentos',cliente:'Cliente',
              clientes:'Clientes',materiais:'Produtos',
              status:['Agendado','Em atendimento','Concluido','Cancelado']}
@@ -1726,14 +1754,14 @@ const SEGMENTOS = {
                'video','vídeo','filmagem','drone','retratos',
                'filmmaker','cinegrafista','audiovisual','producao','produção',
                'cobertura','motion','editor','edicao','edição'],
-    icone: '📷',
+    icone: 'camera',
     labels: {genero:'f',servico:'Sessão',servicos:'Sessões',cliente:'Cliente',
              clientes:'Clientes',materiais:'Equipamentos',
              status:['Agendado','Em andamento','Editando','Entregue']}
   },
   geral: {
     keywords: [],
-    icone: '🛠️',
+    icone: 'sliders',
     labels: {genero:'m',servico:'Serviço',servicos:'Serviços',cliente:'Cliente',
              clientes:'Clientes',materiais:'Materiais',
              status:['Agendado','Em andamento','Realizado','Cancelado']}
@@ -1820,6 +1848,9 @@ const ICONS = {
   'bar-chart':'<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
   bell:'<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>',
   zap:'<path d="M13 2 4 14h7l-1 8 10-13h-7l0-7Z"/>',
+  camera:'<path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z"/><circle cx="12" cy="13" r="3"/>',
+  image:'<path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5Z"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4-4L5 21"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
   eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
   'eye-off':'<path d="m3 3 18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c6 0 10 8 10 8a16 16 0 0 1-3.1 4.2"/><path d="M6.5 6.5C3.8 8.3 2 12 2 12s4 8 10 8a10.5 10.5 0 0 0 4.2-.9"/>',
   menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
@@ -1969,10 +2000,10 @@ function toggleSenha(id, btn){
   if(!inp) return;
   if(inp.type === 'password'){
     inp.type = 'text';
-    btn.textContent = '🙈';
+    btn.textContent = 'Ocultar';
   } else {
     inp.type = 'password';
-    btn.textContent = '👁';
+    btn.textContent = 'Mostrar';
   }
 }
 
@@ -1998,7 +2029,7 @@ async function salvarNovaSenha(){
     mostrarTelaRedefinirSenha();
     toast('Erro: ' + error.message);
   } else {
-    document.getElementById('login-loading').innerHTML = '✅ Senha atualizada! Entrando...';
+    document.getElementById('login-loading').innerHTML = ' Senha atualizada! Entrando...';
     // Limpar hash da URL
     history.replaceState(null, '', window.location.pathname);
     setTimeout(async () => {
@@ -2033,7 +2064,7 @@ async function enviarResetSenha(){
     mostrarLogin();
     toast('Erro: ' + error.message);
   } else {
-    document.getElementById('login-loading').innerHTML = '✅ Link enviado! Verifique seu email.';
+    document.getElementById('login-loading').innerHTML = ' Link enviado! Verifique seu email.';
     setTimeout(mostrarLogin, 3000);
   }
 }
@@ -2082,7 +2113,7 @@ async function fazerLogout(){
   D.servicos=[]; D.clientes=[]; D.orcamentos=[];
   D.notifs=[]; D.despesas=[];
   D.perfil={nome:'',tipo:'',wpp:'',assinatura_data:'',meta:0};
-  toast('Até logo! 👋');
+  toast('Até logo! ');
 }
 
 function abrirRecebidos(){
@@ -2100,7 +2131,7 @@ function abrirRecebidos(){
   if(!pagos.length){
     lista.innerHTML = `
       <div style="text-align:center;padding:40px 20px;color:var(--mut)">
-        <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+        <div style="font-size:2.5rem;margin-bottom:12px"></div>
         <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Nenhum recebimento ainda</div>
         <div style="font-size:.85rem">Finalize serviços e marque como pago.</div>
       </div>`;
@@ -2169,7 +2200,7 @@ function abrirCustos(){
   // Bloco materiais
   html += `
     <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 8px;display:flex;justify-content:space-between">
-      <span>📦 Materiais dos serviços</span>
+      <span> Materiais dos serviços</span>
       <span style="color:var(--red)">${R$(tMats)}</span>
     </div>`;
 
@@ -2192,7 +2223,7 @@ function abrirCustos(){
   // Bloco despesas
   html += `
     <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 8px;display:flex;justify-content:space-between">
-      <span>💸 Despesas operacionais</span>
+      <span> Despesas operacionais</span>
       <span style="color:var(--red)">${R$(tDesp)}</span>
     </div>`;
 
@@ -2249,7 +2280,7 @@ function abrirAReceber(){
   if(!pendentes.length){
     lista.innerHTML = `
       <div style="text-align:center;padding:40px 20px;color:var(--mut)">
-        <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+        <div style="font-size:2.5rem;margin-bottom:12px"></div>
         <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Tudo em dia!</div>
         <div style="font-size:.85rem">Nenhum pagamento pendente no momento.</div>
       </div>`;
@@ -2262,11 +2293,11 @@ function abrirAReceber(){
     const tel = (cli?.wpp||'').replace(/[^0-9]/g,'');
     const nome = D.perfil.nome || 'Prestador';
     const msg  = encodeURIComponent(
-      `Olá, ${s.cli}! 😊
+      `Olá, ${s.cli}!
 
 Passando para lembrar sobre o pagamento de *${R$(s.val)}* referente ao serviço de *${s.tipo||'serviço'}* realizado em ${fd(s.dt)}.
 
-Quando puder, entre em contato! 🙏
+Quando puder, entre em contato!
 
 _${nome}_`
     );
@@ -2281,7 +2312,7 @@ _${nome}_`
         <div>
           <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--brn)">${s.cli||'—'}</div>
           <div style="font-size:.78rem;color:var(--mut);margin-top:2px">${s.tipo||'—'} · ${fd(s.dt)}</div>
-          ${tel ? '' : '<div style="font-size:.72rem;color:var(--red);margin-top:3px">⚠️ Sem WhatsApp cadastrado</div>'}
+          ${tel ? '' : '<div style="font-size:.72rem;color:var(--red);margin-top:3px"> Sem WhatsApp cadastrado</div>'}
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--org)">${R$(s.val)}</div>
@@ -2290,9 +2321,9 @@ _${nome}_`
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a href="${wppUrl}" target="_blank" class="btn btn-wpp btn-sm" style="flex:1;justify-content:center;text-decoration:none">
-          📱 Cobrar no WhatsApp
+           Cobrar no WhatsApp
         </a>
-        <button class="btn btn-grn btn-sm" onclick="marcarPagoModal(${idx},${i})">✅ Marcar pago</button>
+        <button class="btn btn-grn btn-sm" onclick="marcarPagoModal(${idx},${i})"> Marcar pago</button>
       </div>
     </div>`;
   }).join('');
@@ -2321,7 +2352,7 @@ function atualizarTotalAReceber(){
     const lista = document.getElementById('ar-lista');
     if(lista) lista.innerHTML = `
       <div style="text-align:center;padding:40px 20px;color:var(--mut)">
-        <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+        <div style="font-size:2.5rem;margin-bottom:12px"></div>
         <div style="font-weight:700;font-size:1rem;color:var(--brn);margin-bottom:6px">Tudo em dia!</div>
         <div style="font-size:.85rem">Todos os pagamentos foram recebidos!</div>
       </div>`;
@@ -2405,6 +2436,7 @@ async function carregarDadosSupabase(){
       entrada: s.entrada, saldo: s.saldo,
       sts_srv: s.sts_srv, sts_pag: s.sts_pag, pag: s.pag,
       materiais: s.materiais||[], desc_feito: s.desc_feito||'',
+      fotos: s.fotos||[],
       inicio: s.inicio, fim: s.fim, _dbid: s.id
     }));
 
@@ -2468,6 +2500,7 @@ async function sbSalvarServico(srv){
     qtd: srv.qtd||null, entrada: srv.entrada||null, saldo: srv.saldo||null,
     sts_srv: srv.sts_srv, sts_pag: srv.sts_pag||null, pag: srv.pag||null,
     materiais: srv.materiais||[], desc_feito: srv.desc_feito||null,
+    fotos: srv.fotos||[],
     inicio: srv.inicio||null, fim: srv.fim||null
   };
   try {
@@ -2640,14 +2673,14 @@ function save(){
 // ══════════════════════════════════════════
 async function salvarPerfil(){
   const nm = document.getElementById('p-nome').value.trim();
-  if(!nm) return toast('⚠️ Digite seu nome');
+  if(!nm) return toast(' Digite seu nome');
   D.perfil.nome = nm;
   D.perfil.tipo = document.getElementById('p-tipo').value.trim();
   D.perfil.segmento = detectarSegmento(D.perfil.tipo);
   await sbSalvarPerfil();
   document.getElementById('welcome').classList.remove('open');
   uiPerfil(); render();
-  toast('Bem-vindo, ' + nm + '! ⚡');
+  toast('Bem-vindo, ' + nm + '! ');
 }
 
 async function atualizarPerfil(){
@@ -2660,7 +2693,7 @@ async function atualizarPerfil(){
   D.perfil.segmento = detectarSegmento(D.perfil.tipo);
   await sbSalvarPerfil();
   uiPerfil();
-  toast('✅ Perfil atualizado!');
+  toast(' Perfil atualizado!');
 }
 
 function uiPerfil(){
@@ -2670,7 +2703,7 @@ function uiPerfil(){
   const SEG = SEGMENTOS[key];
   const ico = SEG.icone;
   D.perfil.segmento = key;
-  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ⚡` : `Olá! ⚡`;
+  document.getElementById('dash-ola').textContent = nm ? `Olá, ${nm.split(' ')[0]}! ` : `Olá! `;
   document.getElementById('sb-tipo').textContent  = tp || 'Gestão de Serviços';
   document.getElementById('sb-nome').textContent  = nm || 'Dados locais';
   aplicarSegmento(SEG);
@@ -2723,12 +2756,12 @@ function atualizarPreviewMeta(){
 
 async function salvarMeta(){
   const meta = parseFloat(document.getElementById('edit-meta').value) || 0;
-  if(!meta) return toast('⚠️ Digite um valor de meta');
+  if(!meta) return toast(' Digite um valor de meta');
   D.perfil.meta = meta;
   await sbSalvarPerfil();
   atualizarPreviewMeta();
   rDash();
-  toast('🎯 Meta de ' + R$(meta) + ' definida!');
+  toast(' Meta de ' + R$(meta) + ' definida!');
 }
 
 // ══════════════════════════════════════════
@@ -2817,7 +2850,7 @@ function abre(id){
   // Resetar modal serviço ao abrir
   if(id === 'm-srv'){
     const btn = document.querySelector('#m-srv .btn-org');
-    if(btn){ btn.disabled=false; btn.textContent='✅ Agendar serviço'; }
+    if(btn){ btn.disabled=false; btn.textContent=' Agendar serviço'; }
   }
   if(id === 'm-orc'){
     const editIdx = parseInt(document.getElementById('orc-edit-idx')?.value ?? '-1');
@@ -2839,6 +2872,11 @@ function fd(d){
   if(!d) return '—';
   const p = String(d).split('-');
   return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+}
+function htmlSafe(v){
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
 }
 function bdg(s){
   const m = {
@@ -3095,7 +3133,7 @@ function rDash(){
             <div style="margin-top:3px">${bdg(s.sts_srv)}</div>
           </div>
         </div>`).join('')
-    : '<div class="empty"><div class="empty-ico">🗓</div>Nenhum serviço hoje</div>';
+    : '<div class="empty"><div class="empty-ico"></div>Nenhum serviço hoje</div>';
 
   // Ocultar meta box se valores ocultos
   const metaBox = document.getElementById('dash-meta-box');
@@ -3110,12 +3148,12 @@ function rDash(){
     const diasRest = diasMes - hoje.getDate() + 1;
     const porDia = diasRest > 0 ? (falta/diasRest) : 0;
     let frase = '';
-    if(tRec === 0)     frase = `Meta: ${R$(META_MES)}. Você precisa de ${R$(porDia)}/dia 💪`;
-    else if(pct < 25)  frase = `${R$(tRec)} faturados. Faltam ${R$(falta)} — ${R$(porDia)}/dia 🔥`;
-    else if(pct < 50)  frase = `Quase na metade! Faltam ${R$(falta)} em ${diasRest} dias 🚀`;
-    else if(pct < 75)  frase = `Mais da metade! Faltam só ${R$(falta)} pra meta! 😤`;
-    else if(pct < 100) frase = `Quase lá! Só faltam ${R$(falta)} — você consegue! 🏅`;
-    else               frase = `🏆 Meta de ${R$(META_MES)} batida! Você é fera!`;
+    if(tRec === 0)     frase = `Meta: ${R$(META_MES)}. Você precisa de ${R$(porDia)}/dia `;
+    else if(pct < 25)  frase = `${R$(tRec)} faturados. Faltam ${R$(falta)} — ${R$(porDia)}/dia `;
+    else if(pct < 50)  frase = `Quase na metade! Faltam ${R$(falta)} em ${diasRest} dias `;
+    else if(pct < 75)  frase = `Mais da metade! Faltam só ${R$(falta)} pra meta! `;
+    else if(pct < 100) frase = `Quase lá! Só faltam ${R$(falta)} — você consegue! `;
+    else               frase = ` Meta de ${R$(META_MES)} batida! Você é fera!`;
     document.getElementById('dash-meta-txt').textContent = frase;
     document.getElementById('dash-meta-pct').textContent = pct + '%';
   } else if(metaBox){
@@ -3133,7 +3171,7 @@ function rDash(){
         <td class="hide-mob">${s.sts_pag ? bdg(s.sts_pag):'—'}</td>
       </tr>`).join('')
     : `<tr><td colspan="6"><div class="empty" style="padding:36px 20px">
-        <div class="empty-ico" id="empty-srv-ico" style="font-size:2.4rem;margin-bottom:10px">🚀</div>
+        <div class="empty-ico" id="empty-srv-ico" style="font-size:2.4rem;margin-bottom:10px"></div>
         <div style="font-weight:700;margin-bottom:6px">Tudo começa com o primeiro serviço!</div>
         <div style="margin-bottom:16px">Cadastre um serviço e veja seu negócio crescer aqui.</div>
         <button class="btn btn-org" onclick="abreSrv()">+ Cadastrar primeiro serviço</button>
@@ -3227,6 +3265,14 @@ function rServicos(){
       ${isReal&&(srv.materiais||[]).length>0?`
         <div class="srv-materials">
           Materiais: ${(srv.materiais||[]).map(m=>`${m.desc} (${R$(m.val)})`).join(', ')}
+        </div>`:''}
+      ${isReal&&fotosServico(srv).length?`
+        <div class="photo-grid">
+          ${fotosServico(srv).slice(0,4).map(f=>`
+            <div class="photo-box">
+              <img src="${htmlSafe(f.url)}" alt="Foto ${htmlSafe(f.tipo||'serviço')}">
+              <div class="photo-cap"><strong>${f.tipo==='antes'?'Antes':'Depois'}</strong></div>
+            </div>`).join('')}
         </div>`:''}
       <div class="srv-card-actions">
         ${acaoPrincipal}
@@ -3366,7 +3412,7 @@ async function salvarEditCli(){
   }
   await sbSalvarCliente(D.clientes[i]);
   fecha('m-edit-cli'); render();
-  toast('✅ Cliente atualizado!');
+  toast(' Cliente atualizado!');
 }
 
 function rOrcamentos(){
@@ -3515,7 +3561,7 @@ function autoPreencherCliente(){
 function abreSrv(){
   // Resetar botão antes de abrir
   const btn = document.querySelector('#m-srv .btn-org');
-  if(btn){ btn.disabled=false; btn.textContent='✅ Agendar serviço'; }
+  if(btn){ btn.disabled=false; btn.textContent=' Agendar serviço'; }
   // Mostrar campos conforme segmento atual
   const seg = D.perfil.segmento || 'geral';
   const segsP = ['confeitaria','artesanato','embalagens','fotografia'];
@@ -3575,7 +3621,7 @@ function calcSaldo(){
 
 async function salvarSrv(){
   const btnSrv = document.querySelector('#m-srv .btn-org');
-  if(btnSrv){ btnSrv.disabled=true; btnSrv.textContent='⏳ Agendando...'; }
+  if(btnSrv){ btnSrv.disabled=true; btnSrv.textContent=' Agendando...'; }
   const entrada = parseFloat(document.getElementById('s-entrada')?.value) || 0;
   const val     = parseFloat(document.getElementById('s-val').value) || 0;
   const o = {
@@ -3594,19 +3640,19 @@ async function salvarSrv(){
     materiais: [], desc_feito: '', inicio: null, fim: null
   };
   if(!o.cli || !o.dt){
-    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
-    return toast('⚠️ Preencha data e nome do cliente');
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent=' Agendar serviço'; }
+    return toast(' Preencha data e nome do cliente');
   }
   if(!verificarLimite('servico')){
-    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent=' Agendar serviço'; }
     return;
   }
 
   // Salvar no Supabase PRIMEIRO
   const saved = await sbSalvarServico(o);
   if(!saved){
-    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
-    return toast('⚠️ Erro ao salvar. Verifique sua conexão.');
+    if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent=' Agendar serviço'; }
+    return toast(' Erro ao salvar. Verifique sua conexão.');
   }
   o._dbid = saved.id;
   D.servicos.unshift(o);
@@ -3618,12 +3664,12 @@ async function salvarSrv(){
     const sc = await sbSalvarCliente(nc);
     if(sc) nc._dbid = sc.id;
     D.clientes.push(nc);
-    toast('✅ Serviço agendado! Cliente cadastrado 👤');
+    toast(' Serviço agendado! Cliente cadastrado ');
   } else {
-    toast('✅ Serviço agendado!');
+    toast(' Serviço agendado!');
   }
 
-  if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent='✅ Agendar serviço'; }
+  if(btnSrv){ btnSrv.disabled=false; btnSrv.textContent=' Agendar serviço'; }
   render();
   clr('s-cli','s-hr','s-tipo','s-end','s-val','s-prazo','s-qtd','s-entrada');
   const el = document.getElementById('s-saldo'); if(el) el.value = '';
@@ -3641,7 +3687,7 @@ async function iniciarSrv(i){
   D.servicos[i].sts_srv = 'Em andamento';
   D.servicos[i].inicio  = new Date().toISOString();
   render(); // render ANTES do await — usuário vê na hora
-  toast('▶️ Serviço iniciado!');
+  toast('▶ Serviço iniciado!');
   addNotif('agenda','Serviço iniciado','Serviço com ' + D.servicos[i].cli + ' iniciado agora.');
   // Salva no banco em background
   sbSalvarServico(D.servicos[i]).catch(e => console.error('iniciarSrv save:', e));
@@ -3666,7 +3712,7 @@ async function repetirServico(i){
   const novo = {
     dt, hr:s.hr||'', cli:s.cli, tipo:s.tipo, end:s.end||'', val:s.val||0,
     prazo:s.prazo||null, qtd:s.qtd||null, entrada:null, saldo:null,
-    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], desc_feito:'',
+    sts_srv:'Agendado', sts_pag:null, pag:null, materiais:[], fotos:[], desc_feito:'',
     inicio:null, fim:null
   };
   const ss = await sbSalvarServico(novo);
@@ -3684,10 +3730,12 @@ function abrirFinalizar(i){
   if(lbl) lbl.textContent = SEG ? SEG.labels.materiais : 'Custos do serviço';
   document.getElementById('fin-idx').value = i;
   finMats = [];
+  finFotos = [...(D.servicos[i].fotos || [])];
   clr('fin-desc','fin-mat-desc','fin-mat-val');
   document.getElementById('fin-val-edit').value = D.servicos[i].val || '';
   document.getElementById('fin-val-original').textContent = D.servicos[i].val ? `Valor combinado: ${R$(D.servicos[i].val)}` : '';
   renderFinMats(i);
+  renderFinFotos();
 
   // Mostrar seção de estoque se módulo ativo
   const estoqueBox = document.getElementById('fin-estoque-box');
@@ -3698,6 +3746,7 @@ function abrirFinalizar(i){
   }
 
   document.getElementById('m-fin-srv').classList.add('open');
+  hydrateIcons(document.getElementById('m-fin-srv'));
 }
 
 function renderEstoqueFinalizar(){
@@ -3765,13 +3814,86 @@ function renderFinMats(idx){
 function addMat(){
   const desc = document.getElementById('fin-mat-desc').value.trim();
   const val  = document.getElementById('fin-mat-val').value;
-  if(!desc||!val) return toast('⚠️ Preencha o material e o valor');
+  if(!desc||!val) return toast(' Preencha o material e o valor');
   finMats.push({desc, val: parseFloat(val)||0});
   clr('fin-mat-desc','fin-mat-val');
   document.getElementById('fin-mat-desc').focus();
   renderFinMats();
 }
 function remMat(j){ finMats.splice(j,1); renderFinMats(); }
+
+function fotosServico(s,tipo){
+  const fotos = Array.isArray(s?.fotos) ? s.fotos : [];
+  return tipo ? fotos.filter(f=>f.tipo===tipo) : fotos;
+}
+
+function renderFinFotos(){
+  const el = document.getElementById('fin-fotos-lista');
+  if(!el) return;
+  el.innerHTML = finFotos.length
+    ? finFotos.map((f,j)=>`
+        <div class="photo-box">
+          <img src="${htmlSafe(f.url)}" alt="Foto ${htmlSafe(f.tipo||'serviço')}">
+          <div class="photo-cap">
+            <strong>${(f.tipo||'serviço') === 'antes' ? 'Antes' : 'Depois'}</strong>
+            <button class="btn btn-del btn-sm" onclick="removerFotoServico(${j})" style="padding:3px 7px">${iconSvg('x')}</button>
+          </div>
+        </div>`).join('')
+    : '<div class="photo-empty" style="grid-column:1/-1">Nenhuma foto adicionada</div>';
+  hydrateIcons(el);
+}
+
+function selecionarFotoServico(tipo){
+  fotoTipoAtual = tipo === 'antes' ? 'antes' : 'depois';
+  document.getElementById('srv-photo-input')?.click();
+}
+
+async function uploadFotoServico(input){
+  const file = input.files?.[0];
+  if(!file) return;
+  if(!USER_ID) return toast('Faça login para enviar fotos');
+  if(!/^image\/(png|jpe?g|webp)$/i.test(file.type)) return toast('Envie uma imagem em PNG, JPG ou WebP');
+  if(file.size > 5*1024*1024) return toast('Imagem muito grande. Limite: 5 MB');
+
+  const idx = +document.getElementById('fin-idx').value;
+  const srv = D.servicos[idx] || {};
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const baseId = String(srv._dbid || srv.id || 'rascunho').replace(/[^a-zA-Z0-9_-]/g,'');
+  const path = `${USER_ID}/${baseId}/${fotoTipoAtual}-${Date.now()}.${ext}`;
+
+  toast('Enviando foto...');
+  try{
+    const { error } = await SUPA.storage.from('service-photos').upload(path, file, {
+      upsert: true,
+      contentType: file.type
+    });
+    if(error){ console.error('Foto upload:', error.message); return toast('Erro ao enviar foto: ' + error.message); }
+    const { data } = SUPA.storage.from('service-photos').getPublicUrl(path);
+    finFotos.push({
+      tipo: fotoTipoAtual,
+      url: data.publicUrl + '?v=' + Date.now(),
+      path,
+      nome: file.name,
+      criado_em: new Date().toISOString()
+    });
+    renderFinFotos();
+    toast('Foto adicionada');
+  }catch(e){
+    console.error('uploadFotoServico:', e);
+    toast('Erro ao enviar foto');
+  }finally{
+    input.value = '';
+  }
+}
+
+function removerFotoServico(j){
+  const foto = finFotos[j];
+  finFotos.splice(j,1);
+  renderFinFotos();
+  if(foto?.path){
+    SUPA.storage.from('service-photos').remove([foto.path]).catch(e=>console.error('remover foto:', e));
+  }
+}
 
 document.getElementById('fin-mat-val')?.addEventListener('keydown', e=>{ if(e.key==='Enter') addMat(); });
 
@@ -3787,6 +3909,7 @@ async function finalizarSrv(){
   D.servicos[i].pag       = pag;
   D.servicos[i].val       = valFinal;
   D.servicos[i].materiais = [...finMats];
+  D.servicos[i].fotos     = [...finFotos];
   D.servicos[i].desc_feito= desc;
   D.servicos[i].fim       = new Date().toISOString();
 
@@ -3805,7 +3928,7 @@ async function finalizarSrv(){
   }
 
   fecha('m-fin-srv'); render();
-  toast('✅ Serviço finalizado!');
+  toast(' Serviço finalizado!');
   addNotif('sistema','Serviço concluído',D.servicos[i].cli + ' — ' + D.servicos[i].tipo + '. ' + (sts_pag==='Pago'?'Pagamento confirmado.':'Pagamento pendente.'));
   sbSalvarServico(D.servicos[i]);
   if(D.perfil.modulos?.avaliacoes && confirm('Serviço concluído. Deseja pedir uma avaliação ao cliente agora?')){
@@ -3838,21 +3961,21 @@ async function marcarPendente(i){
   D.servicos[i].sts_pag = 'Pendente';
   await sbSalvarServico(D.servicos[i]);
   render();
-  toast('⏳ Marcado como pendente');
+  toast(' Marcado como pendente');
 }
 async function cancelarPag(i){
   if(!confirm('Cancelar este pagamento?')) return;
   D.servicos[i].sts_pag = 'Cancelado';
   await sbSalvarServico(D.servicos[i]);
   render();
-  toast('❌ Pagamento cancelado');
+  toast(' Pagamento cancelado');
 }
 async function delSrv(i){
   if(!confirm('Remover este serviço?')) return;
   const dbid = D.servicos[i]._dbid;
   D.servicos.splice(i,1);
   await sbDeletarServico(dbid);
-  render(); toast('🗑 Removido');
+  render(); toast(' Removido');
 }
 
 // ══════════════════════════════════════════
@@ -3867,10 +3990,10 @@ function enviarWpp(tipo){
   const tel  = cli?.wpp?.replace(/\D/g,'')||'';
   const nome = D.perfil.nome || 'Prestador';
   const msgs = {
-    deslocamento: `Olá ${s.cli}! 😊 Aqui é ${nome}. Estou a caminho para realizar o serviço. Em breve estarei aí! 🚗`,
-    chegada:      `Olá ${s.cli}! Aqui é ${nome}. Acabei de chegar no local. Pode me receber! 📍`,
-    atraso:       `Olá ${s.cli}! Aqui é ${nome}. Peço desculpas, vou me atrasar um pouco. Em breve estarei aí! ⏰`,
-    concluido:    `Olá ${s.cli}! Serviço de *${s.tipo||'serviço'}* concluído com sucesso! ✅\n\nFoi um prazer atendê-lo. Qualquer dúvida, estou à disposição!\n\n_${nome}_`,
+    deslocamento: `Olá ${s.cli}!  Aqui é ${nome}. Estou a caminho para realizar o serviço. Em breve estarei aí! `,
+    chegada:      `Olá ${s.cli}! Aqui é ${nome}. Acabei de chegar no local. Pode me receber! `,
+    atraso:       `Olá ${s.cli}! Aqui é ${nome}. Peço desculpas, vou me atrasar um pouco. Em breve estarei aí! `,
+    concluido:    `Olá ${s.cli}! Serviço de *${s.tipo||'serviço'}* concluído com sucesso! \n\nFoi um prazer atendê-lo. Qualquer dúvida, estou à disposição!\n\n_${nome}_`,
     cobranca:     `Olá, ${s.cli}! Tudo bem?\n\nEstou passando para lembrar sobre o pagamento de *${R$(s.val)}*, referente ao serviço de *${s.tipo||'serviço'}*.\n\nQuando puder, entre em contato.\n\n_${nome}_`
   };
   const msg = msgs[tipo]||'';
@@ -3879,7 +4002,7 @@ function enviarWpp(tipo){
     : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
   fecha('m-wpp');
-  toast('📱 Abrindo WhatsApp...');
+  toast(' Abrindo WhatsApp...');
 }
 
 // ══════════════════════════════════════════
@@ -3893,10 +4016,22 @@ function abrirRelSrv(i){
   const mats = s.materiais||[];
   const tMat = mats.reduce((a,b)=>a+(+b.val),0);
   const lucroSrv = (+s.val) - tMat;
+  const fotos = fotosServico(s);
+  const blocoFotos = fotos.length ? `
+    <div style="margin-top:10px;padding:10px 12px;background:var(--sur);border-radius:8px;border:1px solid var(--bor)">
+      <div style="font-size:.75rem;font-weight:700;color:var(--mut);margin-bottom:6px;text-transform:uppercase">Fotos do serviço</div>
+      <div class="photo-grid" style="margin:0">
+        ${fotos.slice(0,4).map(f=>`
+          <div class="photo-box">
+            <img src="${htmlSafe(f.url)}" alt="Foto ${htmlSafe(f.tipo||'serviço')}">
+            <div class="photo-cap"><strong>${f.tipo==='antes'?'Antes':'Depois'}</strong></div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
 
   const blocoDesp = inclDesp && mats.length ? `
     <div style="margin-top:10px;padding:9px 12px;background:var(--red-bg);border-radius:8px;border:1px solid rgba(184,50,50,.15)">
-      <div style="font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:6px;text-transform:uppercase">💸 Custos e materiais</div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--red);margin-bottom:6px;text-transform:uppercase"> Custos e materiais</div>
       ${mats.map(m=>`<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;border-bottom:1px dashed var(--bor)">
         <span>${m.desc}</span><span style="color:var(--red);font-weight:600">${R$(m.val)}</span>
       </div>`).join('')}
@@ -3907,7 +4042,7 @@ function abrirRelSrv(i){
 
   const blocoLucro = inclDesp ? `
     <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:${lucroSrv>=0?'var(--grn-bg)':'var(--red-bg)'};border-radius:8px;border:1px solid ${lucroSrv>=0?'rgba(26,107,60,.15)':'rgba(184,50,50,.15)'}">
-      <div style="font-size:.82rem;font-weight:700;color:var(--mut)">💰 Lucro real do serviço</div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--mut)"> Lucro real do serviço</div>
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:${lucroSrv>=0?'var(--grn)':'var(--red)'}">${R$(lucroSrv)}</div>
     </div>` : '';
 
@@ -3915,8 +4050,8 @@ function abrirRelSrv(i){
     <div style="background:var(--bg);border-radius:12px;padding:16px;border:1px solid var(--bor)">
       <div style="font-size:.7rem;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Pré-visualização do relatório</div>
       <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;margin-bottom:2px">${s.cli||'—'}</div>
-      <div style="font-size:.82rem;color:var(--mut)">📅 ${fd(s.dt)}${s.hr?' às '+s.hr:''}</div>
-      ${s.end?`<div style="font-size:.8rem;color:var(--mut)">📍 ${s.end}</div>`:''}
+      <div style="font-size:.82rem;color:var(--mut)"> ${fd(s.dt)}${s.hr?' às '+s.hr:''}</div>
+      ${s.end?`<div style="font-size:.8rem;color:var(--mut)"> ${s.end}</div>`:''}
       <div style="margin-top:10px;padding:9px 12px;background:var(--sur);border-radius:8px;border:1px solid var(--bor)">
         <div style="font-size:.75rem;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase">Serviço realizado</div>
         <div style="font-size:.9rem;font-weight:600;color:var(--org)">${s.tipo||'—'}</div>
@@ -3934,6 +4069,7 @@ function abrirRelSrv(i){
         </div>
       </div>
       ${blocoDesp}
+      ${blocoFotos}
       ${blocoLucro}
       ${!inclDesp?'<div style="font-size:.72rem;color:var(--mut);margin-top:8px;font-style:italic">* Marque a opção acima para incluir custos e lucro real</div>':''}
     </div>
@@ -3954,6 +4090,7 @@ async function pdfRelSrv(){
   const cnpj = D.perfil.cnpj || '';
   const wpp  = D.perfil.wpp  || '';
   const mats = s.materiais || [];
+  const fotos = fotosServico(s);
   const tMats = mats.reduce(function(a,b){ return a+(+b.val); }, 0);
   const lucro = (+s.val) - tMats;
   const inclDesp = document.getElementById('rel-srv-desp')?.checked;
@@ -4058,6 +4195,31 @@ async function pdfRelSrv(){
   }
 
   // ── Materiais ────────────────────────────────────────
+  if(fotos.length > 0){
+    if(y > 185){ doc.addPage(); y = 20; }
+    doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
+    doc.text('FOTOS DO SERVICO', 14, y); y += 6;
+    var imgW = (pw - 34) / 2;
+    var imgH = 48;
+    for(var fi=0; fi<Math.min(fotos.length, 4); fi++){
+      var f = fotos[fi];
+      var colX = fi % 2 === 0 ? 14 : 20 + imgW;
+      if(fi > 0 && fi % 2 === 0){ y += imgH + 12; }
+      if(y + imgH + 8 > ph - 24){ doc.addPage(); y = 20; }
+      try{
+        var fb = await logoParaBase64(f.url);
+        if(fb){
+          doc.setFillColor(...GRAY_L);
+          doc.roundedRect(colX, y, imgW, imgH, 2, 2, 'F');
+          doc.addImage(fb, colX, y, imgW, imgH);
+        }
+      }catch(e){}
+      doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
+      doc.text((f.tipo === 'antes' ? 'ANTES' : 'DEPOIS'), colX, y + imgH + 5);
+    }
+    y += imgH + 16;
+  }
+
   if(mats.length > 0){
     if(y > 200){ doc.addPage(); y = 20; }
     doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...GRAY_T);
@@ -4341,18 +4503,18 @@ function wppRelSrv(){
   const i = +document.getElementById('rel-srv-idx').value;
   const s = D.servicos[i];
   const nome = D.perfil.nome || 'Prestador';
-  let msg = `📋 *Relatório de Serviço*\n\n`;
-  const _ico = '⚡';
+  let msg = ` *Relatório de Serviço*\n\n`;
+  const _ico = '';
   msg += `${_ico} *${nome}*\n`;
-  msg += `👤 Cliente: ${s.cli||'—'}\n`;
-  msg += `📅 Data: ${fd(s.dt)}\n`;
-  if(s.end) msg += `📍 Local: ${s.end}\n`;
-  msg += `\n🔧 *Serviço: ${s.tipo||'—'}*\n`;
-  if(s.desc_feito) msg += `\n📝 O que foi feito:\n${s.desc_feito}\n`;
-  if(garantiaServico(s)) msg += `\n🛡️ Garantia: ${garantiaServico(s)}\n`;
-  msg += `\n💰 *Valor: ${R$(s.val)}*\n`;
-  msg += `💳 Pagamento: ${s.pag||'—'} · ${s.sts_pag||'—'}\n`;
-  if(D.perfil.wpp) msg += `\n📱 ${D.perfil.wpp}`;
+  msg += ` Cliente: ${s.cli||'—'}\n`;
+  msg += ` Data: ${fd(s.dt)}\n`;
+  if(s.end) msg += ` Local: ${s.end}\n`;
+  msg += `\n *Serviço: ${s.tipo||'—'}*\n`;
+  if(s.desc_feito) msg += `\n O que foi feito:\n${s.desc_feito}\n`;
+  if(garantiaServico(s)) msg += `\n Garantia: ${garantiaServico(s)}\n`;
+  msg += `\n *Valor: ${R$(s.val)}*\n`;
+  msg += ` Pagamento: ${s.pag||'—'} · ${s.sts_pag||'—'}\n`;
+  if(D.perfil.wpp) msg += `\n ${D.perfil.wpp}`;
   msg += `\n\n_Enviado via AutônomoPro_`;
 
   const cli = D.clientes.find(c=>c.nm===s.cli);
@@ -4360,7 +4522,7 @@ function wppRelSrv(){
   const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
   fecha('m-rel-srv');
-  toast('📱 Abrindo WhatsApp...');
+  toast(' Abrindo WhatsApp...');
 }
 
 // ══════════════════════════════════════════
@@ -4368,22 +4530,22 @@ function wppRelSrv(){
 // ══════════════════════════════════════════
 async function salvarCli(){
   const btnCli = document.querySelector('#m-cli .btn-org');
-  if(btnCli){ btnCli.disabled=true; btnCli.textContent='⏳ Salvando...'; }
+  if(btnCli){ btnCli.disabled=true; btnCli.textContent=' Salvando...'; }
   const o = {
     nm:  document.getElementById('c-nm').value.trim(),
     wpp: document.getElementById('c-wpp').value.trim(),
     srv: document.getElementById('c-srv').value.trim(),
     end: document.getElementById('c-end').value.trim()
   };
-  if(!o.nm) return toast('⚠️ Digite o nome do cliente');
-  if(D.clientes.find(c=>c.nm.toLowerCase()===o.nm.toLowerCase())) return toast('⚠️ Cliente já cadastrado');
-  if(!verificarLimite('cliente')){ if(btnCli){ btnCli.disabled=false; btnCli.textContent='✅ Salvar'; } return; }
+  if(!o.nm) return toast(' Digite o nome do cliente');
+  if(D.clientes.find(c=>c.nm.toLowerCase()===o.nm.toLowerCase())) return toast(' Cliente já cadastrado');
+  if(!verificarLimite('cliente')){ if(btnCli){ btnCli.disabled=false; btnCli.textContent=' Salvar'; } return; }
   const sc = await sbSalvarCliente(o);
   if(sc) o._dbid = sc.id;
   D.clientes.push(o);
-  if(btnCli){ btnCli.disabled=false; btnCli.textContent='✅ Salvar'; }
+  if(btnCli){ btnCli.disabled=false; btnCli.textContent=' Salvar'; }
   fecha('m-cli'); render();
-  toast('✅ Cliente cadastrado!');
+  toast(' Cliente cadastrado!');
   clr('c-nm','c-wpp','c-srv','c-end');
 }
 async function delCli(i){
@@ -4391,7 +4553,7 @@ async function delCli(i){
   const dbid = D.clientes[i]._dbid;
   D.clientes.splice(i,1);
   await sbDeletarCliente(dbid);
-  render(); toast('🗑 Removido');
+  render(); toast(' Removido');
 }
 
 function editarWppCli(i){
@@ -4403,7 +4565,7 @@ function editarWppCli(i){
   if(wpp === null) return;
   D.clientes[i].wpp = wpp.trim();
   save(); render();
-  toast('✅ WhatsApp cadastrado!');
+  toast(' WhatsApp cadastrado!');
 }
 
 // ══════════════════════════════════════════
@@ -4443,7 +4605,7 @@ function abreDesp(){
 
 async function salvarDesp(){
   const btnSalvar = document.querySelector('#m-desp .btn-org');
-  if(btnSalvar){ btnSalvar.disabled = true; btnSalvar.textContent = '⏳ Salvando...'; }
+  if(btnSalvar){ btnSalvar.disabled = true; btnSalvar.textContent = ' Salvando...'; }
   const nm   = document.getElementById('desp-nm').value.trim();
   const cat  = document.getElementById('desp-cat').value;
   const val  = parseFloat(document.getElementById('desp-val').value) || 0;
@@ -4454,16 +4616,16 @@ async function salvarDesp(){
   const npar = parseInt(document.getElementById('desp-nparc')?.value) || 1;
 
   if(!nm){
-    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent='✅ Salvar despesa'; }
-    return toast('⚠️ Digite o nome da despesa');
+    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent=' Salvar despesa'; }
+    return toast(' Digite o nome da despesa');
   }
   if(!val){
-    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent='✅ Salvar despesa'; }
-    return toast('⚠️ Digite o valor');
+    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent=' Salvar despesa'; }
+    return toast(' Digite o valor');
   }
   if(!dt){
-    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent='✅ Salvar despesa'; }
-    return toast('⚠️ Selecione a data');
+    if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent=' Salvar despesa'; }
+    return toast(' Selecione a data');
   }
 
   const nomeCompleto = (cat === 'Mão de obra' && ajud) ? nm + ' - ' + ajud : nm;
@@ -4483,16 +4645,16 @@ async function salvarDesp(){
       if(sd) nd._dbid = sd.id;
       D.despesas.unshift(nd);
     }
-    toast('✅ Despesa em ' + npar + 'x salva!');
+    toast(' Despesa em ' + npar + 'x salva!');
   } else {
     const nd = { nm:nomeCompleto, cat, val, dt, pag, parcela:null, totalParcelas:null };
     const sd = await sbSalvarDespesa(nd);
     if(sd) nd._dbid = sd.id;
     D.despesas.unshift(nd);
-    toast('✅ Despesa salva!');
+    toast(' Despesa salva!');
   }
 
-  if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent='✅ Salvar despesa'; }
+  if(btnSalvar){ btnSalvar.disabled=false; btnSalvar.textContent=' Salvar despesa'; }
   fecha('m-desp');
   // Forçar select pro mês da despesa salva
   const selMes = document.getElementById('desp-mes');
@@ -4519,7 +4681,7 @@ async function delDesp(id){
     D.despesas = D.despesas.filter(x=>(x._dbid||x.id) !== id);
     await sbDeletarDespesa(d._dbid);
   }
-  rDespesas(); toast('🗑 Removida');
+  rDespesas(); toast(' Removida');
 }
 
 function rDespesas(){
@@ -4553,7 +4715,7 @@ function rDespesas(){
 
   if(!lista.length){
     el.innerHTML = `<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" style="font-size:2.4rem;margin-bottom:12px">💸</div>
+      <div class="empty-ico" style="font-size:2.4rem;margin-bottom:12px"></div>
       <div style="font-weight:700;margin-bottom:6px">Nenhuma despesa em ${nomeMes(mes)}</div>
       <div style="margin-bottom:18px">Registre combustível, ajudantes e outras despesas do seu negócio.</div>
       <button class="btn btn-org" onclick="abreDesp()">+ Registrar despesa</button>
@@ -4633,7 +4795,7 @@ function renderOrcItens(){
 function addOrcItem(){
   const desc = document.getElementById('oi-desc').value.trim();
   const val  = document.getElementById('oi-val').value;
-  if(!desc||!val) return toast('⚠️ Preencha item e valor');
+  if(!desc||!val) return toast(' Preencha item e valor');
   orcItens.push({desc, val: parseFloat(val)||0});
   clr('oi-desc','oi-val');
   document.getElementById('oi-desc').focus();
@@ -4645,11 +4807,11 @@ document.getElementById('oi-val')?.addEventListener('keydown', e=>{ if(e.key==='
 
 async function salvarOrc(){
   const btnOrc = document.getElementById('btn-salvar-orc');
-  const resetBtnOrc = () => { if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; } };
+  const resetBtnOrc = () => { if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent=' Salvar orçamento'; } };
 
-  if(!orcItens.length){ return toast('⚠️ Adicione pelo menos 1 item'); }
+  if(!orcItens.length){ return toast(' Adicione pelo menos 1 item'); }
 
-  if(btnOrc){ btnOrc.disabled=true; btnOrc.textContent='⏳ Salvando...'; }
+  if(btnOrc){ btnOrc.disabled=true; btnOrc.textContent=' Salvando...'; }
 
   const editIdx = parseInt(document.getElementById('orc-edit-idx')?.value ?? '-1');
   const o = {
@@ -4664,35 +4826,35 @@ async function salvarOrc(){
     public_response: editIdx >= 0 ? D.orcamentos[editIdx].public_response : '',
     public_responded_at: editIdx >= 0 ? D.orcamentos[editIdx].public_responded_at : ''
   };
-  if(!o.cli){ resetBtnOrc(); return toast('⚠️ Informe o cliente'); }
+  if(!o.cli){ resetBtnOrc(); return toast(' Informe o cliente'); }
 
   if(editIdx >= 0){
     o._dbid = D.orcamentos[editIdx]._dbid;
     D.orcamentos[editIdx] = o;
     const so = await sbSalvarOrcamento(o);
-    if(!so){ 
-      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
-      return toast('⚠️ Erro ao salvar. Tente novamente.');
+    if(!so){
+      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent=' Salvar orçamento'; }
+      return toast(' Erro ao salvar. Tente novamente.');
     }
-    toast('✅ Orçamento atualizado!');
+    toast(' Orçamento atualizado!');
   } else {
     const so = await sbSalvarOrcamento(o);
-    if(!so){ 
-      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
-      return toast('⚠️ Erro ao salvar. Tente novamente.');
+    if(!so){
+      if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent=' Salvar orçamento'; }
+      return toast(' Erro ao salvar. Tente novamente.');
     }
     o._dbid = so.id;
     o.approval_token = so.approval_token || o.approval_token;
     D.orcamentos.unshift(o);
-    toast('✅ Orçamento salvo!');
+    toast(' Orçamento salvo!');
   }
 
   // Resetar modo edição
   document.getElementById('orc-edit-idx').value = '-1';
   const titulo = document.getElementById('m-orc-titulo');
-  if(titulo) titulo.childNodes[0].textContent = '📋 Novo Orçamento ';
+  if(titulo) titulo.childNodes[0].textContent = ' Novo Orçamento ';
 
-  if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent='✅ Salvar orçamento'; }
+  if(btnOrc){ btnOrc.disabled=false; btnOrc.textContent=' Salvar orçamento'; }
   fecha('m-orc'); render();
   clr('o-cli','o-desc','o-obs','o-garantia','o-custo-prev');
   orcItens = [];
@@ -4723,7 +4885,7 @@ async function converterOrcSrv(){
   if(o.sts === 'Convertido') return toast('Este orçamento já foi convertido em serviço.');
   const dt = document.getElementById('conv-dt').value;
   const hr = document.getElementById('conv-hr').value;
-  if(!dt) return toast('⚠️ Selecione a data');
+  if(!dt) return toast(' Selecione a data');
   const itens = orcItensPublicos(o);
   const meta = orcMeta(o);
   const total = totalOrcamento(o);
@@ -4755,7 +4917,7 @@ function abrirNovoOrc(){
   orcItens = [];
   document.getElementById('orc-edit-idx').value = '-1';
   const titulo = document.getElementById('m-orc-titulo');
-  if(titulo) titulo.childNodes[0].textContent = '📋 Novo Orçamento ';
+  if(titulo) titulo.childNodes[0].textContent = ' Novo Orçamento ';
   clr('o-cli','o-desc','o-obs','o-garantia','o-custo-prev');
   renderOrcItens();
   abre('m-orc');
@@ -4775,7 +4937,7 @@ function editarOrc(i){
   document.getElementById('o-custo-prev').value = meta.custo_previsto||'';
   renderOrcItens();
   const titulo = document.getElementById('m-orc-titulo');
-  if(titulo) titulo.childNodes[0].textContent = '✏️ Editar Orçamento ';
+  if(titulo) titulo.childNodes[0].textContent = '✏ Editar Orçamento ';
   abre('m-orc');
 }
 
@@ -4784,7 +4946,7 @@ async function delOrc(i){
   const dbid = D.orcamentos[i]._dbid;
   D.orcamentos.splice(i,1);
   await sbDeletarOrcamento(dbid);
-  rOrcamentos(); toast('🗑 Removido');
+  rOrcamentos(); toast(' Removido');
 }
 
 async function pdfOrc(i){
@@ -4993,19 +5155,19 @@ function wppOrc(i){
   const meta  = orcMeta(o);
   const total = totalOrcamento(o);
   const nome  = D.perfil.nome || 'Prestador';
-  let msg = `📋 *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
-  const _ico = '⚡';
+  let msg = ` *Orçamento #${String(i+1).padStart(3,'0')}*\n\n`;
+  const _ico = '';
   msg += `${_ico} *${nome}*\n`;
-  msg += `👤 Cliente: ${o.cli||'—'}\n`;
-  msg += `📅 Data: ${fd(o.dt)}\n`;
-  if(o.desc) msg += `📋 ${o.desc}\n`;
+  msg += ` Cliente: ${o.cli||'—'}\n`;
+  msg += ` Data: ${fd(o.dt)}\n`;
+  if(o.desc) msg += ` ${o.desc}\n`;
   msg += `\n*Itens:*\n`;
   itens.forEach(it=>{ msg += `• ${it.desc}: ${R$(it.val)}\n`; });
-  msg += `\n*💰 Total: ${R$(total)}*\n`;
-  if(o.valid) msg += `⏳ Válido até: ${fd(o.valid)}\n`;
-  if(meta.garantia) msg += `🛡️ Garantia: ${meta.garantia}\n`;
-  if(o.obs)   msg += `\n📌 ${o.obs}`;
-  if(D.perfil.wpp) msg += `\n\n📱 ${D.perfil.wpp}`;
+  msg += `\n* Total: ${R$(total)}*\n`;
+  if(o.valid) msg += ` Válido até: ${fd(o.valid)}\n`;
+  if(meta.garantia) msg += ` Garantia: ${meta.garantia}\n`;
+  if(o.obs)   msg += `\n ${o.obs}`;
+  if(D.perfil.wpp) msg += `\n\n ${D.perfil.wpp}`;
   msg += `\n\n_Enviado via AutônomoPro_`;
 
   const cli = D.clientes.find(c=>c.nm===o.cli);
@@ -5013,7 +5175,7 @@ function wppOrc(i){
   const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
   D.orcamentos[i].sts = 'Enviado'; sbSalvarOrcamento(D.orcamentos[i]); rOrcamentos();
-  toast('📱 Abrindo WhatsApp...');
+  toast(' Abrindo WhatsApp...');
 }
 
 // ══════════════════════════════════════════
@@ -5145,7 +5307,7 @@ function preencherTabelasRel(){
           <div style="border-top:1px dashed var(--bor);padding-top:8px">
             ${mats.map(m=>`
               <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;color:var(--mut)">
-                <span>📦 ${m.desc}</span>
+                <span> ${m.desc}</span>
                 <span style="color:var(--red);font-weight:600">−${R$(m.val)}</span>
               </div>`).join('')}
             <div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;padding-top:6px;border-top:1px solid var(--bor);margin-top:4px">
@@ -5159,7 +5321,7 @@ function preencherTabelasRel(){
   // Bloco despesas
   const blocoDesp = despMes.length ? `
     <div class="tw" style="margin-bottom:12px">
-      <div class="th"><div class="pt">💸 Despesas operacionais</div></div>
+      <div class="th"><div class="pt"> Despesas operacionais</div></div>
       <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead>
       <tbody>
         ${despMes.map(d=>`<tr>
@@ -5179,7 +5341,7 @@ function preencherTabelasRel(){
   const blocoLucro = `
     <div style="background:${lucroReal>=0?'linear-gradient(135deg,var(--grn-bg),#c8eed9)':'linear-gradient(135deg,var(--red-bg),#fdd)'};border:1.5px solid ${lucroReal>=0?'rgba(26,107,60,.2)':'rgba(184,50,50,.2)'};border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'};text-transform:uppercase;letter-spacing:.5px">📈 Lucro real do mês</div>
+        <div style="font-size:.72rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'};text-transform:uppercase;letter-spacing:.5px"> Lucro real do mês</div>
         <div style="font-size:.8rem;color:var(--mut);margin-top:2px">Recebido − Materiais − Despesas</div>
       </div>
       <div style="font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:${lucroReal>=0?'var(--grn)':'var(--red)'}">${R$(lucroReal)}</div>
@@ -5187,7 +5349,7 @@ function preencherTabelasRel(){
 
   body.innerHTML = `
     <div class="tw" style="margin-bottom:12px">
-      <div class="th"><div class="pt">🔧 Serviços realizados</div></div>
+      <div class="th"><div class="pt"> Serviços realizados</div></div>
       <div style="padding:12px">${blocoServicos}</div>
     </div>
     ${blocoDesp}
@@ -5198,7 +5360,7 @@ function preencherTabelasRel(){
 function gerarPDFRel(){
   const mes      = document.getElementById('rel-mes').value;
   const detalhado = _modoRelAtual === 'detalhado';
-  if(!window.jspdf){ toast('⚠️ Aguarde...'); return; }
+  if(!window.jspdf){ toast(' Aguarde...'); return; }
   const {jsPDF} = window.jspdf;
   const doc  = new jsPDF({unit:'mm',format:'a4'});
   const pw   = doc.internal.pageSize.getWidth();
@@ -5422,7 +5584,7 @@ function gerarPDFRel(){
   }
 
   doc.save(`relatorio-${mes}-${detalhado?'detalhado':'resumido'}.pdf`);
-  toast(`📄 PDF ${detalhado?'detalhado':'resumido'} gerado!`);
+  toast(` PDF ${detalhado?'detalhado':'resumido'} gerado!`);
 }
 
 
@@ -5448,7 +5610,7 @@ async function salvarModulo(nome, ativo){
     ajudantes:'Ajudantes',contrato:'Contrato digital',
     avaliacoes:'Avaliações'
   };
-  toast(ativo ? '✅ ' + (nomes[nome]||nome) + ' ativado!' : (nomes[nome]||nome) + ' desativado');
+  toast(ativo ? ' ' + (nomes[nome]||nome) + ' ativado!' : (nomes[nome]||nome) + ' desativado');
 }
 
 function aplicarModulos(){
@@ -5493,7 +5655,7 @@ function renderModulos(){
 // ══════════════════════════════════════════
 function abrirNovoMaterial(){
   document.getElementById('mat-edit-idx').value = -1;
-  document.getElementById('m-material-titulo').childNodes[0].textContent = '📦 Novo Material ';
+  document.getElementById('m-material-titulo').childNodes[0].textContent = ' Novo Material ';
   clr('mat-nome','mat-qtd','mat-custo','mat-minimo');
   document.getElementById('mat-unidade').value = 'un';
   abre('m-material');
@@ -5502,7 +5664,7 @@ function abrirNovoMaterial(){
 function editarMaterial(i){
   const m = D.materiais[i];
   document.getElementById('mat-edit-idx').value = i;
-  document.getElementById('m-material-titulo').childNodes[0].textContent = '✏️ Editar Material ';
+  document.getElementById('m-material-titulo').childNodes[0].textContent = '✏ Editar Material ';
   document.getElementById('mat-nome').value    = m.nome;
   document.getElementById('mat-unidade').value = m.unidade||'un';
   document.getElementById('mat-qtd').value     = m.quantidade;
@@ -5538,7 +5700,7 @@ async function salvarMaterial(){
 
   fecha('m-material');
   rMateriais();
-  toast('✅ Material salvo!');
+  toast(' Material salvo!');
 }
 
 async function deletarMaterial(i){
@@ -5547,7 +5709,7 @@ async function deletarMaterial(i){
   D.materiais.splice(i,1);
   if(dbid) await SUPA.from('materiais_estoque').delete().eq('id', dbid).eq('user_id', USER_ID);
   rMateriais();
-  toast('🗑 Removido');
+  toast(' Removido');
 }
 
 async function carregarMateriais(){
@@ -5579,7 +5741,7 @@ function rMateriais(){
 
   if(!lista.length){
     el.innerHTML = `<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px">📦</div>
+      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px"></div>
       <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum material ainda</div>
       <div style="margin-bottom:18px">Cadastre seus materiais e controle o estoque</div>
       <button class="btn btn-org" onclick="abrirNovoMaterial()">+ Cadastrar primeiro material</button>
@@ -5610,8 +5772,8 @@ function rMateriais(){
         <span style="font-size:.76rem;color:var(--mut)">Mínimo: ${m.estoque_minimo} ${m.unidade}</span>
       </div>
       <div class="srv-card-actions">
-        <button class="btn btn-gho btn-sm" onclick="editarMaterial(${i})">✏️ Editar</button>
-        <button class="btn btn-del btn-sm" onclick="deletarMaterial(${i})" style="margin-left:auto">🗑</button>
+        <button class="btn btn-gho btn-sm" onclick="editarMaterial(${i})">✏ Editar</button>
+        <button class="btn btn-del btn-sm" onclick="deletarMaterial(${i})" style="margin-left:auto"></button>
       </div>
     </div>`;
   }).join('');
@@ -5672,7 +5834,7 @@ async function salvarProduto(){
 
   fecha('m-produto');
   rProdutos();
-  toast('✅ Produto salvo!');
+  toast(' Produto salvo!');
 }
 
 function editarProduto(i){
@@ -5692,7 +5854,7 @@ function abrirVender(i){
   document.getElementById('vender-qtd').value = 1;
   document.getElementById('vender-info').innerHTML =
     `<strong>${p.nome}</strong><br>
-     Preço: <strong style="color:var(--grn)">${R$(p.preco)}</strong> · 
+     Preço: <strong style="color:var(--grn)">${R$(p.preco)}</strong> ·
      Estoque: <strong>${p.estoque}</strong> unid.`;
   abre('m-vender');
 }
@@ -5715,7 +5877,7 @@ async function confirmarVenda(){
 
   fecha('m-vender');
   rProdutos();
-  toast(`✅ ${qtd}x ${p.nome} vendido! ${R$(p.preco * qtd)}`);
+  toast(` ${qtd}x ${p.nome} vendido! ${R$(p.preco * qtd)}`);
 }
 
 async function deletarProduto(i){
@@ -5724,7 +5886,7 @@ async function deletarProduto(i){
   D.produtos.splice(i,1);
   if(dbid) await SUPA.from('produtos').delete().eq('id', dbid).eq('user_id', USER_ID);
   rProdutos();
-  toast('🗑 Produto removido');
+  toast(' Produto removido');
 }
 
 async function carregarProdutos(){
@@ -5747,7 +5909,7 @@ function rProdutos(){
 
   if(!lista.length){
     el.innerHTML = `<div class="empty" style="padding:48px 20px">
-      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px">🛍️</div>
+      <div class="empty-ico" style="font-size:2.5rem;margin-bottom:12px"></div>
       <div style="font-weight:700;font-size:1rem;margin-bottom:6px">Nenhum produto ainda</div>
       <div style="margin-bottom:18px">Cadastre seus produtos e controle o estoque</div>
       <button class="btn btn-org" onclick="abrirNovoProduto()">+ Cadastrar primeiro produto</button>
@@ -5791,14 +5953,14 @@ function rProdutos(){
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
         <span style="font-size:.78rem;color:${semEstoque?'var(--red)':'var(--mut)'}">
-          📦 Estoque: <strong>${p.estoque}</strong>
+           Estoque: <strong>${p.estoque}</strong>
         </span>
         ${semEstoque ? '<span class="badge b-r">Sem estoque</span>' : ''}
       </div>
       <div class="srv-card-actions">
-        ${!semEstoque ? `<button class="btn btn-grn btn-sm" onclick="abrirVender(${i})">💰 Vender</button>` : ''}
-        <button class="btn btn-gho btn-sm" onclick="editarProduto(${i})">✏️ Editar</button>
-        <button class="btn btn-del btn-sm" onclick="deletarProduto(${i})" style="margin-left:auto">🗑</button>
+        ${!semEstoque ? `<button class="btn btn-grn btn-sm" onclick="abrirVender(${i})"> Vender</button>` : ''}
+        <button class="btn btn-gho btn-sm" onclick="editarProduto(${i})">✏ Editar</button>
+        <button class="btn btn-del btn-sm" onclick="deletarProduto(${i})" style="margin-left:auto"></button>
       </div>
     </div>`;
   }).join('');
@@ -5819,7 +5981,7 @@ async function carregarAjudantes(){
 }
 
 function abrirNovoAjudante(){
-  toast('Módulo Ajudantes em breve! 🔨');
+  toast('Módulo Ajudantes em breve! ');
 }
 
 // ══════════════════════════════════════════
@@ -6031,7 +6193,7 @@ async function salvarAssinaturaDigital(){
   await sbSalvarPerfil();
   fecha('m-assinatura-digital');
   uiPerfil();
-  toast('✅ Assinatura salva!');
+  toast(' Assinatura salva!');
 }
 
 async function removerAssinaturaDigital(){
@@ -6121,9 +6283,9 @@ function renderAssinatura(){
     const orcs  = D.orcamentos.filter(o=>(o.dt||'').startsWith(mes)).length;
     const uso   = document.getElementById('assin-uso');
     if(uso) uso.innerHTML =
-      '📋 Servicos: <strong>' + srvs + '/5</strong> este mes<br>' +
-      '👤 Clientes: <strong>' + clis + '/10</strong> cadastrados<br>' +
-      '📄 Orçamentos: <strong>' + orcs + '/3</strong> este mês';
+      ' Servicos: <strong>' + srvs + '/5</strong> este mes<br>' +
+      ' Clientes: <strong>' + clis + '/10</strong> cadastrados<br>' +
+      ' Orçamentos: <strong>' + orcs + '/3</strong> este mês';
   }
 }
 
@@ -6165,8 +6327,8 @@ async function obSalvarDados(){
   const nome = document.getElementById('ob-nome')?.value.trim();
   const wpp  = document.getElementById('ob-wpp')?.value.trim();
   const cnpj = document.getElementById('ob-cnpj')?.value.trim();
-  if(!nome) return toast('⚠️ Digite seu nome');
-  if(!wpp)  return toast('⚠️ Digite seu WhatsApp');
+  if(!nome) return toast(' Digite seu nome');
+  if(!wpp)  return toast(' Digite seu WhatsApp');
 
   D.perfil.nome       = nome;
   D.perfil.wpp        = wpp;
@@ -6189,7 +6351,7 @@ async function obConcluir(){
     aplicarSegmento(SEGMENTOS[_obSegmento] || SEGMENTOS.geral);
   }
   render(); uiPerfil();
-  toast('✅ Bem-vindo ao AutônomoPro!');
+  toast(' Bem-vindo ao AutônomoPro!');
 }
 
 // Verificar se deve mostrar onboarding
@@ -6312,7 +6474,7 @@ async function migrarDadosLocais(){
 
     document.getElementById('migracao-box').style.display = 'none';
     render(); uiPerfil();
-    toast('✅ Dados migrados com sucesso!');
+    toast(' Dados migrados com sucesso!');
   }catch(e){
     console.error('Erro na migração:', e);
     toast('Erro ao migrar. Tente novamente.');
@@ -6323,15 +6485,15 @@ async function migrarDadosLocais(){
 // NOTIFICAÇÕES
 // ══════════════════════════════════════════
 async function ativarNotifs(){
-  if(!('Notification' in window)){ toast('❌ Não suportado neste navegador'); return; }
+  if(!('Notification' in window)){ toast(' Não suportado neste navegador'); return; }
   const p = await Notification.requestPermission();
   if(p==='granted'){
-    document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
+    document.getElementById('btn-ativar').textContent=' Notificações ativas';
     document.getElementById('btn-ativar').className='btn btn-ok';
-    toast('🔔 Notificações ativadas!');
+    toast(' Notificações ativadas!');
     addNotif('sistema','Notificações ativadas','Você receberá alertas automáticos.');
   } else {
-    toast('❌ Permissão negada');
+    toast(' Permissão negada');
   }
 }
 
@@ -6340,7 +6502,7 @@ function iniciarNotificacoes(){
   setInterval(verificarNotifs, 60000);
   verificarNotifs();
   if('Notification' in window && Notification.permission==='granted'){
-    document.getElementById('btn-ativar').textContent='✅ Notificações ativas';
+    document.getElementById('btn-ativar').textContent=' Notificações ativas';
     document.getElementById('btn-ativar').className='btn btn-ok';
   }
 }
@@ -6408,7 +6570,7 @@ function testarNotif(){
     addNotif('sistema','Notificações configuradas',msg);
     toast('Notificação enviada!');
   } else {
-    toast('⚠️ Ative as notificações primeiro');
+    toast(' Ative as notificações primeiro');
     ativarNotifs();
   }
 }
@@ -6474,7 +6636,7 @@ function executarAcaoNotif(action){
   const m = action.match(/ir\('([^']+)'\)/);
   if(m && NAV_PAGES.includes(m[1])) return ir(m[1]);
 }
-function limparNotifs(){ D.notifs=[]; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); toast('🗑 Notificações limpas'); }
+function limparNotifs(){ D.notifs=[]; salvarNotifsLocal(); atualizarBadge(); renderNotifs(); toast(' Notificações limpas'); }
 
 function atualizarBadge(){
   const n   = D.notifs.filter(x=>!x.lida).length;
@@ -6491,16 +6653,16 @@ async function salvarCfg(){
     togCob: document.getElementById('tog-cob').checked
   };
   await sbSalvarPerfil(); // cfg salvo junto com perfil
-  toast('✅ Configuração salva!');
+  toast(' Configuração salva!');
 }
 
 // ══════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════
 function limparTudo(){
-  if(!confirm('⚠️ Isso vai apagar TODOS os dados. Tem certeza?')) return;
+  if(!confirm(' Isso vai apagar TODOS os dados. Tem certeza?')) return;
   D.servicos=[]; D.clientes=[]; D.orcamentos=[]; D.notifs=[];
-  save(); render(); toast('🗑 Todos os dados apagados');
+  save(); render(); toast(' Todos os dados apagados');
 }
 
 // ══════════════════════════════════════════
@@ -6554,8 +6716,8 @@ function toast(msg, dur){
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = 'toast';
-  if(msg.includes('✅')) el.classList.add('t-ok');
-  else if(msg.includes('⚠️')||msg.includes('❌')||msg.includes('Erro')) el.classList.add('t-err');
+  if(msg.includes('')) el.classList.add('t-ok');
+  else if(msg.includes('')||msg.includes('')||msg.includes('Erro')) el.classList.add('t-err');
   el.style.display = 'block';
   clearTimeout(tT);
   tT = setTimeout(()=>el.style.display='none', dur||3200);
@@ -6565,9 +6727,9 @@ function toastPagamentoRecebido(i){
   const el = document.getElementById('toast');
   el.className = 'toast t-ok';
   el.innerHTML = `
-    <div>✅ Pagamento marcado como recebido</div>
+    <div> Pagamento marcado como recebido</div>
     <div class="toast-action">
-      <button class="btn btn-sm" onclick="pdfRecibo(${i});document.getElementById('toast').style.display='none'">🧾 Gerar recibo</button>
+      <button class="btn btn-sm" onclick="pdfRecibo(${i});document.getElementById('toast').style.display='none'"> Gerar recibo</button>
     </div>`;
   el.style.display = 'block';
   clearTimeout(tT);
