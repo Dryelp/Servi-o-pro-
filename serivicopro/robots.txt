@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://autonomopro.vercel.app/sitemap.xml
+Disallow: /p/
+Disallow: /sitemap.xml

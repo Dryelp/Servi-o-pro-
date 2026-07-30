@@ -1,4 +1,4 @@
-const CACHE = 'autonomopro-v27';
+const CACHE = 'autonomopro-v28';
 const FILES = [
   './index.html',
   './orcamento.html',
